@@ -2,6 +2,7 @@
 {% from "_ui.html" import icon, avatar, status_badge %}
 
 {% block title %}Admin Overview — Anti-Imbak{% endblock %}
+{% block body_class %}dashboard-page admin-page admin-overview{% endblock %}
 {% block admin_breadcrumb %}Overview{% endblock %}
 {% block admin_title %}Operations overview{% endblock %}
 {% block admin_subtitle %}
@@ -193,7 +194,7 @@
   </section>
 </div>
 
-<div class="dash-grid dash-grid--two">
+<div class="dash-grid dash-grid--two dash-grid--stack">
   <section class="panel panel--flush">
     <div class="panel-head panel-head--inline panel-head--padded">
       <div><span class="eyebrow">{{ icon('receipt') }} Ledger</span><h2>Recent transactions</h2></div>

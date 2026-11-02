@@ -2252,3 +2252,48 @@ a.admin-mini-row:hover strong {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* --------------------------------------------------------------------------
+   Overview: page-level scrollbar and full-width ledger
+   The admin workspace uses the browser scrollbar on desktop so it sits
+   outside the console instead of inside the content column, and panels that
+   hold wide tables stretch across the full content width.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1121px) {
+  .admin-page {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .admin-page .dashboard-main {
+    height: auto;
+    padding: clamp(1rem, 2.4vw, 2rem) 0 clamp(3rem, 6vw, 5rem);
+    overflow: visible;
+  }
+
+  .admin-page .dashboard-shell,
+  .admin-page .dashboard-layout {
+    height: auto;
+  }
+
+  .admin-page .dash-content {
+    display: block;
+    height: auto;
+  }
+
+  .admin-page .dash-scroll {
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .admin-page .dash-sidebar {
+    top: calc(var(--header-h) + 1rem);
+    max-height: calc(100vh - var(--header-h) - 2rem);
+  }
+}
+
+.admin-overview .dash-grid--stack {
+  grid-template-columns: minmax(0, 1fr);
+}
