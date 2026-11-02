@@ -173,10 +173,6 @@ PREVIEW_CSS = """\
     font-size: 0.68rem;
   }
 
-  .static-preview-bar .static-preview-copy {
-    display: none;
-  }
-
   .static-preview-links a {
     padding: 0.14rem 0.4rem;
     font-size: 0.62rem;
@@ -260,9 +256,6 @@ def render_banner(root_prefix: str, workspace_prefix: str, current: str) -> str:
     return (
         '<div class="static-preview-bar" role="note">'
         '<span class="static-preview-badge">Static preview</span>'
-        '<span class="static-preview-copy">'
-        "GitHub Pages snapshot. Accounts and actions run in the Flask app."
-        "</span>"
         f'<span class="static-preview-links">{"".join(links)}</span>'
         f'<a href="{REPO_URL}#quick-start" target="_blank" rel="noopener">Run locally &rarr;</a>'
         "</div>"
