@@ -1,0 +1,25 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, listing_card, empty_state %}
+
+{% block title %}Saved Items — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}Saved items{% endblock %}
+{% block dash_title %}Saved items{% endblock %}
+{% block dash_subtitle %}
+<p>{{ listings|length }} {{ listings|length|plural('find') }} kept for later. Save now, decide when the timing is right.</p>
+{% endblock %}
+{% block dash_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Browse Marketplace</a>
+{% endblock %}
+
+{% block dash_content %}
+{% if listings %}
+<div class="listing-grid listing-grid--three saved-grid">
+  {% for listing in listings %}{{ listing_card(listing) }}{% endfor %}
+</div>
+<div class="saved-note">{{ icon('info') }} Saved items are not reserved. If someone else claims an item first, it may no longer be available. You can always message the Donor to ask about its condition.</div>
+{% else %}
+<div class="panel">
+  {{ empty_state('heart', 'Nothing saved yet', 'Tap the heart on any donation to keep it here while you decide. Saved finds stay in your workspace, not on someone else’s.', 'Explore free items', url_for('public.browse')) }}
+</div>
+{% endif %}
+{% endblock %}

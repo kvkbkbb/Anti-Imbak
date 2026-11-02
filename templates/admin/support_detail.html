@@ -1,0 +1,184 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar, verified_badge %}
+
+{% block title %}{{ concern.ticket_code }} — User Concerns{% endblock %}
+{% block admin_breadcrumb %}<a href="{{ url_for('admin.support') }}">User concerns</a> {{ icon('chevron-right') }} {{ concern.ticket_code }}{% endblock %}
+{% block admin_title %}{{ concern.subject }}{% endblock %}
+{% block admin_subtitle %}
+<p>{{ concern.category }} · opened {{ concern.created_at|time_ago }} by {{ concern.user_name }}.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.support') }}">{{ icon('arrow-left') }} Concern queue</a>
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.activity', q=concern.ticket_code) }}">{{ icon('list') }} Audit trail</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="case-detail-grid support-detail-grid">
+  <div class="case-detail-main">
+    <section class="panel support-thread-panel">
+      <div class="panel-head panel-head--inline">
+        <div>
+          <span class="eyebrow">{{ icon('message-circle') }} Conversation</span>
+          <h2>{{ concern.ticket_code }} · {{ concern.subject }}</h2>
+          <p>Member messages and support replies in one thread.</p>
+        </div>
+        <span class="status status--{{ concern.status|status_tone }}">{{ concern.status|support_status_label }}</span>
+      </div>
+
+      <div class="support-thread">
+        {% for message in messages %}
+        <article class="support-message {% if message.is_admin %}support-message--admin{% else %}support-message--member{% endif %}">
+          <div class="support-message-avatar">
+            {% if message.is_admin %}
+            <span class="support-agent-avatar">{{ icon('shield-check') }}</span>
+            {% else %}
+            {{ avatar(message.sender_name or concern.user_name, message.sender_avatar or concern.user_avatar, 'avatar--sm') }}
+            {% endif %}
+          </div>
+          <div class="support-message-body">
+            <div class="support-message-head">
+              <strong>{{ message.sender_label if message.is_admin else (message.sender_name or concern.user_name) }}</strong>
+              {% if message.is_admin %}<span class="mini-tag mini-tag--cyan">{{ icon('shield-check') }} Support team</span>{% else %}<span class="mini-tag">Member</span>{% endif %}
+              <time>{{ message.created_at|time_ago }}</time>
+            </div>
+            <p>{{ message.body }}</p>
+            <small>{{ message.created_at|long_date }}</small>
+          </div>
+        </article>
+        {% else %}
+        <article class="support-message support-message--member">
+          <div class="support-message-avatar">{{ avatar(concern.user_name, concern.user_avatar, 'avatar--sm') }}</div>
+          <div class="support-message-body">
+            <div class="support-message-head">
+              <strong>{{ concern.user_name }}</strong><span class="mini-tag">Member</span><time>{{ concern.created_at|time_ago }}</time>
+            </div>
+            <p>{{ concern.message }}</p>
+            <small>{{ concern.created_at|long_date }}</small>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      {% if concern.resolution %}
+      <div class="support-resolution">
+        <span>{{ icon('check-circle') }}</span>
+        <div><strong>Resolution summary</strong><p>{{ concern.resolution }}</p><small>Recorded {{ concern.resolved_at|long_date if concern.resolved_at else 'as part of this concern' }}.</small></div>
+      </div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('admin.support_action', concern_id=concern.id) }}" class="support-reply-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="reply">
+        <label class="field">
+          <span>Reply to {{ concern.user_name.split()[0] }}</span>
+          <textarea id="support-reply" name="body" rows="4" maxlength="3000" placeholder="Write a clear, kind reply. Empty replies use a predefined sample response."></textarea>
+        </label>
+        <div class="support-reply-actions">
+          <span class="support-reply-note">{{ icon('info') }} The member receives a notification in their account. No external email or SMS is sent.</span>
+          <button class="btn btn-primary" type="submit">{{ icon('send') }} Send reply</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel support-guidance">
+      <div class="panel-head panel-head--inline">
+        <div><span class="eyebrow">{{ icon('book-open') }} Response guide</span><h2>Sample replies for this category</h2></div>
+      </div>
+      <div class="support-snippet-list">
+        <button class="support-snippet" type="button" data-fill-target="#support-reply" data-fill-text="Thanks for reaching out. I’ve checked your account and everything looks correct on our side. I’ll keep this ticket open for a day in case anything else comes up.">Account check completed</button>
+        <button class="support-snippet" type="button" data-fill-target="#support-reply" data-fill-text="Thanks for flagging this. I’ve recorded the issue for the prototype review and shared a safe workaround. Please reply here if it happens again so we can add more detail.">Technical issue logged</button>
+        <button class="support-snippet" type="button" data-fill-target="#support-reply" data-fill-text="For everyone’s safety, please keep the handover in a public, well-lit place. You can politely decline a residential pickup and propose a mall lobby or barangay hall instead. I’m here if you need help wording the reply.">Safe handover advice</button>
+        <button class="support-snippet" type="button" data-fill-target="#support-reply" data-fill-text="This is a thoughtful suggestion — thank you. I’ve added it to the product suggestion board for the next prototype iteration. We’ll keep this concern open until it has been reviewed.">Suggestion acknowledged</button>
+      </div>
+    </section>
+  </div>
+
+  <aside class="case-detail-side">
+    <section class="panel case-facts">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('mail') }} Ticket record</span><h2>Concern details</h2></div></div>
+      <dl>
+        <div><dt>Ticket</dt><dd><span class="mono">{{ concern.ticket_code }}</span></dd></div>
+        <div><dt>Category</dt><dd>{{ concern.category }}</dd></div>
+        <div><dt>Priority</dt><dd><span class="priority priority--{{ concern.priority|priority_tone }}">{{ concern.priority|priority_label }}</span></dd></div>
+        <div><dt>Status</dt><dd><span class="status status--{{ concern.status|status_tone }}">{{ concern.status|support_status_label }}</span></dd></div>
+        <div><dt>Assigned to</dt><dd>{{ concern.assigned_name or 'Unassigned' }}</dd></div>
+        <div><dt>Opened</dt><dd>{{ concern.created_at|long_date }}</dd></div>
+        {% if concern.resolved_at %}<div><dt>Resolved</dt><dd>{{ concern.resolved_at|long_date }}</dd></div>{% endif %}
+        <div><dt>Thread</dt><dd>{{ messages|length }} {{ messages|length|plural('message') }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="panel case-parties">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('user') }} Member</span><h2>Who needs help</h2></div></div>
+      <article class="case-person">
+        <div class="case-person-head">
+          {{ avatar(concern.user_name, concern.user_avatar, 'avatar--md') }}
+          <div>
+            <strong>{{ concern.user_name }} {{ verified_badge(concern.user_verified, compact=True) }}</strong>
+            <span>{{ icon('map-pin') }} {{ concern.user_city or 'Location not shared' }}</span>
+          </div>
+        </div>
+        <p>{{ concern.user_email }}</p>
+        <div class="case-person-meta">
+          <span>{{ icon('calendar') }} Joined {{ concern.user_joined|long_date }}</span>
+          <span class="status status--{{ concern.user_status|status_tone }}">{{ concern.user_status|title }}</span>
+        </div>
+        <div class="case-person-actions">
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('public.member_profile', user_id=concern.user_id) }}">{{ icon('user') }} View profile</a>
+          <a class="text-link text-link--sm" href="{{ url_for('admin.users', q=concern.user_email) }}">Member record {{ icon('arrow-right') }}</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel case-actions">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('settings') }} Ticket actions</span><h2>Manage this concern</h2></div></div>
+
+      {% if not concern.assigned_name %}
+      <form method="post" action="{{ url_for('admin.support_action', concern_id=concern.id) }}" class="case-action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="assign">
+        <button class="btn btn-secondary btn-block" type="submit">{{ icon('user') }} Assign this concern to me</button>
+      </form>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('admin.support_action', concern_id=concern.id) }}" class="case-action-form case-action-form--divided">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="status">
+        <label class="field">
+          <span>Update status</span>
+          <select name="status">
+            {% for status in support_statuses %}
+            <option value="{{ status }}" {% if concern.status == status %}selected{% endif %}>{{ status|support_status_label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span>Resolution summary <small>(used when resolving)</small></span>
+          <textarea name="resolution" rows="2" maxlength="2000" placeholder="Summarise the answer for the member.">{{ concern.resolution or '' }}</textarea>
+        </label>
+        <button class="btn btn-primary btn-block" type="submit">{{ icon('check-circle') }} Save status &amp; notify</button>
+      </form>
+
+      {% if concern.status in ['resolved', 'closed'] %}
+      <form method="post" action="{{ url_for('admin.support_action', concern_id=concern.id) }}" class="case-action-form case-action-form--divided">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="reopen">
+        <button class="btn btn-ghost btn-block" type="submit" data-confirm="Reopen this concern? It returns to the active support queue.">{{ icon('refresh') }} Reopen concern</button>
+      </form>
+      {% endif %}
+
+      <div class="case-action-note">{{ icon('info') }} Every reply, status change and assignment is written to the administrative activity log.</div>
+    </section>
+
+    <section class="panel case-related">
+      <span class="eyebrow">{{ icon('shield') }} Escalation</span>
+      <h2>Does this need a dispute?</h2>
+      <p>If the concern involves a specific handover or another member, open a structured dispute with evidence and a case history.</p>
+      <div class="case-related-actions">
+        <a class="btn btn-secondary btn-sm btn-block" href="{{ url_for('admin.disputes') }}">{{ icon('shield') }} Disputes management</a>
+        <a class="btn btn-ghost btn-sm btn-block" href="{{ url_for('admin.reports') }}">{{ icon('flag') }} Safety reports</a>
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

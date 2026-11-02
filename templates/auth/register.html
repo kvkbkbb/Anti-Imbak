@@ -1,0 +1,82 @@
+{% extends "auth/base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}Create your account — Anti-Imbak{% endblock %}
+{% block auth_title %}Create your account — Anti-Imbak{% endblock %}
+{% block auth_aside %}
+<h1>Give something.<br>Find something.<br>Keep it useful.</h1>
+<p>One free account lets you donate, claim, save finds and coordinate safer handovers with your community.</p>
+{% endblock %}
+
+{% block auth_content %}
+<div class="auth-heading">
+  <span class="eyebrow">{{ icon('sparkles') }} Join the community</span>
+  <h2>Create your free account</h2>
+  <p>Already a member? <a href="{{ url_for('auth.login', next=next_url) }}">Log in instead</a>.</p>
+</div>
+
+<form method="post" action="{{ url_for('auth.register') }}" class="auth-form" novalidate data-register-form>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="next" value="{{ next_url }}">
+  <label class="field">
+    <span class="field-label">Full name</span>
+    <div class="input-with-icon">
+      {{ icon('user') }}
+      <input type="text" name="name" autocomplete="name" minlength="2" maxlength="80" required placeholder="e.g. Juan Dela Cruz" value="{{ form.get('name', '') }}">
+    </div>
+  </label>
+  <label class="field">
+    <span class="field-label">Email address</span>
+    <div class="input-with-icon">
+      {{ icon('mail') }}
+      <input type="email" name="email" autocomplete="email" required placeholder="you@example.com" value="{{ form.get('email', '') }}">
+    </div>
+  </label>
+  <label class="field">
+    <span class="field-label">Your city</span>
+    <div class="input-with-icon input-with-select">
+      {{ icon('map-pin') }}
+      <select name="city" required>
+        <option value="">Choose the city you usually meet in</option>
+        {% for city in cities %}
+        <option value="{{ city }}" {% if form.get('city') == city %}selected{% endif %}>{{ city }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <span class="field-hint">This helps show useful finds and estimate Partnered Delivery distances.</span>
+  </label>
+  <div class="form-row">
+    <label class="field">
+      <span class="field-label">Password</span>
+      <div class="input-with-icon input-with-action">
+        {{ icon('lock') }}
+        <input type="password" name="password" autocomplete="new-password" minlength="8" required placeholder="8+ characters" data-password-input data-password-strength>
+        <button type="button" class="input-action" data-password-toggle aria-label="Show password">{{ icon('eye') }}</button>
+      </div>
+      <span class="password-meter" data-password-meter aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+      <span class="field-hint" data-password-hint>Use at least 8 characters, including a letter and a number.</span>
+    </label>
+    <label class="field">
+      <span class="field-label">Confirm password</span>
+      <div class="input-with-icon input-with-action">
+        {{ icon('lock') }}
+        <input type="password" name="confirm_password" autocomplete="new-password" minlength="8" required placeholder="Repeat password" data-password-confirm>
+        <button type="button" class="input-action" data-password-toggle aria-label="Show password">{{ icon('eye') }}</button>
+      </div>
+      <span class="field-hint" data-password-match></span>
+    </label>
+  </div>
+  <label class="checkbox-field">
+    <input type="checkbox" name="terms" required {% if form.get('terms') == 'on' %}checked{% endif %}>
+    <span>I agree to the <a href="{{ url_for('public.terms') }}" target="_blank" rel="noopener">Terms of Use</a>, <a href="{{ url_for('public.privacy') }}" target="_blank" rel="noopener">Privacy Notice</a> and the community safety guidelines.</span>
+  </label>
+  <button class="btn btn-primary btn-block btn-lg" type="submit">{{ icon('sparkles') }} Create my account</button>
+</form>
+
+<div class="auth-trust-row">
+  <span>{{ icon('shield-check') }} No payment details</span>
+  <span>{{ icon('gift') }} Always free to give</span>
+  <span>{{ icon('leaf') }} Reuse built in</span>
+</div>
+<p class="auth-demo-note">{{ icon('info') }} Your city is used to show nearby finds and estimate delivery distance. You can change it later in Account Settings.</p>
+{% endblock %}

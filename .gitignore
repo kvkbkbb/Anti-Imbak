@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Runtime data, local configuration, and secrets
+instance/
+*.db
+*.sqlite
+*.sqlite3
+secret.key
+.env
+.env.*
+
+# Uploaded member content
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Local tooling and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}{{ copy.title }} — Anti-Imbak{% endblock %}
+{% block body_class %}site-page access-page{% endblock %}
+
+{% block content %}
+<section class="access-section">
+  <div class="access-orb access-orb--one" aria-hidden="true"></div>
+  <div class="access-orb access-orb--two" aria-hidden="true"></div>
+  <div class="container access-layout">
+    <div class="access-copy">
+      <div class="page-breadcrumb">
+        <a href="{{ url_for('public.index') }}">Home</a> {{ icon('chevron-right') }}
+        <a href="{{ url_for('public.browse') }}">Browse</a> {{ icon('chevron-right') }}
+        <span>Account action</span>
+      </div>
+      <span class="eyebrow">{{ icon('shield-check') }} {{ copy.eyebrow }}</span>
+      <h1>{{ copy.title }}</h1>
+      <p class="access-lede">{{ copy.lede }}</p>
+
+      <div class="access-points">
+        <div class="access-point">
+          <span>{{ icon('refresh') }}</span>
+          <div><strong>Choose a perspective</strong><p>Pick the side of the marketplace you want to explore. The sample account is ready for you.</p></div>
+        </div>
+        <div class="access-point">
+          <span>{{ icon('users') }}</span>
+          <div><strong>Connected community data</strong><p>Your action joins the listings, requests, disputes and support threads already in the marketplace.</p></div>
+        </div>
+        <div class="access-point">
+          <span>{{ icon('info') }}</span>
+          <div><strong>Nothing is charged or sent</strong><p>Payments, couriers, email and SMS are simulated for this preview.</p></div>
+        </div>
+      </div>
+
+      <p class="access-fine-print">{{ icon('info') }} This access screen is part of a preview. In normal use, sign in or create a free community account.</p>
+    </div>
+
+    <div class="access-card-wrap">
+      {% if listing %}
+      <div class="access-listing">
+        <div class="access-listing-media">
+          <img src="{{ listing.primary_image or '/static/img/lamp.jpg' }}" alt="{{ listing.title }}">
+          <span class="free-pill">Free</span>
+        </div>
+        <div class="access-listing-copy">
+          <span class="eyebrow eyebrow--green">{{ listing.category_name }}</span>
+          <h2>{{ listing.title }}</h2>
+          <p>{{ icon('map-pin') }} {{ listing.city }}{% if listing.area %}, {{ listing.area }}{% endif %}</p>
+          <div class="listing-price-row"><strong>₱0</strong><span>Donation only · never for sale</span></div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="access-card">
+        <span class="access-card-kicker"><span class="pulse-dot"></span> Perspective switcher</span>
+        <h2>{{ 'Continue as a Recipient' if intent in ['claim', 'save', 'request'] else 'Continue as a Donor' }}</h2>
+        <p>
+          {% if intent in ['claim', 'save', 'request'] %}
+            Enter the Recipient perspective to send a thoughtful request, save useful finds and follow the handover from your workspace.
+          {% else %}
+            Enter the Donor perspective to create a free donation, review incoming requests and coordinate a safe handover.
+          {% endif %}
+        </p>
+
+        <div class="access-account">
+          {% if intent in ['claim', 'save', 'request'] %}
+            {{ avatar('Josh Mendoza', None, 'avatar--md') }}
+            <div><strong>Josh Mendoza</strong><span>Recipient sample account · josh@antiimbak.com</span></div>
+            <span class="verified verified--compact" title="Community verified">{{ icon('badge-check') }}</span>
+          {% else %}
+            {{ avatar('Maya Reyes', None, 'avatar--md') }}
+            <div><strong>Maya Reyes</strong><span>Donor sample account · maya@antiimbak.com</span></div>
+            <span class="verified verified--compact" title="Community verified">{{ icon('badge-check') }}</span>
+          {% endif %}
+        </div>
+
+        <form method="post" action="{{ url_for('demo.switch', role='recipient' if intent in ['claim', 'save', 'request'] else 'donor') }}" class="access-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="next" value="{{ target }}">
+          <button class="btn btn-primary btn-block btn-lg" type="submit">
+            {{ icon('hand-heart' if intent in ['claim', 'save', 'request'] else 'gift') }}
+            Continue as {{ 'Recipient' if intent in ['claim', 'save', 'request'] else 'Donor' }}
+          </button>
+        </form>
+
+        <div class="access-divider"><span>or</span></div>
+        <div class="access-secondary-actions">
+          <a class="btn btn-secondary btn-block" href="{{ url_for('auth.login', next=target) }}">{{ icon('lock') }} Use the sample login</a>
+          <a class="btn btn-ghost btn-block" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Keep browsing without an account</a>
+        </div>
+        <p class="access-note">{{ icon('info') }} Role switching updates the local sample data. Reset anytime from the View as bar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

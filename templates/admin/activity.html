@@ -1,0 +1,159 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}Administrative Activity — Anti-Imbak Admin{% endblock %}
+{% block admin_breadcrumb %}Activity logs{% endblock %}
+{% block admin_title %}Administrative activity{% endblock %}
+{% block admin_subtitle %}
+<p>A complete, filterable audit trail of moderator actions. Every entry is written to the marketplace ledger.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.disputes') }}">{{ icon('shield') }} Disputes{% if nav_counts.disputes %} <span class="btn-count">{{ nav_counts.disputes }}</span>{% endif %}</a>
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.support') }}">{{ icon('message-circle') }} User concerns{% if nav_counts.concerns %} <span class="btn-count">{{ nav_counts.concerns }}</span>{% endif %}</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--four">
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('list') }}</span>
+    <div class="stat-copy"><span>Actions recorded</span><strong>{{ stats.total }}</strong><small>matching this view</small></div>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('calendar') }}</span>
+    <div class="stat-copy"><span>Today</span><strong>{{ stats.today }}</strong><small>actions logged today</small></div>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('chart') }}</span>
+    <div class="stat-copy"><span>Last 7 days</span><strong>{{ stats.week }}</strong><small>recent moderation work</small></div>
+  </article>
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('shield-check') }}</span>
+    <div class="stat-copy"><span>Administrators</span><strong>{{ stats.admins }}</strong><small>with recorded actions</small></div>
+  </article>
+</section>
+
+<section class="panel panel--flush">
+  <div class="panel-head panel-head--inline panel-head--padded">
+    <div>
+      <span class="eyebrow">{{ icon('list') }} Audit trail</span>
+      <h2>Recorded actions</h2>
+      <p>Filter by administrator, target type or a phrase in the action and details.</p>
+    </div>
+    <span class="mini-tag">{{ total }} {{ total|plural('entry') }}</span>
+  </div>
+
+  <form class="admin-filter-bar" method="get" action="{{ url_for('admin.activity') }}">
+    <label class="filter-search">
+      {{ icon('search') }}
+      <input type="search" name="q" value="{{ q }}" placeholder="Search action or details" aria-label="Search administrative activity">
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Administrator</span>
+      <select name="admin">
+        <option value="">Any administrator</option>
+        {% for admin in admins %}
+        <option value="{{ admin.id }}" {% if admin_filter == admin.id %}selected{% endif %}>{{ admin.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Target type</span>
+      <select name="target">
+        <option value="all" {% if target_filter == 'all' %}selected{% endif %}>Any target</option>
+        {% for target in target_types %}
+        <option value="{{ target }}" {% if target_filter == target %}selected{% endif %}>{{ target|replace('_', ' ')|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-secondary btn-sm" type="submit">{{ icon('filter') }} Apply</button>
+    {% if q or admin_filter or target_filter != 'all' %}
+    <a class="text-link text-link--sm" href="{{ url_for('admin.activity') }}">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if logs %}
+  <div class="activity-log-table table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>When</th><th>Administrator</th><th>Action</th><th>Details</th><th>Target</th></tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>
+            <span class="cell-strong">{{ log.created_at|time_ago }}</span>
+            <small class="cell-sub">{{ log.created_at|long_date }}</small>
+          </td>
+          <td>
+            <div class="log-admin-cell">
+              {{ avatar(log.admin_name, None, 'avatar--xs') }}
+              <span><strong>{{ log.admin_name }}</strong><small>{{ log.admin_email }}</small></span>
+            </div>
+          </td>
+          <td><span class="log-action">{{ log.action }}</span></td>
+          <td><p class="log-details">{{ log.details or 'No extra details were recorded.' }}</p></td>
+          <td>
+            {% if log.target_type == 'dispute' and log.target_id %}
+            <a class="mini-tag mini-tag--cyan" href="{{ url_for('admin.dispute_detail', dispute_id=log.target_id) }}">{{ icon('shield') }} {{ log.target_type|replace('_', ' ')|title }} #{{ log.target_id }}</a>
+            {% elif log.target_type == 'support_concern' and log.target_id %}
+            <a class="mini-tag mini-tag--cyan" href="{{ url_for('admin.support_detail', concern_id=log.target_id) }}">{{ icon('message-circle') }} {{ log.target_type|replace('_', ' ')|title }} #{{ log.target_id }}</a>
+            {% elif log.target_type == 'listing' and log.target_id %}
+            <a class="mini-tag mini-tag--cyan" href="{{ url_for('admin.listings', q=log.target_id) }}">{{ icon('gift') }} Listing #{{ log.target_id }}</a>
+            {% elif log.target_type == 'user' and log.target_id %}
+            <a class="mini-tag mini-tag--cyan" href="{{ url_for('admin.user_detail', user_id=log.target_id) }}">{{ icon('user') }} Member #{{ log.target_id }}</a>
+            {% elif log.target_type == 'report' and log.target_id %}
+            <a class="mini-tag mini-tag--cyan" href="{{ url_for('admin.reports') }}">{{ icon('flag') }} Report #{{ log.target_id }}</a>
+            {% elif log.target_type in ['advertisement', 'ad_package', 'ad_inquiry'] %}
+            <a class="mini-tag" href="{{ url_for('admin.content') }}">{{ icon('megaphone') }} {{ log.target_type|replace('_', ' ')|title }}</a>
+            {% elif log.target_type == 'category' %}
+            <a class="mini-tag" href="{{ url_for('admin.content') }}">{{ icon('grid') }} Category{% if log.target_id %} #{{ log.target_id }}{% endif %}</a>
+            {% elif log.target_type == 'content' %}
+            <span class="mini-tag">{{ icon('file') }} Content</span>
+            {% elif log.target_type == 'announcement' %}
+            <span class="mini-tag">{{ icon('megaphone') }} Announcement</span>
+            {% else %}
+            <span class="mini-tag">{{ log.target_type|replace('_', ' ')|title }}{% if log.target_id %} #{{ log.target_id }}{% endif %}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pages > 1 %}
+  <nav class="pagination admin-pagination" aria-label="Activity log pages">
+    {% if page > 1 %}
+    <a class="pagination-link" href="{{ url_for('admin.activity', q=q, admin=admin_filter or '', target=target_filter, page=page-1) }}">{{ icon('chevron-left') }} Previous</a>
+    {% else %}
+    <span class="pagination-link is-disabled">{{ icon('chevron-left') }} Previous</span>
+    {% endif %}
+    <span class="pagination-status">Page {{ page }} of {{ pages }} · {{ total }} entries</span>
+    {% if page < pages %}
+    <a class="pagination-link" href="{{ url_for('admin.activity', q=q, admin=admin_filter or '', target=target_filter, page=page+1) }}">Next {{ icon('chevron-right') }}</a>
+    {% else %}
+    <span class="pagination-link is-disabled">Next {{ icon('chevron-right') }}</span>
+    {% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">{{ icon('list') }}</span>
+    <h3>No activity matches this view</h3>
+    <p>Try a broader search or clear the administrator and target filters. Every future action will appear here.</p>
+    <a class="btn btn-secondary" href="{{ url_for('admin.activity') }}">View all activity {{ icon('arrow-right') }}</a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel report-guidance">
+  <div class="panel-head panel-head--inline">
+    <div><span class="eyebrow">{{ icon('info') }} About this log</span><h2>Accountable by design</h2></div>
+  </div>
+  <div class="report-guide-grid">
+    <div><span>{{ icon('lock') }}</span><strong>No secrets</strong><p>Every moderation, dispute, support and content action creates an entry. Entries are read-only from this screen.</p></div>
+    <div><span>{{ icon('clock') }}</span><strong>Time-stamped</strong><p>Entries are ordered newest first and stored in local SQLite time. Dates are presented in a friendly format.</p></div>
+    <div><span>{{ icon('refresh') }}</span><strong>Reset-safe</strong><p>Resetting the sample data restores the original sample logs as well as the rest of the marketplace data.</p></div>
+  </div>
+</section>
+{% endblock %}

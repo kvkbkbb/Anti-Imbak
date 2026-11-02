@@ -1,0 +1,74 @@
+{% extends "auth/base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}Log in — Anti-Imbak{% endblock %}
+{% block auth_title %}Log in — Anti-Imbak{% endblock %}
+{% block auth_aside %}
+<h1>Welcome back.<br>Something useful is waiting.</h1>
+<p>Log in to manage your donations, follow claim updates and arrange a safe handover.</p>
+{% endblock %}
+
+{% block auth_content %}
+<div class="auth-heading">
+  <span class="eyebrow">{{ icon('log-out') }} Member access</span>
+  <h2>Log in to your account</h2>
+  <p>New here? <a href="{{ url_for('auth.register', next=next_url) }}">Create a free account</a>.</p>
+</div>
+
+<form method="post" action="{{ url_for('auth.login') }}" class="auth-form" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="next" value="{{ next_url }}">
+  <label class="field">
+    <span class="field-label">Email address</span>
+    <div class="input-with-icon">
+      {{ icon('mail') }}
+      <input type="email" name="email" autocomplete="email" required placeholder="you@example.com" value="{{ email }}">
+    </div>
+  </label>
+  <label class="field">
+    <span class="field-label">Password</span>
+    <div class="input-with-icon input-with-action">
+      {{ icon('lock') }}
+      <input type="password" name="password" autocomplete="current-password" required placeholder="Your password" data-password-input>
+      <button type="button" class="input-action" data-password-toggle aria-label="Show password">{{ icon('eye') }}</button>
+    </div>
+  </label>
+  <div class="auth-form-row">
+    <span class="fine-print">{{ icon('shield-check') }} Protected session</span>
+    <a href="{{ url_for('auth.forgot_password') }}" class="text-link text-link--sm">Forgot password?</a>
+  </div>
+  <button class="btn btn-primary btn-block btn-lg" type="submit">{{ icon('log-out') }} Log in</button>
+</form>
+
+<div class="auth-divider"><span>or continue with a sample account</span></div>
+
+<div class="demo-logins">
+  <form method="post" action="{{ url_for('auth.demo_login', role='donor') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <button class="demo-login" type="submit">
+      <span class="demo-avatar"><img src="{{ url_for('static', filename='img/avatars/maya.jpg') }}" alt=""></span>
+      <span><strong>Donor account</strong><small>Maya · manage gifts &amp; claims</small></span>
+      {{ icon('arrow-right') }}
+    </button>
+  </form>
+  <form method="post" action="{{ url_for('auth.demo_login', role='claimant') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <button class="demo-login" type="submit">
+      <span class="demo-avatar"><img src="{{ url_for('static', filename='img/avatars/josh.jpg') }}" alt=""></span>
+      <span><strong>Recipient account</strong><small>Josh · track requests &amp; delivery</small></span>
+      {{ icon('arrow-right') }}
+    </button>
+  </form>
+  <form method="post" action="{{ url_for('auth.demo_login', role='admin') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="demo-login" type="submit">
+      <span class="demo-avatar demo-avatar--admin">{{ icon('shield-check') }}</span>
+      <span><strong>Administrator account</strong><small>Aria · moderation &amp; platform</small></span>
+      {{ icon('arrow-right') }}
+    </button>
+  </form>
+</div>
+<p class="auth-demo-note">{{ icon('info') }} Sample accounts are provided so you can explore both sides of the marketplace. You can also create your own free account.</p>
+{% endblock %}

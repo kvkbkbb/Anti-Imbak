@@ -1,0 +1,16 @@
+{% macro logo(compact=False, tagline=False, light=False, href=None) -%}
+<a class="brand{% if compact %} brand--compact{% endif %}{% if light %} brand--light{% endif %}" href="{{ href or url_for('public.index') }}" aria-label="Anti-Imbak — Giving Items a Second Purpose">
+  <span class="brand-orbit" aria-hidden="true">
+    <svg viewBox="0 0 138 58" fill="none">
+      <path class="orbit-line orbit-line--one" d="M5 45C13 13 56 3 79 8c16 4 16 15 2 20" />
+      <path class="orbit-line orbit-line--two" d="M2 49C39 61 96 54 129 23" />
+      <circle class="orbit-dot" cx="89" cy="33" r="1.6" />
+    </svg>
+  </span>
+  <span class="brand-type">
+    <span class="brand-anti">Anti</span><span class="brand-hyphen">-</span><span class="brand-imbak">Imbak</span>
+    <span class="brand-spark" aria-hidden="true">✦</span>
+  </span>
+  {% if tagline %}<span class="brand-tagline">Giving Items a Second Purpose.</span>{% endif %}
+</a>
+{%- endmacro %}

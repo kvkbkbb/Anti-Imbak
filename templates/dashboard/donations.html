@@ -1,0 +1,128 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}My Listings — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}My Listings{% endblock %}
+{% block dash_title %}My Listings{% endblock %}
+{% block dash_subtitle %}<p>Everything you have offered to the community, with the people who have asked about each item.</p>{% endblock %}
+{% block dash_actions %}
+  <a class="btn btn-primary btn-sm" href="{{ url_for('dashboard.new_donation') }}">{{ icon('plus') }} New listing</a>
+{% endblock %}
+
+{% block dash_content %}
+<div class="member-metrics">
+  <div class="member-metric member-metric--cyan">
+    <span>All listings</span>
+    <strong>{{ counts.get('all', 0) }}</strong>
+    <small>Including claimed and unavailable</small>
+  </div>
+  <div class="member-metric member-metric--green">
+    <span>Available</span>
+    <strong>{{ counts.get('available', 0) }}</strong>
+    <small>Visible and open to requests</small>
+  </div>
+  <div class="member-metric member-metric--warm">
+    <span>Pending requests</span>
+    <strong>{{ nav_counts.incoming }}</strong>
+    <small>People waiting for your reply</small>
+  </div>
+  <div class="member-metric member-metric--violet">
+    <span>Reserved or claimed</span>
+    <strong>{{ counts.get('reserved', 0) + counts.get('claimed', 0) }}</strong>
+    <small>Handovers in progress or complete</small>
+  </div>
+</div>
+
+<div class="dash-tabs" role="navigation" aria-label="Filter listings">
+  {% for key, label in [('all', 'All'), ('available', 'Available'), ('reserved', 'Reserved'), ('claimed', 'Claimed'), ('unavailable', 'Unavailable')] %}
+  <a class="dash-tab {% if status_filter == key %}is-active{% endif %}" href="{{ url_for('dashboard.donations', status=key) }}">
+    {{ label }}<span class="dash-tab-count">{{ counts.get(key, counts.get('all', 0) if key == 'all' else 0) }}</span>
+  </a>
+  {% endfor %}
+</div>
+
+{% if donations %}
+<div class="manage-list">
+  {% for item in donations %}
+  <article class="manage-card{% if item.status in ['unavailable', 'claimed'] %} is-muted{% endif %}">
+    <div class="manage-thumb">
+      <a href="{{ url_for('public.listing_detail', listing_id=item.id) }}">
+        {% if item.primary_image %}
+          <img src="{{ item.primary_image }}" alt="{{ item.title }}" loading="lazy">
+        {% else %}
+          <span class="listing-image listing-image--empty">{{ icon('image') }}</span>
+        {% endif %}
+      </a>
+      <span class="status status--{{ item.status|status_tone }}">{{ item.status|status_label }}</span>
+    </div>
+    <div class="manage-body">
+      <div class="manage-head">
+        <div>
+          <h2 class="manage-title"><a href="{{ url_for('public.listing_detail', listing_id=item.id) }}">{{ item.title }}</a></h2>
+          <p class="manage-meta">
+            <span>{{ icon('map-pin') }} {{ item.area }}, {{ item.city }}</span>
+            <span>{{ icon('clock') }} {{ item.created_at|time_ago }}</span>
+            <span class="condition condition--{{ item.condition|condition_tone }}">{{ item.condition|condition_label }}</span>
+            <span>{{ item.item_size|item_size_label }}</span>
+          </p>
+        </div>
+        {% if item.is_featured %}<span class="status status--cyan">{{ icon('sparkles') }} Featured</span>{% endif %}
+      </div>
+
+      <div class="manage-stats">
+        <span class="manage-stat">{{ icon('hand-heart') }} <strong>{{ item.claim_count }}</strong> {{ item.claim_count|plural('request') }}</span>
+        {% if item.pending_claims %}<span class="manage-stat" style="border-color: rgba(255,184,107,.3); color: var(--warm);">{{ icon('clock') }} <strong>{{ item.pending_claims }}</strong> waiting</span>{% endif %}
+        <span class="manage-stat">{{ icon('heart') }} <strong>{{ item.save_count }}</strong> saved</span>
+        <span class="manage-stat">{{ icon('eye') }} <strong>{{ item.views }}</strong> views</span>
+      </div>
+
+      {% if item.interested %}
+      <div class="interested-strip">
+        <span class="interested-label">Interested</span>
+        {% for person in item.interested %}
+        <a class="interested-person" href="{{ url_for('dashboard.start_conversation', listing_id=item.id, user_id=person.claimant_id) }}" title="Message {{ person.claimant_name }}">
+          {{ avatar(person.claimant_name, person.claimant_avatar, 'avatar--xs') }} {{ person.claimant_name.split()[0] }}
+        </a>
+        {% endfor %}
+        <a class="text-link" href="{{ url_for('dashboard.incoming_claims') }}">Review requests {{ icon('arrow-right') }}</a>
+      </div>
+      {% endif %}
+
+      <div class="manage-actions">
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('dashboard.edit_donation', listing_id=item.id) }}">{{ icon('edit') }} Edit</a>
+        {% if item.status in ['available', 'unavailable'] %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.boost', listing_id=item.id) }}">{{ icon('sparkles') }} Boost</a>
+        {% endif %}
+        {% if item.status == 'available' %}
+        <form method="post" action="{{ url_for('dashboard.update_donation_status', listing_id=item.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="action" value="mark_unavailable">
+          <button class="btn btn-warning btn-sm" type="submit">{{ icon('pause') }} Mark unavailable</button>
+        </form>
+        {% elif item.status == 'unavailable' %}
+        <form method="post" action="{{ url_for('dashboard.update_donation_status', listing_id=item.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="action" value="mark_available">
+          <button class="btn btn-positive btn-sm" type="submit">{{ icon('play') }} Make available</button>
+        </form>
+        {% endif %}
+        {% if item.status not in ['reserved', 'claimed'] %}
+        <form method="post" action="{{ url_for('dashboard.delete_donation', listing_id=item.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-destructive btn-sm" type="submit" data-confirm="Remove “{{ item.title }}” from the marketplace? Pending requests will be closed.">{{ icon('trash') }} Remove</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <span class="empty-icon">{{ icon('gift') }}</span>
+  <h3>No listings in this view</h3>
+  <p>Offer something useful and describe its real condition. Interested Recipients can then message you before claiming.</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard.new_donation') }}">{{ icon('plus') }} Create a listing</a>
+</div>
+{% endif %}
+{% endblock %}

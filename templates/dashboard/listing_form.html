@@ -1,0 +1,194 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, form_error %}
+
+{% block title %}{{ 'Edit listing' if mode == 'edit' else 'Create a listing' }} — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}{{ 'Edit listing' if mode == 'edit' else 'New listing' }}{% endblock %}
+{% block dash_title %}{{ 'Edit your listing' if mode == 'edit' else 'Give something a second purpose.' }}{% endblock %}
+{% block dash_subtitle %}
+<p>{{ 'Refresh the details below. Existing photos stay in the gallery; new ones are added.' if mode == 'edit' else 'A clear photo and an honest description help the right person find it.' }}</p>
+{% endblock %}
+{% block dash_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('dashboard.donations') }}">{{ icon('arrow-left') }} Back to My Listings</a>
+{% endblock %}
+
+{% block dash_content %}
+{% if errors %}
+<div class="form-alert form-alert--error" role="alert">
+  {{ icon('alert-circle') }}
+  <div><strong>Please check the highlighted fields.</strong><p>{{ errors|length }} {{ errors|length|plural('detail') }} need a little attention before this can be published.</p></div>
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="listing-editor" data-listing-form novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="listing-editor-main">
+    <section class="panel form-section">
+      <div class="form-section-head">
+        <span class="form-step">01</span>
+        <div><span class="eyebrow">{{ icon('gift') }} The item</span><h2>What are you giving?</h2><p>Be specific and honest. This is the story a Recipient will read.</p></div>
+      </div>
+      <label class="field">
+        <span class="field-label">Item title <em>Required</em></span>
+        <input type="text" name="title" minlength="5" maxlength="120" required placeholder="e.g. Compact wooden bookshelf" value="{{ form.get('title', '') }}" data-live-title>
+        {{ form_error(errors, 'title') }}
+        <span class="field-hint">A specific, friendly title works best. Avoid all caps and sales language.</span>
+      </label>
+      <label class="field">
+        <span class="field-label">Description <em>Required</em></span>
+        <textarea name="description" rows="7" minlength="40" maxlength="2000" required placeholder="Share the item's story, its condition, what is included, and any honest imperfections. For example: how long you have had it, why you no longer need it, and what kind of home it would suit." data-live-description>{{ form.get('description', '') }}</textarea>
+        {{ form_error(errors, 'description') }}
+        <span class="field-hint"><span data-character-count>0</span> / 2,000 characters · at least 40</span>
+      </label>
+      <div class="form-row">
+        <label class="field">
+          <span class="field-label">Category <em>Required</em></span>
+          <select name="category_id" required data-live-category>
+            <option value="">Choose a category</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if (form.get('category_id')|int if form.get('category_id') else selected_category) == category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+          {{ form_error(errors, 'category_id') }}
+        </label>
+        <label class="field">
+          <span class="field-label">Condition <em>Required</em></span>
+          <select name="condition" required data-live-condition>
+            <option value="">Choose a condition</option>
+            {% for option in conditions %}
+            <option value="{{ option }}" {% if (form.get('condition') if form.get('condition') else (listing.condition if listing else '')) == option %}selected{% endif %}>{{ option|condition_label }}</option>
+            {% endfor %}
+          </select>
+          {{ form_error(errors, 'condition') }}
+          <span class="field-hint">For Repair or Nonfunctional items must say clearly what is broken.</span>
+        </label>
+      </div>
+      <label class="field">
+        <span class="field-label">Item size <em>Required</em></span>
+        <select name="item_size" required data-live-size>
+          <option value="">Choose a size</option>
+          {% for option in item_sizes %}
+          <option value="{{ option }}" {% if (form.get('item_size') if form.get('item_size') else (listing.item_size if listing else '')) == option %}selected{% endif %}>{{ item_size_labels[option] }}</option>
+          {% endfor %}
+        </select>
+        {{ form_error(errors, 'item_size') }}
+        <span class="field-hint">Size helps calculate the Partnered Delivery fee, which stays between ₱{{ delivery_fee_min|int }} and ₱{{ delivery_fee_max|int }}.</span>
+      </label>
+    </section>
+
+    <section class="panel form-section">
+      <div class="form-section-head">
+        <span class="form-step">02</span>
+        <div><span class="eyebrow">{{ icon('map-pin') }} Where it is</span><h2>Share a general location.</h2><p>Your city and area appear publicly. Exact handover details are agreed privately after a request is accepted.</p></div>
+      </div>
+      <div class="form-row">
+        <label class="field">
+          <span class="field-label">City <em>Required</em></span>
+          <select name="city" required data-live-city>
+            <option value="">Choose a city</option>
+            {% for city in cities %}
+            <option value="{{ city }}" {% if (form.get('city') if form.get('city') else (listing.city if listing else '')) == city %}selected{% endif %}>{{ city }}</option>
+            {% endfor %}
+          </select>
+          {{ form_error(errors, 'city') }}
+        </label>
+        <label class="field">
+          <span class="field-label">Area or neighbourhood <em>Required</em></span>
+          <input type="text" name="area" maxlength="100" required placeholder="e.g. Teachers Village" value="{{ form.get('area', '') }}" data-live-area>
+          {{ form_error(errors, 'area') }}
+        </label>
+      </div>
+      <div class="inline-notice inline-notice--compact">
+        {{ icon('truck') }}
+        <span><strong>Partnered Delivery is the default.</strong> A partner is assigned when a Recipient claims the item, and the inclusive fee is shown before they confirm. A Recipient may choose Self Pickup instead and arrange the meeting with you in Messages.</span>
+      </div>
+    </section>
+
+    <section class="panel form-section">
+      <div class="form-section-head">
+        <span class="form-step">03</span>
+        <div><span class="eyebrow">{{ icon('camera') }} Photos</span><h2>Show it clearly.</h2><p>Natural light and honest angles help people decide with confidence.</p></div>
+      </div>
+      {{ form_error(errors, 'images') }}
+      {% if listing and listing.images %}
+      <div class="current-images">
+        <span class="field-label">Current gallery</span>
+        <div class="current-image-grid">
+          {% for image in listing.images %}
+          <figure><img src="{{ image.image_url }}" alt="{{ image.alt_text or listing.title }}"><figcaption>Photo {{ loop.index }}</figcaption></figure>
+          {% endfor %}
+        </div>
+        <p class="field-hint">Current photos remain in the listing. New uploads or a reference photo are added to the gallery.</p>
+      </div>
+      {% endif %}
+      <div class="upload-zone" data-upload-zone>
+        <label class="upload-drop" for="listing-photos">
+          <span class="upload-icon">{{ icon('upload') }}</span>
+          <strong>Add photos</strong>
+          <span>Drag and drop or choose JPG, PNG or WebP images</span>
+          <small>Up to 5 photos per listing · 5 MB each · 8 MB total request</small>
+          <input id="listing-photos" type="file" name="images" accept="image/png,image/jpeg,image/webp" multiple data-image-input>
+        </label>
+        <div class="upload-preview" data-image-preview></div>
+      </div>
+      <div class="demo-photo-picker">
+        <div class="demo-photo-head">
+          <span class="field-label">Or choose a reference photo</span>
+          <span class="mini-tag">Photo library</span>
+        </div>
+        <p class="field-hint">Use this when you cannot take a new photo right now. Choose the image that best matches the item you are giving.</p>
+        <div class="demo-photo-grid">
+          {% for key, sample in receiving_images.items() %}
+          <label class="demo-photo {% if form.get('sample_image') == key %}is-selected{% endif %}">
+            <input type="radio" name="sample_image" value="{{ key }}" {% if form.get('sample_image') == key %}checked{% endif %}>
+            <img src="{{ sample.url }}" alt="" loading="lazy">
+            <span>{{ sample.label }}</span>
+            <span class="demo-photo-check">{{ icon('check') }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <div class="editor-actions">
+      <a class="btn btn-ghost" href="{{ url_for('dashboard.donations') }}">Cancel</a>
+      <button class="btn btn-primary btn-lg" type="submit">{{ icon('check-circle') }} {{ 'Save changes' if mode == 'edit' else 'Publish listing' }}</button>
+    </div>
+    <p class="editor-fineprint">{{ icon('shield-check') }} By publishing, you confirm this item is genuinely free and yours to give. Listings are reviewed through community reports and administrator moderation.</p>
+  </div>
+
+  <aside class="listing-editor-side">
+    <div class="preview-card">
+      <div class="preview-card-head"><span class="eyebrow eyebrow--soft">Live preview</span><span class="free-pill">Free</span></div>
+      <div class="preview-media">
+        <span class="preview-placeholder" data-preview-image>{{ icon('image') }}</span>
+        <span class="preview-badge" data-preview-category>Category</span>
+      </div>
+      <div class="preview-body">
+        <span class="condition condition--neutral" data-preview-condition>Condition</span>
+        <h3 data-preview-title>Your item title</h3>
+        <p data-preview-description>A short, honest description will appear here as you type.</p>
+        <div class="preview-meta">{{ icon('map-pin') }} <span data-preview-location>City, area</span></div>
+        <div class="preview-meta">{{ icon('package') }} <span data-preview-size>Item size</span></div>
+        <div class="preview-footer">
+          <span>{{ icon('gift') }} Free donation</span>
+          <span class="round-arrow">{{ icon('arrow-up-right') }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel editor-tips">
+      <span class="eyebrow">{{ icon('sparkles') }} A listing that works</span>
+      <ul class="check-list check-list--tight">
+        <li>{{ icon('check') }} Mention faults honestly — it builds trust.</li>
+        <li>{{ icon('check') }} Include everything that comes with it.</li>
+        <li>{{ icon('check') }} Describe the real condition, not the ideal one.</li>
+        <li>{{ icon('check') }} Keep the story human, not sales-like.</li>
+      </ul>
+      <div class="inline-notice">{{ icon('info') }} Items are never sold on Anti-Imbak. There is intentionally no price field.</div>
+    </div>
+    <div class="panel editor-tips editor-tips--secure">
+      <span class="eyebrow">{{ icon('shield-check') }} Privacy reminder</span>
+      <p>Your listing shows your name, avatar, city and verification status. Your email, phone number and full address are not public. Arrange the handover in Messages.</p>
+    </div>
+  </aside>
+</form>
+{% endblock %}

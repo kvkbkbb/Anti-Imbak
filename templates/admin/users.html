@@ -1,0 +1,189 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar, status_badge %}
+
+{% block title %}Members — Anti-Imbak Admin{% endblock %}
+{% block admin_breadcrumb %}Members{% endblock %}
+{% block admin_title %}Community members{% endblock %}
+{% block admin_subtitle %}
+<p>Search, verify and moderate the people who keep the marketplace generous.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.users') }}">{{ icon('refresh') }} Reset view</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--five">
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('users') }}</span>
+    <div class="stat-copy"><span>All members</span><strong>{{ stats.all }}</strong><small>including administrators</small></div>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('check-circle') }}</span>
+    <div class="stat-copy"><span>Active</span><strong>{{ stats.active }}</strong><small>able to sign in</small></div>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('gift') }}</span>
+    <div class="stat-copy"><span>Donors</span><strong>{{ stats.donors }}</strong><small>have shared a listing</small></div>
+    <a class="stat-link" href="{{ url_for('admin.users', role='donor') }}">{{ icon('arrow-up-right') }}</a>
+  </article>
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('hand-heart') }}</span>
+    <div class="stat-copy"><span>Recipients</span><strong>{{ stats.recipients }}</strong><small>have sent a request</small></div>
+    <a class="stat-link" href="{{ url_for('admin.users', role='recipient') }}">{{ icon('arrow-up-right') }}</a>
+  </article>
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('alert-circle') }}</span>
+    <div class="stat-copy"><span>Suspended</span><strong>{{ stats.suspended }}</strong><small>access paused</small></div>
+  </article>
+</section>
+
+<section class="panel panel--flush">
+  <div class="panel-head panel-head--inline panel-head--padded">
+    <div>
+      <span class="eyebrow">{{ icon('users') }} Directory</span>
+      <h2>Member directory</h2>
+      <p>{{ users|length }} {{ users|length|plural('result') }} in this view.</p>
+    </div>
+    {% if stats.suspended %}
+    <a class="text-link text-link--sm" href="{{ url_for('admin.users', status='suspended') }}">{{ icon('alert-circle') }} Review suspended</a>
+    {% endif %}
+  </div>
+
+  <form class="admin-filter-bar" method="get" action="{{ url_for('admin.users') }}">
+    <label class="filter-search">
+      {{ icon('search') }}
+      <input type="search" name="q" value="{{ q }}" placeholder="Search name, email or city" aria-label="Search members">
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Status</span>
+      <select name="status">
+        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Any status</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="suspended" {% if status_filter == 'suspended' %}selected{% endif %}>Suspended</option>
+      </select>
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Role</span>
+      <select name="role">
+        <option value="all" {% if role_filter == 'all' %}selected{% endif %}>Any role</option>
+        <option value="donor" {% if role_filter == 'donor' %}selected{% endif %}>Donors - have shared an item</option>
+        <option value="recipient" {% if role_filter == 'recipient' %}selected{% endif %}>Recipients - have sent a request</option>
+        <option value="user" {% if role_filter == 'user' %}selected{% endif %}>All members</option>
+        <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Administrator</option>
+      </select>
+    </label>
+    <button class="btn btn-secondary btn-sm" type="submit">{{ icon('filter') }} Apply</button>
+    {% if q or status_filter != 'all' or role_filter != 'all' %}
+    <a class="text-link text-link--sm" href="{{ url_for('admin.users') }}">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if users %}
+  <div class="table-wrap">
+    <table class="data-table admin-users-table">
+      <thead>
+        <tr>
+          <th scope="col">Member</th>
+          <th scope="col">Role</th>
+          <th scope="col">Location</th>
+          <th scope="col">Activity</th>
+          <th scope="col">Joined</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="cell-actions">Manage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in users %}
+        <tr>
+          <td>
+            <div class="table-member">
+              {{ avatar(member.name, member.avatar_url, 'avatar--sm') }}
+              <div>
+                <strong><a href="{{ url_for('admin.user_detail', user_id=member.id) }}">{{ member.name }}</a></strong>
+                <span>{{ member.email }}</span>
+                <div class="member-flags">
+                  {% if member.verified %}<span class="mini-tag mini-tag--cyan">{{ icon('badge-check') }} Verified</span>{% endif %}
+                  {% if member.report_count %}<span class="mini-tag mini-tag--danger">{{ icon('flag') }} {{ member.report_count }} open {{ member.report_count|plural('report') }}</span>{% endif %}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            {% if member.role == 'admin' %}
+            <span class="mini-tag mini-tag--cyan">{{ icon('shield-check') }} Admin</span>
+            {% elif member.donation_count %}
+            <span class="mini-tag mini-tag--cyan">{{ icon('gift') }} Donor</span>
+            {% if member.claim_count %}<span class="mini-tag">{{ icon('hand-heart') }} Recipient</span>{% endif %}
+            {% elif member.claim_count %}
+            <span class="mini-tag">{{ icon('hand-heart') }} Recipient</span>
+            {% else %}
+            <span class="mini-tag">Member</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if member.city %}
+            <span class="cell-strong">{{ member.city }}</span>
+            {% if member.contact_number %}<small class="cell-sub">{{ member.contact_number }}</small>{% endif %}
+            {% else %}
+            <span class="cell-muted">Not shared</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="activity-counts">
+              <span><strong>{{ member.donation_count }}</strong> donations</span>
+              <span><strong>{{ member.claim_count }}</strong> claims</span>
+            </div>
+          </td>
+          <td>
+            <span class="cell-strong">{{ member.created_at|long_date }}</span>
+            <small class="cell-sub">Last sign-in {{ member.last_login|time_ago if member.last_login else 'never' }}</small>
+          </td>
+          <td>
+            <span class="status status--{{ 'success' if member.status == 'active' else 'danger' }}">{{ member.status|title }}</span>
+            {% if not member.email_verified %}<small class="cell-sub">Email unverified</small>{% endif %}
+          </td>
+          <td class="cell-actions">
+            <div class="row-actions">
+              <a class="icon-button" href="{{ url_for('admin.user_detail', user_id=member.id) }}" title="Open member" aria-label="Open {{ member.name }}">{{ icon('eye') }}</a>
+              {% if member.id != current_user.id and member.role != 'admin' %}
+              <details class="action-menu">
+                <summary class="icon-button" aria-label="Moderate {{ member.name }}">{{ icon('menu-dots') }}</summary>
+                <div class="action-menu-panel">
+                  {% if member.status == 'active' %}
+                  <form method="post" action="{{ url_for('admin.user_action', user_id=member.id) }}" data-confirm="Suspend {{ member.name }}? They will be signed out and unable to claim or list.">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="suspend">
+                    <button type="submit" class="action-menu-item action-menu-item--danger">{{ icon('alert-circle') }} Suspend account</button>
+                  </form>
+                  {% else %}
+                  <form method="post" action="{{ url_for('admin.user_action', user_id=member.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="reactivate">
+                    <button type="submit" class="action-menu-item">{{ icon('check-circle') }} Reactivate</button>
+                  </form>
+                  {% endif %}
+                  <form method="post" action="{{ url_for('admin.user_action', user_id=member.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="{{ 'unverify' if member.verified else 'verify' }}">
+                    <button type="submit" class="action-menu-item">{{ icon('badge-check') }} {{ 'Remove verification' if member.verified else 'Mark verified' }}</button>
+                  </form>
+                </div>
+              </details>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">{{ icon('search') }}</span>
+    <h3>No members match this view</h3>
+    <p>Try a different search phrase or clear the filters to see the full community.</p>
+    <a class="btn btn-secondary" href="{{ url_for('admin.users') }}">Clear filters {{ icon('arrow-right') }}</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

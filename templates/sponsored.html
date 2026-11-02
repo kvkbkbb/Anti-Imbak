@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}{{ ad.title }} — Sponsored on Anti-Imbak{% endblock %}
+{% block meta_description %}{{ ad.body|truncate(150, True, '…') }}{% endblock %}
+{% block body_class %}site-page content-page sponsored-page{% endblock %}
+
+{% block content %}
+<section class="sponsored-hero">
+  <div class="container sponsored-layout">
+    <div class="sponsored-main">
+      <div class="page-breadcrumb"><a href="{{ url_for('public.index') }}">Home</a> {{ icon('chevron-right') }} <span>Sponsored</span></div>
+      <span class="sponsored-disclosure">{{ icon('megaphone') }} Sponsored · Paid advertisement</span>
+      <span class="eyebrow eyebrow--soft">{{ ad.business_type }}</span>
+      <h1>{{ ad.title }}</h1>
+      <p class="sponsored-lede">{{ ad.body }}</p>
+      <div class="sponsored-actions">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('public.ad_visit', ad_id=ad.id) }}">{{ ad.cta_label }} {{ icon('arrow-up-right') }}</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('public.browse') }}">Back to donations</a>
+      </div>
+      <div class="sponsored-meta">
+        <span>{{ icon('users') }} Advertisement by <strong>{{ ad.advertiser_name }}</strong></span>
+        {% if ad.package_name %}<span>{{ icon('tag') }} {{ ad.package_name }}</span>{% endif %}
+        <span>{{ icon('calendar') }} Ends {{ ad.ends_at|long_date }}</span>
+      </div>
+    </div>
+    <div class="sponsored-visual">
+      {% if ad.image_url %}
+        <img src="{{ ad.image_url }}" alt="{{ ad.advertiser_name }} advertising creative">
+      {% else %}
+        <div class="sponsored-visual-empty">{{ icon('megaphone') }}<span>{{ ad.advertiser_name }}</span></div>
+      {% endif %}
+      <span class="sponsored-flag">Sponsored · Paid advertisement</span>
+      <span class="sponsored-orbit" aria-hidden="true"></span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container sponsored-detail-grid">
+    <article class="detail-info-card">
+      <div class="info-card-heading">
+        <span class="eyebrow">{{ icon('info') }} About this placement</span>
+        <h2>Why you are seeing this</h2>
+      </div>
+      <p>Anti-Imbak is free for Donors and Recipients. To keep the marketplace running, we offer clearly labelled placements to local businesses whose services are relevant to the community. This page is part of that paid placement.</p>
+      <ul class="check-list">
+        <li>{{ icon('check') }} This is an advertisement, not a donation listing.</li>
+        <li>{{ icon('check') }} The advertiser paid for visibility.</li>
+        <li>{{ icon('check') }} Sponsored content never changes which community donations you see.</li>
+        <li>{{ icon('check') }} Every advertisement is reviewed against our community guidelines.</li>
+      </ul>
+      <div class="inline-notice">{{ icon('shield-check') }} Anti-Imbak does not process payments for the advertised business. Any transaction you choose to make is directly with the advertiser.</div>
+    </article>
+
+    <aside class="sponsored-side">
+      <div class="sidebar-card">
+        <span class="eyebrow eyebrow--soft">Campaign snapshot</span>
+        <div class="mini-stat-list">
+          <div><span>Impressions</span><strong>{{ ad.impressions }}</strong></div>
+          <div><span>Link clicks</span><strong>{{ ad.clicks }}</strong></div>
+          <div><span>Placement</span><strong>{{ ad.placement|replace('_', ' ')|title }}</strong></div>
+          {% if ad.category_id %}<div><span>Category</span><strong>Targeted</strong></div>{% endif %}
+        </div>
+        <p class="fine-print">Counts are recorded for this placement. They are not audited advertising metrics.</p>
+      </div>
+      <div class="sidebar-card sidebar-card--free">
+        <span class="sidebar-icon">{{ icon('gift') }}</span>
+        <h3>Here for the donations?</h3>
+        <p>Every item in the marketplace is free. Explore community finds from neighbours across Metro Manila.</p>
+        <a class="btn btn-primary btn-block" href="{{ url_for('public.browse') }}">Browse free items {{ icon('arrow-right') }}</a>
+      </div>
+      <div class="sidebar-card">
+        <span class="eyebrow eyebrow--soft">{{ icon('megaphone') }} Your business here?</span>
+        <p>Reach a community that values reuse, repair and local connection.</p>
+        <a class="text-link text-link--sm" href="{{ url_for('public.advertise') }}">See advertising options {{ icon('arrow-right') }}</a>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

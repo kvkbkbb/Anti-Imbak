@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon, avatar, listing_card, ad_sidebar_card %}
+{% set needs_repair = listing.condition in ['For Repair', 'Nonfunctional'] %}
+
+{% block title %}{{ listing.title }} — Free on Anti-Imbak{% endblock %}
+{% block meta_description %}Free donation: {{ listing.title }}. {{ listing.description|truncate(140, True, '…') }}{% endblock %}
+{% block body_class %}site-page listing-page{% endblock %}
+
+{% block content %}
+<section class="listing-detail-section">
+  <div class="container">
+    <div class="page-breadcrumb">
+      <a href="{{ url_for('public.index') }}">Home</a> {{ icon('chevron-right') }}
+      <a href="{{ url_for('public.browse') }}">Browse</a> {{ icon('chevron-right') }}
+      <a href="{{ url_for('public.browse', category=listing.category_slug) }}">{{ listing.category_name }}</a> {{ icon('chevron-right') }}
+      <span>{{ listing.title|truncate(40, True, '…') }}</span>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-gallery detail-main">
+        <div class="gallery-stage">
+          <div class="gallery-main">
+            <img id="gallery-main-image" src="{{ images[0].image_url }}" alt="{{ images[0].alt_text or listing.title }}">
+            <span class="free-pill free-pill--large">Free</span>
+            {% if listing.is_featured %}<span class="featured-pill">{{ icon('sparkles') }} Featured</span>{% endif %}
+            {% if listing.status != 'available' %}<span class="availability-ribbon availability-ribbon--{{ listing.status }}">{{ listing.status|status_label }}</span>{% endif %}
+          </div>
+          {% if images|length > 1 %}
+          <button type="button" class="gallery-nav gallery-nav--prev" data-gallery-prev aria-label="Previous image">{{ icon('chevron-left') }}</button>
+          <button type="button" class="gallery-nav gallery-nav--next" data-gallery-next aria-label="Next image">{{ icon('chevron-right') }}</button>
+          <span class="gallery-count"><span data-gallery-current>1</span> / {{ images|length }}</span>
+          {% endif %}
+        </div>
+        {% if images|length > 1 %}
+        <div class="gallery-thumbs" aria-label="Item photos">
+          {% for image in images %}
+          <button type="button" class="gallery-thumb {% if loop.first %}is-current{% endif %}" data-gallery-thumb data-src="{{ image.image_url }}" data-alt="{{ image.alt_text or listing.title }}" aria-label="Show photo {{ loop.index }}">
+            <img src="{{ image.image_url }}" alt="" loading="lazy">
+          </button>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="gallery-notes">
+          <span>{{ icon('shield-check') }} Photos shared by the Donor</span>
+          <span>{{ icon('truck') }} Partnered Delivery available</span>
+          <span>{{ icon('eye') }} {{ listing.views }} views</span>
+        </div>
+      </div>
+
+      <div class="detail-summary">
+        <div class="detail-topline">
+          <a class="eyebrow eyebrow--link" href="{{ url_for('public.browse', category=listing.category_slug) }}">{{ icon(listing.category_icon) }} {{ listing.category_name }}</a>
+          <span class="condition condition--{{ listing.condition|condition_tone }}">{{ listing.condition|condition_label }}</span>
+        </div>
+        <h1>{{ listing.title }}</h1>
+        <div class="detail-submeta">
+          <span>{{ icon('map-pin') }} {{ listing.area }}, {{ listing.city }}</span>
+          <span>{{ icon('calendar') }} Posted {{ listing.created_at|time_ago }}</span>
+          <span class="status status--{{ listing.status|status_tone }}">{{ listing.status|status_label }}</span>
+        </div>
+
+        <div class="free-callout">
+          <span class="free-callout-icon">{{ icon('gift') }}</span>
+          <div>
+            <strong>₱0 · Always free</strong>
+            <span>The item itself is free. Partnered Delivery, when chosen, adds one inclusive fee of ₱{{ delivery_fee_min|int }}–₱{{ delivery_fee_max|int }}.</span>
+          </div>
+          <span class="free-badge-large">FREE</span>
+        </div>
+
+        {% if needs_repair %}
+        <div class="inline-notice inline-notice--warning">
+          {{ icon('alert-triangle') }}
+          <span><strong>{{ 'For repair' if listing.condition == 'For Repair' else 'Not working' }}.</strong> Read the full description for the specific faults before sending a request. This item is offered as-is.</span>
+        </div>
+        {% endif %}
+
+        <p class="detail-description">{{ listing.description }}</p>
+
+        <div class="detail-facts">
+          <div><span>{{ icon('tag') }}</span><small>Condition</small><strong>{{ listing.condition|condition_label }}</strong></div>
+          <div><span>{{ icon('package') }}</span><small>Item size</small><strong>{{ listing.item_size|item_size_label }}</strong></div>
+          <div><span>{{ icon('truck') }}</span><small>Delivery</small><strong>Partnered Delivery</strong></div>
+          <div><span>{{ icon('shield-check') }}</span><small>Listing type</small><strong>Community donation</strong></div>
+        </div>
+
+        <div class="donor-card">
+          <div class="donor-card-head">
+            <a class="donor-card-avatar" href="{{ url_for('public.member_profile', user_id=listing.donor_id) }}" aria-label="View {{ listing.donor_name }}'s profile">
+              {{ avatar(listing.donor_name, listing.donor_avatar, 'avatar--md') }}
+            </a>
+            <div class="donor-card-title">
+              <span class="eyebrow eyebrow--soft">Offered by</span>
+              <strong><a href="{{ url_for('public.member_profile', user_id=listing.donor_id) }}">{{ listing.donor_name }}</a></strong>
+              <span>{{ icon('map-pin') }} {{ listing.donor_city or listing.city }} <span class="dot-separator">·</span> Member since {{ listing.donor_joined|long_date(false) }}</span>
+            </div>
+            {% if listing.donor_verified %}<span class="verified">{{ icon('badge-check') }} Verified</span>{% endif %}
+          </div>
+          <div class="donor-stats">
+            <div><strong>{{ listing.donor_listing_count }}</strong><span>items shared</span></div>
+            <div><strong>{{ listing.donor_gifts }}</strong><span>successful gifts</span></div>
+            <div><strong>100%</strong><span>free listings</span></div>
+          </div>
+          <div class="donor-card-foot">
+            <a class="text-link text-link--sm" href="{{ url_for('public.member_profile', user_id=listing.donor_id) }}">View Donor profile {{ icon('arrow-right') }}</a>
+            <p class="donor-privacy">{{ icon('lock') }} Contact details stay private. Agree the handover in Messages once a request is accepted.</p>
+          </div>
+        </div>
+
+        {% if my_claim %}
+        <div class="claim-state-box claim-state-box--{{ my_claim.status|status_tone }}">
+          <span class="claim-state-icon">{{ icon('check-circle' if my_claim.status in ['accepted','completed'] else 'x-circle' if my_claim.status in ['rejected','cancelled'] else 'clock') }}</span>
+          <div>
+            <strong>Your request: {{ my_claim.status|claim_status_label }}</strong>
+            <p>
+              {% if my_claim.status == 'pending' %}The Donor is reviewing your request. You will receive a notification when there is news.
+              {% elif my_claim.status == 'accepted' %}Your request was accepted. Follow the delivery or pickup plan in your workspace.
+              {% elif my_claim.status == 'completed' %}This item is now part of your story. Thank you for giving it a second life.
+              {% elif my_claim.status == 'rejected' %}The Donor chose another request this time. There are more useful finds waiting for you.
+              {% else %}You withdrew this request.{% endif %}
+            </p>
+            {% if my_claim.donor_note %}<span class="claim-donor-note">“{{ my_claim.donor_note }}”</span>{% endif %}
+          </div>
+          <a class="text-link text-link--sm" href="{{ url_for('dashboard.claim_detail', claim_id=my_claim.id) }}">View request {{ icon('arrow-right') }}</a>
+        </div>
+        {% endif %}
+
+        <div class="detail-actions">
+          {% if current_user and current_user.id == listing.donor_id %}
+            <a class="btn btn-secondary btn-lg btn-block" href="{{ url_for('dashboard.donations') }}">{{ icon('settings') }} Manage your listing</a>
+          {% elif listing.status != 'available' %}
+            <span class="closed-notice">{{ icon('info') }} This item is currently {{ listing.status|status_label|lower }}.</span>
+          {% elif not current_user %}
+            <a class="btn btn-primary btn-lg" href="{{ url_for('demo.access', intent='claim', listing_id=listing.id) }}">{{ icon('hand-heart') }} Claim this item</a>
+            <a class="btn btn-secondary btn-lg" href="{{ url_for('auth.login', next=request.path) }}">{{ icon('lock') }} Sign in first</a>
+          {% elif can_claim %}
+            <button type="button" class="btn btn-primary btn-lg" data-dialog-open="claim-dialog">{{ icon('hand-heart') }} Claim this item</button>
+          {% elif my_claim %}
+            <a class="btn btn-secondary btn-lg" href="{{ url_for('dashboard.my_claims') }}">{{ icon('dashboard') }} Go to my request</a>
+          {% endif %}
+
+          {% if current_user and current_user.id != listing.donor_id %}
+            {% if conversation %}
+            <a class="btn btn-informational btn-lg" href="{{ url_for('dashboard.messages', conversation=conversation.id) }}">{{ icon('message-circle') }} Open conversation</a>
+            {% else %}
+            <a class="btn btn-informational btn-lg" href="{{ url_for('dashboard.start_conversation', listing_id=listing.id) }}">{{ icon('message-circle') }} Message Donor</a>
+            {% endif %}
+          {% endif %}
+
+          {% if current_user %}
+          <form method="post" action="{{ url_for('public.toggle_save', listing_id=listing.id) }}" class="detail-save-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="btn btn-secondary btn-lg save-button {% if listing.is_saved %}is-saved{% endif %}">{{ icon('heart') }} <span>{{ 'Saved' if listing.is_saved else 'Save' }}</span></button>
+          </form>
+          {% else %}
+          <a class="btn btn-secondary btn-lg save-button" href="{{ url_for('demo.access', intent='save', listing_id=listing.id) }}">{{ icon('heart') }} <span>Save</span></a>
+          {% endif %}
+        </div>
+
+        <div class="detail-foot-actions">
+          {% if current_user %}
+          <button type="button" class="text-link text-link--muted" data-dialog-open="report-dialog">{{ icon('flag') }} Report listing</button>
+          {% else %}
+          <a class="text-link text-link--muted" href="{{ url_for('auth.login', next=request.path) }}">{{ icon('flag') }} Log in to report a listing</a>
+          {% endif %}
+          <span>{{ icon('shield') }} Community safety protected</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-body-grid">
+      <div class="detail-info-main">
+        <section class="detail-info-card reveal">
+          <div class="info-card-heading">
+            <span class="eyebrow">{{ icon('book-open') }} The full story</span>
+            <h2>About this item</h2>
+          </div>
+          <p class="pre-line">{{ listing.description }}</p>
+          <div class="detail-spec-grid">
+            <div><span>Condition</span><strong>{{ listing.condition|condition_label }}</strong></div>
+            <div><span>Category</span><strong>{{ listing.category_name }}</strong></div>
+            <div><span>Item size</span><strong>{{ listing.item_size|item_size_label }}</strong></div>
+            <div><span>Availability</span><strong>{{ listing.status|status_label }}</strong></div>
+            <div><span>Location</span><strong>{{ listing.area }}, {{ listing.city }}</strong></div>
+            <div><span>Posted</span><strong>{{ listing.created_at|long_date }}</strong></div>
+            <div><span>Item price</span><strong class="spec-free">₱0 — Free</strong></div>
+            <div><span>Delivery fee</span><strong>₱{{ delivery_fee_min|int }}–₱{{ delivery_fee_max|int }} inclusive</strong></div>
+          </div>
+        </section>
+
+        <section class="detail-info-card reveal">
+          <div class="info-card-heading">
+            <span class="eyebrow">{{ icon('truck') }} Receiving the item</span>
+            <h2>Partnered Delivery by default.</h2>
+          </div>
+          <div class="handover-grid">
+            <div class="handover-block handover-block--primary">
+              <span class="handover-icon">{{ icon('truck') }}</span>
+              <h3>Partnered Delivery <span class="mini-tag mini-tag--cyan">Default</span></h3>
+              <p>The Recipient selects Partnered Delivery automatically when claiming. A suitable partner is assigned based on the item's size and your city, and the fee depends on distance.</p>
+              <span class="fine-print">Inclusive fee: ₱{{ delivery_fee_min|int }}–₱{{ delivery_fee_max|int }}. No extra charges; the donated item stays free.</span>
+            </div>
+            <div class="handover-block">
+              <span class="handover-icon">{{ icon('map-pin') }}</span>
+              <h3>Self Pickup <span class="mini-tag">Optional</span></h3>
+              <p>A Recipient may choose Self Pickup instead when claiming. The meeting place and time are then agreed between the Donor and Recipient in Messages.</p>
+              <span class="fine-print">The Donor never chooses pickup for the Recipient, and no delivery fee applies.</span>
+            </div>
+          </div>
+          <div class="inline-notice">
+            {{ icon('message-circle') }}
+            <span>Use <a href="{{ url_for('dashboard.messages') if current_user else url_for('auth.login') }}">Messages</a> to ask about condition, request extra photos, or agree the handover. Keeping the conversation there leaves a shared record for both sides.</span>
+          </div>
+        </section>
+
+        <section class="detail-info-card safety-card-detail reveal">
+          <div class="info-card-heading">
+            <span class="eyebrow eyebrow--green">{{ icon('shield-check') }} Community care</span>
+            <h2>A good handover is a safe handover.</h2>
+          </div>
+          <div class="safety-mini-grid">
+            {% for tip in safety_tips[:4] %}
+            <div><span>{{ icon('check') }}</span><p>{{ tip }}</p></div>
+            {% endfor %}
+          </div>
+          <a class="text-link" href="{{ url_for('public.safety') }}">Read all safety guidelines {{ icon('arrow-right') }}</a>
+        </section>
+      </div>
+
+      <aside class="detail-side">
+        {{ ad_sidebar_card(category_ad) }}
+        <div class="sidebar-card sidebar-card--free">
+          <span class="sidebar-icon">{{ icon('hand-heart') }}</span>
+          <h3>Claiming is a request.</h3>
+          <p>The Donor reviews every request and decides who to pass the item to. Claiming does not create a payment for the item or guarantee the item.</p>
+          <a class="text-link text-link--sm" href="{{ url_for('public.how_it_works') }}">See the full flow {{ icon('arrow-right') }}</a>
+        </div>
+        <div class="sidebar-card">
+          <span class="eyebrow eyebrow--soft">{{ icon('sparkles') }} Also useful</span>
+          <div class="mini-related">
+            {% for item in related[:2] %}
+            <a href="{{ url_for('public.listing_detail', listing_id=item.id) }}">
+              <img src="{{ item.primary_image }}" alt="" loading="lazy">
+              <span><strong>{{ item.title|truncate(40, True, '…') }}</strong><small>{{ item.city }} · Free</small></span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    {% if related %}
+    <section class="related-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">{{ icon('compass') }} More from {{ listing.category_name }}</span>
+          <h2>You might also find useful</h2>
+        </div>
+        <a class="text-link" href="{{ url_for('public.browse', category=listing.category_slug) }}">View category {{ icon('arrow-right') }}</a>
+      </div>
+      <div class="listing-grid listing-grid--three">
+        {% for item in related %}{{ listing_card(item) }}{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  </div>
+</section>
+
+{% if current_user and can_claim %}
+<dialog class="modal" id="claim-dialog" aria-labelledby="claim-dialog-title"{% if request.args.get('claim') == '1' %} data-auto-open="true"{% endif %}>
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">{{ icon('hand-heart') }} A thoughtful request</span>
+        <h2 id="claim-dialog-title">Claim “{{ listing.title }}”</h2>
+        <p>Tell the Donor why this item matters. The item is free — Partnered Delivery adds one inclusive fee, shown below.</p>
+      </div>
+      <button type="button" class="icon-button" data-dialog-close aria-label="Close claim form">{{ icon('close') }}</button>
+    </div>
+    <form method="post" action="{{ url_for('public.claim_listing', listing_id=listing.id) }}" class="claim-form" data-delivery-form data-listing-id="{{ listing.id }}" data-quote-url="{{ url_for('api.quote') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="claim-item-preview">
+        <img src="{{ images[0].image_url }}" alt="">
+        <div><span>{{ listing.category_name }} · {{ listing.condition|condition_label }} · {{ listing.item_size|item_size_label }}</span><strong>{{ listing.title }}</strong><small>{{ icon('map-pin') }} {{ listing.city }} · Free</small></div>
+      </div>
+      <label class="field">
+        <span class="field-label">Why would this help you? <em>Required</em></span>
+        <textarea name="message" rows="5" minlength="30" maxlength="1500" required placeholder="Share a little context with the Donor. For example: what you need it for, who will use it, and anything you would like to ask about its condition."></textarea>
+        <span class="field-hint">Be honest and specific. At least 30 characters. Your reason is only visible to the Donor.</span>
+      </label>
+
+      <fieldset class="claim-method">
+        <legend>How would you like to receive it?</legend>
+        <label class="method-option">
+          <input type="radio" name="receive_method" value="delivery" checked data-method-option>
+          <span class="method-card">
+            <span class="method-icon">{{ icon('truck') }}</span>
+            <strong>Partnered Delivery <span class="mini-tag mini-tag--cyan">Default</span></strong>
+            <small>A partner is assigned automatically. One inclusive fee of ₱{{ delivery_fee_min|int }}–₱{{ delivery_fee_max|int }}.</small>
+          </span>
+        </label>
+        <label class="method-option">
+          <input type="radio" name="receive_method" value="pickup" data-method-option>
+          <span class="method-card">
+            <span class="method-icon">{{ icon('map-pin') }}</span>
+            <strong>Self Pickup</strong>
+            <small>Choose this only if you can collect the item. Agree the meeting point with the Donor in Messages.</small>
+          </span>
+        </label>
+      </fieldset>
+
+      <div class="claim-fields claim-fields--delivery" data-delivery-fields>
+        <label class="field">
+          <span class="field-label">Drop-off address <em>Required</em></span>
+          <input type="text" name="delivery_address" maxlength="240" placeholder="House/unit, street, barangay, city" data-delivery-address required>
+          <span class="field-hint">Used to calculate the inclusive fee and to brief the delivery partner. Visible only to the people handling the handover.</span>
+        </label>
+        <div class="quote-box" data-quote-box>
+          <div class="quote-box-head">
+            <span>{{ icon('truck') }} Partnered Delivery estimate</span>
+            <span class="mini-tag mini-tag--cyan">Inclusive</span>
+          </div>
+          <div class="quote-breakdown">
+            <div><span>Estimated distance</span><strong data-quote-distance>{{ default_quote.distance_km }} km</strong></div>
+            <div><span>Delivery fee</span><strong data-quote-fee>₱{{ '%.2f'|format(default_quote.fee) }}</strong></div>
+            <div><span>Partner</span><strong data-quote-partner>{{ default_quote.partner_name }}</strong></div>
+            <div><span>Estimated arrival</span><strong data-quote-eta>{{ default_quote.eta }}</strong></div>
+          </div>
+          <p data-quote-message>Inclusive delivery fee. No additional charges.</p>
+        </div>
+        <div class="inline-notice inline-notice--compact">
+          {{ icon('info') }} The fee varies by item size and distance, and stays within ₱{{ delivery_fee_min|int }}–₱{{ delivery_fee_max|int }}. It is passed in full to the delivery partner.
+        </div>
+      </div>
+
+      <div class="claim-fields claim-fields--pickup" data-pickup-fields hidden>
+        <div class="inline-notice inline-notice--compact">
+          {{ icon('map-pin') }} Self Pickup has no delivery fee. The Donor will confirm a public meeting point with you in Messages after accepting.
+        </div>
+      </div>
+
+      <div class="safety-before-final">
+        <span class="safety-before-icon">{{ icon('shield-check') }}</span>
+        <div>
+          <strong>Before you finalise</strong>
+          <ul>
+            <li>Meet in a public, well-lit place whenever possible.</li>
+            <li>Bring another person if it makes you feel safer.</li>
+            <li>Never share passwords, verification codes or financial details.</li>
+          </ul>
+        </div>
+      </div>
+      <label class="checkbox-field">
+        <input type="checkbox" name="safety_ack" required>
+        <span>I have read the safety reminders and will arrange a safe handover.</span>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-dialog-close>Not yet</button>
+        <button type="submit" class="btn btn-primary">{{ icon('send') }} Send claim request</button>
+      </div>
+      <p class="modal-fine-print">Sending a request does not charge you for the item or guarantee it. The Donor decides which request to accept. A delivery fee applies only if you keep Partnered Delivery.</p>
+    </form>
+  </div>
+</dialog>
+{% endif %}
+
+{% if current_user %}
+<dialog class="modal" id="report-dialog" aria-labelledby="report-dialog-title">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow eyebrow--danger">{{ icon('flag') }} Help keep the community safe</span>
+        <h2 id="report-dialog-title">Report this listing</h2>
+        <p>Reports are private and reviewed by the Anti-Imbak safety team. The Donor is not told who submitted a report.</p>
+      </div>
+      <button type="button" class="icon-button" data-dialog-close aria-label="Close report form">{{ icon('close') }}</button>
+    </div>
+    {% if has_open_report %}
+      <div class="inline-notice">{{ icon('clock') }} You already have an open report for this listing. The safety team is reviewing it.</div>
+    {% else %}
+    <form method="post" action="{{ url_for('public.report_listing', listing_id=listing.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label class="field">
+        <span class="field-label">What is the concern?</span>
+        <select name="reason" required>
+          <option value="">Choose a reason</option>
+          {% for reason in report_reasons %}<option value="{{ reason }}">{{ reason }}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Tell us what happened</span>
+        <textarea name="details" rows="4" minlength="10" maxlength="2000" required placeholder="Add enough detail for the team to investigate. Do not include private information about yourself."></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-dialog-close>Cancel</button>
+        <button type="submit" class="btn btn-danger">{{ icon('flag') }} Submit report</button>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+</dialog>
+{% endif %}
+{% endblock %}

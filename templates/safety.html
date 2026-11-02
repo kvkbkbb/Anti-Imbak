@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}Safety & Trust — Anti-Imbak{% endblock %}
+{% block meta_description %}Safety guidelines for giving and receiving items on Anti-Imbak, including safer meetups, privacy and reporting.{% endblock %}
+{% block body_class %}site-page content-page safety-page{% endblock %}
+
+{% block content %}
+<section class="content-hero safety-hero">
+  <div class="content-hero-glow" aria-hidden="true"></div>
+  <div class="container content-hero-inner">
+    <span class="eyebrow eyebrow--green">{{ icon('shield-check') }} Safety & trust</span>
+    <h1>A generous exchange<br><span class="text-gradient">should always feel safe.</span></h1>
+    <p>Anti-Imbak is built on community care. These guidelines help both Donors and Recipients keep the handover respectful, private and safe.</p>
+    <div class="content-hero-actions">
+      <a class="btn btn-primary" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Browse safely</a>
+      <a class="btn btn-secondary" href="mailto:hello@antiimbak.ph">{{ icon('mail') }} Contact the team</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container safety-layout">
+    <div class="safety-intro">
+      <span class="eyebrow">{{ icon('list') }} {{ tips|length }} simple practice{{ '' if tips|length == 1 else 's' }}</span>
+      <h2>Before, during and after the handover.</h2>
+      <p>Use good judgment and trust your instincts. If a request or meeting plan feels wrong, you can pause, decline or report it.</p>
+      <div class="safety-reminder">
+        <span>{{ icon('phone') }}</span>
+        <div><strong>In an emergency</strong><p>Contact local emergency services first. Anti-Imbak cannot provide emergency response.</p></div>
+      </div>
+    </div>
+    <div class="safety-tips">
+      {% for tip in tips %}
+      <article class="safety-tip reveal">
+        <span class="tip-number">{{ "%02d"|format(loop.index) }}</span>
+        <p>{{ tip.text }}</p>
+        <span class="tip-check">{{ icon('shield-check') }}</span>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section safety-scenarios-section">
+  <div class="container">
+    <div class="section-heading section-heading--center">
+      <div>
+        <span class="eyebrow">{{ icon('users') }} Shared responsibility</span>
+        <h2>For Donors. For Recipients. For everyone.</h2>
+      </div>
+    </div>
+    <div class="safety-scenario-grid">
+      <article class="safety-scenario safety-scenario--do">
+        <span class="eyebrow eyebrow--green">{{ icon('check-circle') }} Do</span>
+        <h3>Choose a handover that gives everyone room.</h3>
+        <ul>
+          <li>{{ icon('check') }} Meet in a public, well-lit place such as a mall lobby or barangay hall.</li>
+          <li>{{ icon('check') }} Tell a friend where you are going and share only a general area first.</li>
+          <li>{{ icon('check') }} Bring a companion for evening pickups or bulky items.</li>
+          <li>{{ icon('check') }} Inspect the item before taking it.</li>
+          <li>{{ icon('check') }} Keep chat and updates inside the Anti-Imbak dashboard where possible.</li>
+        </ul>
+      </article>
+      <article class="safety-scenario safety-scenario--dont">
+        <span class="eyebrow eyebrow--danger">{{ icon('x-circle') }} Don't</span>
+        <h3>Do not trade away your privacy or safety.</h3>
+        <ul>
+          <li>{{ icon('close') }} Send passwords, verification codes or banking details.</li>
+          <li>{{ icon('close') }} Pay a deposit to “hold” a free donation.</li>
+          <li>{{ icon('close') }} Meet alone in an isolated location if you feel uncomfortable.</li>
+          <li>{{ icon('close') }} Share your full home address before a claim is accepted.</li>
+          <li>{{ icon('close') }} Ignore threats, harassment or pressure to act quickly.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container report-process">
+    <div class="report-process-copy">
+      <span class="eyebrow">{{ icon('flag') }} Speak up</span>
+      <h2>Reporting is a community safety tool.</h2>
+      <p>If a listing, message or handover feels unsafe, report it. Reports go privately to the Anti-Imbak team and include the listing, reason and details you provide. The person you report is not told who submitted it.</p>
+      <div class="report-types">
+        <span>{{ icon('alert-triangle') }} Suspicious listing</span>
+        <span>{{ icon('file') }} Misleading description</span>
+        <span>{{ icon('image') }} Inappropriate images</span>
+        <span>{{ icon('user') }} Fraudulent account</span>
+        <span>{{ icon('message-circle') }} Harassment</span>
+        <span>{{ icon('shield') }} Unsafe transaction</span>
+      </div>
+      <a class="btn btn-primary" href="{{ url_for('public.browse') }}">Find a listing to report</a>
+    </div>
+    <div class="report-process-steps">
+      <div><span>1</span><div><strong>Pause the exchange</strong><p>You never have to continue a conversation or meeting that feels unsafe.</p></div></div>
+      <div><span>2</span><div><strong>Use the listing's report button</strong><p>Choose a reason and add factual details. Admin review is private.</p></div></div>
+      <div><span>3</span><div><strong>Keep a record</strong><p>Keep relevant messages or details until the safety team has reviewed your report.</p></div></div>
+      <div><span>4</span><div><strong>Leave if needed</strong><p>Your wellbeing comes first. Contact local authorities in an emergency.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="safety-cta">
+      <span class="safety-cta-icon">{{ icon('shield-check') }}</span>
+      <div>
+        <span class="eyebrow eyebrow--light">A shared promise</span>
+        <h2>Generosity is strongest when it is safe.</h2>
+        <p>Every member helps keep Anti-Imbak a considerate place to give and receive.</p>
+      </div>
+      <a class="btn btn-primary" href="{{ url_for('public.how_it_works') }}">How Anti-Imbak works {{ icon('arrow-right') }}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

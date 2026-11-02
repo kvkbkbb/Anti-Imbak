@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title desc">
+  <title id="title">Donated boxes illustration</title>
+  <desc id="desc">An abstract illustration of stacked donation boxes and a small plant on a dark background.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="640" y2="480" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b152a"/>
+      <stop offset="1" stop-color="#050a16"/>
+    </linearGradient>
+    <linearGradient id="box" x1="220" y1="200" x2="420" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1d3355"/>
+      <stop offset="1" stop-color="#101d35"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="120" y1="120" x2="520" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#39e7f4"/>
+      <stop offset="1" stop-color="#7d6cff"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="480" fill="url(#bg)"/>
+  <circle cx="468" cy="116" r="150" fill="#39e7f4" opacity=".06"/>
+  <circle cx="170" cy="400" r="170" fill="#7d6cff" opacity=".07"/>
+  <g opacity=".24" stroke="#8fb4d9" stroke-width="1">
+    <path d="M0 96h640M0 192h640M0 288h640M0 384h640M96 0v480M192 0v480M288 0v480M384 0v480M480 0v480M576 0v480"/>
+  </g>
+  <ellipse cx="320" cy="392" rx="190" ry="32" fill="#02060f" opacity=".72"/>
+  <g>
+    <path d="m188 248 92-48 92 48-92 48-92-48Z" fill="#233b60"/>
+    <path d="M188 248v84l92 48v-84l-92-48Z" fill="#162844"/>
+    <path d="m372 248-92 48v84l92-48v-84Z" fill="url(#box)"/>
+    <path d="m280 296 92-48" stroke="#39e7f4" stroke-opacity=".5" stroke-width="2"/>
+    <path d="M236 224v42M280 200v42" stroke="#39e7f4" stroke-opacity=".25" stroke-width="2"/>
+  </g>
+  <g transform="translate(68 146) scale(.62)">
+    <path d="m188 248 92-48 92 48-92 48-92-48Z" fill="#2a446b"/>
+    <path d="M188 248v84l92 48v-84l-92-48Z" fill="#182b49"/>
+    <path d="m372 248-92 48v84l92-48v-84Z" fill="#1e3454"/>
+  </g>
+  <g transform="translate(348 208) scale(.48)">
+    <path d="m188 248 92-48 92 48-92 48-92-48Z" fill="#2b3d70"/>
+    <path d="M188 248v84l92 48v-84l-92-48Z" fill="#1a2445"/>
+    <path d="m372 248-92 48v84l92-48v-84Z" fill="#22315b"/>
+  </g>
+  <g>
+    <path d="M320 224c-18-30-18-58 0-78 18 20 18 48 0 78Z" fill="url(#cyan)" opacity=".85"/>
+    <path d="M320 224c-32-8-50-28-54-52 26 2 46 20 54 52Z" fill="#4ee0a1" opacity=".8"/>
+    <path d="M320 224c32-8 50-28 54-52-26 2-46 20-54 52Z" fill="#39e7f4" opacity=".55"/>
+  </g>
+  <path d="M480 122c3 20 10 27 30 30-20 3-27 10-30 30-3-20-10-27-30-30 20-3 27-10 30-30Z" fill="#eef8ff" opacity=".92"/>
+  <circle cx="144" cy="132" r="5" fill="#39e7f4"/>
+  <circle cx="520" cy="330" r="4" fill="#7d6cff"/>
+</svg>

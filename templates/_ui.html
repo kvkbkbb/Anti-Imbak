@@ -1,0 +1,184 @@
+{% macro icon(name, class_name='') -%}
+<svg class="icon {{ class_name }}" aria-hidden="true" focusable="false"><use href="#icon-{{ name }}"></use></svg>
+{%- endmacro %}
+
+{% macro avatar(name, image_url, classes='') -%}
+<span class="avatar {{ classes }}">
+  {% if image_url %}
+    <img src="{{ image_url }}" alt="" loading="lazy">
+  {% else %}
+    <span aria-hidden="true">{{ name|initials }}</span>
+  {% endif %}
+</span>
+{%- endmacro %}
+
+{% macro verified_badge(verified, compact=False) -%}
+{% if verified %}
+<span class="verified{% if compact %} verified--compact{% endif %}" title="Community verified">
+  {{ icon('badge-check') }}{% if not compact %}<span>Verified</span>{% endif %}
+</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro status_badge(status) -%}
+<span class="status status--{{ status|status_tone }}">{{ status|status_label }}</span>
+{%- endmacro %}
+
+{% macro listing_card(listing, show_saved=True) -%}
+{% set is_repair = listing.condition in ['For Repair', 'Nonfunctional'] %}
+{% set is_recent = listing.age_days is defined and listing.age_days is not none and listing.age_days <= 2.5 %}
+<article class="listing-card reveal{% if listing.is_featured %} listing-card--featured{% endif %}{% if is_recent and not listing.is_featured %} listing-card--fresh{% endif %}{% if is_repair %} listing-card--repair{% endif %} listing-card--{{ listing.status }}">
+  <div class="listing-media">
+    <a class="listing-media-link" href="{{ url_for('public.listing_detail', listing_id=listing.id) }}" aria-label="View {{ listing.title }}">
+      {% if listing.primary_image %}
+        <img src="{{ listing.primary_image }}" alt="{{ listing.title }}" class="listing-image" loading="lazy">
+      {% else %}
+        <span class="listing-image listing-image--empty">{{ icon('image') }}</span>
+      {% endif %}
+      <span class="media-vignette" aria-hidden="true"></span>
+      <span class="free-pill">Free</span>
+      {% if listing.is_featured %}
+        <span class="featured-pill">{{ icon('sparkles') }} Featured</span>
+      {% endif %}
+      {% if listing.status != 'available' %}
+        <span class="availability-ribbon availability-ribbon--{{ listing.status }}">{{ listing.status|status_label }}</span>
+      {% endif %}
+    </a>
+    {% if show_saved %}
+    <form method="post" action="{{ url_for('public.toggle_save', listing_id=listing.id) }}" class="save-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ request.full_path }}">
+      <button type="submit" class="card-save {% if listing.is_saved %}is-saved{% endif %}" aria-pressed="{{ 'true' if listing.is_saved else 'false' }}" aria-label="{{ 'Remove ' ~ listing.title ~ ' from saved items' if listing.is_saved else 'Save ' ~ listing.title }}">
+        {{ icon('heart') }}
+      </button>
+    </form>
+    {% endif %}
+  </div>
+  <div class="listing-body">
+    <div class="listing-topline">
+      <span class="eyebrow eyebrow--soft">{{ listing.category_name }}</span>
+      <span class="condition condition--{{ listing.condition|condition_tone }}">{{ listing.condition|condition_label }}</span>
+    </div>
+    <h3 class="listing-title"><a href="{{ url_for('public.listing_detail', listing_id=listing.id) }}">{{ listing.title }}</a></h3>
+    <p class="listing-description">{{ listing.description|truncate(108, True, '…') }}</p>
+    {% if is_repair %}
+    <p class="listing-repair-note">{{ icon('alert-triangle') }} {{ 'Needs repair — read the faults before claiming' if listing.condition == 'For Repair' else 'Not working — listed for parts or repair' }}</p>
+    {% endif %}
+    <div class="listing-meta">
+      <span>{{ icon('map-pin') }} {{ listing.area }}, {{ listing.city }}</span>
+      <span>{{ icon('clock') }} {{ listing.created_at|time_ago }}</span>
+      {% if listing.distance_km is defined and listing.distance_km is not none %}
+      <span class="listing-distance">{{ listing.distance_km|round(1) }} km away</span>
+      {% endif %}
+    </div>
+    <div class="listing-footer">
+      <div class="donor-line">
+        {{ avatar(listing.donor_name, listing.donor_avatar, 'avatar--xs') }}
+        <div class="donor-copy">
+          <span class="donor-name">{{ listing.donor_name }}</span>
+          <span class="donor-note">{% if listing.donor_verified %}Verified Donor{% else %}Community Donor{% endif %}</span>
+        </div>
+      </div>
+      <a class="round-arrow" href="{{ url_for('public.listing_detail', listing_id=listing.id) }}" aria-label="Open {{ listing.title }}">
+        {{ icon('arrow-up-right') }}
+      </a>
+    </div>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro category_card(category) -%}
+<a class="category-card reveal" href="{{ url_for('public.browse', category=category.slug) }}">
+  <span class="category-icon">{{ icon(category.icon) }}</span>
+  <span class="category-copy">
+    <strong>{{ category.name }}</strong>
+    <span>{{ category.listing_count }} {{ category.listing_count|plural('item') }}</span>
+  </span>
+  <span class="category-arrow">{{ icon('arrow-up-right') }}</span>
+</a>
+{%- endmacro %}
+
+{% macro pagination(page, total_pages, page_url) -%}
+{% if total_pages > 1 %}
+<nav class="pagination" aria-label="Marketplace pages">
+  <a class="page-btn page-btn--edge {% if page == 1 %}is-disabled{% endif %}" href="{{ page_url(page - 1) if page > 1 else '#' }}" {% if page == 1 %}aria-disabled="true" tabindex="-1"{% endif %}>
+    {{ icon('chevron-left') }} <span class="hide-mobile">Previous</span>
+  </a>
+  <div class="page-numbers">
+    {% for number in range([1, page - 2]|max, [total_pages, page + 2]|min + 1) %}
+      <a href="{{ page_url(number) }}" class="page-number {% if number == page %}is-current{% endif %}" {% if number == page %}aria-current="page"{% endif %}>{{ number }}</a>
+    {% endfor %}
+  </div>
+  <a class="page-btn page-btn--edge {% if page == total_pages %}is-disabled{% endif %}" href="{{ page_url(page + 1) if page < total_pages else '#' }}" {% if page == total_pages %}aria-disabled="true" tabindex="-1"{% endif %}>
+    <span class="hide-mobile">Next</span> {{ icon('chevron-right') }}
+  </a>
+</nav>
+{% endif %}
+{%- endmacro %}
+
+{% macro empty_state(icon_name, title, message, action_label=None, action_url=None) -%}
+<div class="empty-state reveal">
+  <span class="empty-icon">{{ icon(icon_name) }}</span>
+  <h3>{{ title }}</h3>
+  <p>{{ message }}</p>
+  {% if action_label and action_url %}
+    <a class="btn btn-secondary" href="{{ action_url }}">{{ action_label }} {{ icon('arrow-right') }}</a>
+  {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro ad_sidebar_card(ad) -%}
+{% if ad %}
+<aside class="sponsored-card reveal" aria-label="Sponsored advertisement">
+  <div class="sponsored-label">Sponsored <span>Paid placement</span></div>
+  {% if ad.image_url %}
+  <div class="sponsored-image"><img src="{{ ad.image_url }}" alt="" loading="lazy"></div>
+  {% endif %}
+  <div class="sponsored-copy">
+    <span class="eyebrow eyebrow--soft">{{ ad.business_type }}</span>
+    <h3>{{ ad.title }}</h3>
+    <p>{{ ad.body|truncate(155, True, '…') }}</p>
+    <a class="sponsored-link" href="{{ url_for('public.ad_visit', ad_id=ad.id) }}">{{ ad.cta_label }} {{ icon('arrow-up-right') }}</a>
+    <span class="advertised-by">Advertisement by {{ ad.advertiser_name }}</span>
+  </div>
+</aside>
+{% endif %}
+{%- endmacro %}
+
+{% macro ad_banner(ad) -%}
+{% if ad %}
+<section class="home-ad reveal" aria-label="Sponsored advertisement">
+  <div class="home-ad-media">
+    {% if ad.image_url %}<img src="{{ ad.image_url }}" alt="" loading="lazy">{% endif %}
+    <span class="sponsored-flag">Sponsored · Paid advertisement</span>
+  </div>
+  <div class="home-ad-copy">
+    <span class="eyebrow eyebrow--soft">{{ ad.business_type }}</span>
+    <h2>{{ ad.title }}</h2>
+    <p>{{ ad.body }}</p>
+    <div class="ad-actions">
+      <a class="btn btn-secondary" href="{{ url_for('public.ad_visit', ad_id=ad.id) }}">{{ ad.cta_label }} {{ icon('arrow-up-right') }}</a>
+      <span>Advertisement by {{ ad.advertiser_name }}</span>
+    </div>
+  </div>
+</section>
+{% endif %}
+{%- endmacro %}
+
+{% macro notification_icon(type_name) -%}
+{% set icon_map = {
+  'claim_request': 'gift',
+  'claim_accepted': 'check-circle',
+  'claim_rejected': 'x-circle',
+  'delivery_update': 'truck',
+  'listing_update': 'package',
+  'featured_expired': 'sparkles',
+  'advertisement': 'megaphone',
+  'announcement': 'bell'
+} %}
+{{ icon(icon_map.get(type_name, 'bell')) }}
+{%- endmacro %}
+
+{% macro form_error(errors, field) -%}
+{% if errors and errors.get(field) %}<span class="field-error">{{ errors.get(field) }}</span>{% endif %}
+{%- endmacro %}

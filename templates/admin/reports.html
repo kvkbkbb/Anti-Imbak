@@ -1,0 +1,126 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}Trust &amp; Safety — Anti-Imbak Admin{% endblock %}
+{% block admin_breadcrumb %}Trust &amp; safety{% endblock %}
+{% block admin_title %}Trust &amp; safety queue{% endblock %}
+{% block admin_subtitle %}
+<p>Read every report carefully. Document the decision and keep the community's trust in good hands.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('public.safety') }}">{{ icon('shield-check') }} Public safety page</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--four">
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('flag') }}</span>
+    <div class="stat-copy"><span>Open reports</span><strong>{{ stats.open }}</strong><small>awaiting review</small></div>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('check-circle') }}</span>
+    <div class="stat-copy"><span>Resolved</span><strong>{{ stats.resolved }}</strong><small>actioned by the team</small></div>
+  </article>
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('x-circle') }}</span>
+    <div class="stat-copy"><span>Dismissed</span><strong>{{ stats.dismissed }}</strong><small>reviewed, no action</small></div>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('list') }}</span>
+    <div class="stat-copy"><span>All reports</span><strong>{{ stats.all }}</strong><small>full safety history</small></div>
+  </article>
+</section>
+
+<div class="dash-tabs admin-report-tabs" aria-label="Filter reports by status">
+  <a href="{{ url_for('admin.reports', status='open') }}" class="dash-tab {% if status_filter == 'open' %}is-active{% endif %}">Open queue <span>{{ stats.open }}</span></a>
+  <a href="{{ url_for('admin.reports', status='resolved') }}" class="dash-tab {% if status_filter == 'resolved' %}is-active{% endif %}">Resolved <span>{{ stats.resolved }}</span></a>
+  <a href="{{ url_for('admin.reports', status='dismissed') }}" class="dash-tab {% if status_filter == 'dismissed' %}is-active{% endif %}">Dismissed <span>{{ stats.dismissed }}</span></a>
+  <a href="{{ url_for('admin.reports', status='all') }}" class="dash-tab {% if status_filter == 'all' %}is-active{% endif %}">All <span>{{ stats.all }}</span></a>
+</div>
+
+{% if reports %}
+<section class="report-queue">
+  {% for report in reports %}
+  <article class="panel report-card {% if report.status == 'open' %}report-card--open{% endif %}">
+    <div class="report-card-head">
+      <div class="report-card-reason">
+        <span class="report-icon">{{ icon('flag') }}</span>
+        <div>
+          <span class="eyebrow eyebrow--danger">Report #{{ report.id }}</span>
+          <h2>{{ report.reason }}</h2>
+          <p>Filed {{ report.created_at|time_ago }} by {{ report.reporter_name }} · {{ report.reporter_email }}</p>
+        </div>
+      </div>
+      <span class="status status--{{ report.status|status_tone }}">{{ report.status|title }}</span>
+    </div>
+
+    <div class="report-card-grid">
+      <div class="report-context">
+        <div>
+          <span class="report-label">{{ icon('package') }} Listing</span>
+          {% if report.listing_id %}
+          <a class="report-target" href="{{ url_for('public.listing_detail', listing_id=report.listing_id) }}">{{ report.listing_title }} {{ icon('arrow-up-right') }}</a>
+          {% else %}
+          <span class="cell-muted">Account-level report</span>
+          {% endif %}
+        </div>
+        <div>
+          <span class="report-label">{{ icon('user') }} Reported member</span>
+          {% if report.reported_user_id %}
+          <a class="report-target" href="{{ url_for('admin.user_detail', user_id=report.reported_user_id) }}">{{ report.reported_name }} {{ icon('arrow-up-right') }}</a>
+          <small class="cell-sub">{{ report.reported_email }}</small>
+          {% else %}
+          <span class="cell-muted">No member attached</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="report-details">
+        <span class="report-label">{{ icon('file') }} Reporter's details</span>
+        <p>{{ report.details or 'No additional details were provided.' }}</p>
+      </div>
+    </div>
+
+    {% if report.status == 'open' %}
+    <form class="report-resolution" method="post" action="{{ url_for('admin.resolve_report', report_id=report.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label class="field">
+        <span class="field-label">Administrative note <small>Required · shared with the reporter</small></span>
+        <textarea name="admin_note" rows="3" minlength="5" maxlength="1000" required placeholder="Summarise what you checked and what you decided."></textarea>
+      </label>
+      <div class="report-resolution-actions">
+        <button class="btn btn-secondary" type="submit" name="action" value="dismiss" data-confirm="Dismiss this report? The reporter will be notified that no action was taken.">{{ icon('x-circle') }} Dismiss</button>
+        <button class="btn btn-primary" type="submit" name="action" value="resolve" data-confirm="Resolve this report and notify the reporter?">{{ icon('check-circle') }} Resolve report</button>
+      </div>
+    </form>
+    {% else %}
+    <div class="report-outcome">
+      <span class="eyebrow">{{ icon('shield-check') }} Outcome</span>
+      <p>{{ report.admin_note or 'No administrative note was recorded.' }}</p>
+      <small>{% if report.resolver_name %}Closed by {{ report.resolver_name }}{% else %}Closed by the safety team{% endif %}{% if report.resolved_at %} · {{ report.resolved_at|long_date }}{% endif %}</small>
+    </div>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+{% else %}
+<div class="panel">
+  <div class="empty-state">
+    <span class="empty-icon">{{ icon('shield-check') }}</span>
+    <h3>This queue is clear</h3>
+    <p>No reports match this status. The community is having a calm day — keep an eye on the public listings all the same.</p>
+    <a class="btn btn-secondary" href="{{ url_for('admin.reports', status='all') }}">View all reports {{ icon('arrow-right') }}</a>
+  </div>
+</div>
+{% endif %}
+
+<section class="panel report-guidance">
+  <div class="panel-head panel-head--inline">
+    <div><span class="eyebrow">{{ icon('book-open') }} Resolution guide</span><h2>Close reports with care</h2></div>
+  </div>
+  <div class="report-guide-grid">
+    <div><span>{{ icon('eye') }}</span><strong>Check the context</strong><p>Open the listing and member profile. Read the full description and any prior reports before deciding.</p></div>
+    <div><span>{{ icon('message-circle') }}</span><strong>Write a human note</strong><p>Notes are shown to the reporter. Be clear about what was reviewed and what changed.</p></div>
+    <div><span>{{ icon('shield-check') }}</span><strong>Choose the right action</strong><p>Resolve when a guideline was broken. Dismiss when the report does not hold up.</p></div>
+  </div>
+</section>
+{% endblock %}

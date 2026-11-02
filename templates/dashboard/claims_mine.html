@@ -1,0 +1,116 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}My Requests — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}My Requests{% endblock %}
+{% block dash_title %}My Requests{% endblock %}
+{% block dash_subtitle %}<p>Follow every request, delivery update and conversation from one place.</p>{% endblock %}
+{% block dash_actions %}
+  <a class="btn btn-primary btn-sm" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Browse Marketplace</a>
+{% endblock %}
+
+{% block dash_content %}
+<div class="dash-tabs" role="navigation" aria-label="Filter requests">
+  {% for key, label in [('all', 'All'), ('pending', 'Awaiting review'), ('accepted', 'Accepted'), ('completed', 'Completed'), ('rejected', 'Not selected'), ('cancelled', 'Withdrawn')] %}
+  <a class="dash-tab {% if status_filter == key %}is-active{% endif %}" href="{{ url_for('dashboard.my_claims', status=key) }}">
+    {{ label }}<span class="dash-tab-count">{{ counts.get(key, counts.get('all', 0) if key == 'all' else 0) }}</span>
+  </a>
+  {% endfor %}
+</div>
+
+{% if claims %}
+<div class="request-list">
+  {% for claim in claims %}
+  {% set step_index = delivery_steps.index(claim.delivery_status) if claim.delivery_status in delivery_steps else -1 %}
+  <article class="request-card request-card--{{ claim.status }}">
+    <div class="request-thumb">
+      {% if claim.listing_image %}
+        <img src="{{ claim.listing_image }}" alt="{{ claim.listing_title }}" loading="lazy">
+      {% else %}
+        <span class="listing-image listing-image--empty">{{ icon('image') }}</span>
+      {% endif %}
+    </div>
+    <div class="request-body">
+      <div class="request-top">
+        <div>
+          <h3><a href="{{ url_for('dashboard.claim_detail', claim_id=claim.id) }}">{{ claim.listing_title }}</a></h3>
+          <div class="request-person">
+            {{ avatar(claim.donor_name, claim.donor_avatar, 'avatar--xs') }}
+            <span>Donor: <strong>{{ claim.donor_name }}</strong></span>
+            {% if claim.status in ['accepted', 'completed'] and claim.donor_contact %}<span>· {{ claim.donor_contact }}</span>{% endif %}
+          </div>
+        </div>
+        <span class="status status--{{ claim.status|status_tone }}">{{ claim.status|claim_status_label }}</span>
+      </div>
+
+      <div class="request-facts">
+        <span>{{ icon('truck' if claim.receive_method == 'delivery' else 'map-pin') }} {{ 'Partnered Delivery' if claim.receive_method == 'delivery' else 'Self Pickup' }}</span>
+        <span>{{ icon('tag') }} {{ claim.listing_condition|condition_label }} · {{ claim.item_size|item_size_label }}</span>
+        {% if claim.delivery_fee %}<span>{{ icon('wallet') }} ₱{{ '%.2f'|format(claim.delivery_fee) }} inclusive</span>{% endif %}
+        {% if claim.receive_method == 'delivery' and claim.partner_name %}<span>{{ icon('package') }} {{ claim.partner_name }}</span>{% endif %}
+        <span>{{ icon('clock') }} Requested {{ claim.created_at|time_ago }}</span>
+      </div>
+
+      {% if claim.status == 'accepted' and claim.receive_method == 'delivery' and claim.delivery_status %}
+      <div class="delivery-tracker delivery-tracker--compact">
+        <div class="delivery-tracker-head">
+          <div>
+            <h3>{{ claim.delivery_status|delivery_status_label }}</h3>
+            <p>{% if claim.tracking_code %}Tracking {{ claim.tracking_code }}{% else %}Partnered Delivery{% endif %}</p>
+          </div>
+          <span class="status status--{{ claim.delivery_status|status_tone }}">{{ claim.delivery_status|delivery_status_label }}</span>
+        </div>
+        <ol class="tracker-steps">
+          {% for step in delivery_steps %}
+          <li class="tracker-step {% if loop.index0 < step_index %}is-done{% elif loop.index0 == step_index %}is-current{% endif %}">
+            <span class="tracker-dot">{{ icon('check') if loop.index0 < step_index else icon('clock') if loop.index0 == step_index else icon('package') }}</span>
+            <span class="tracker-copy"><strong>{{ step|delivery_status_label }}</strong></span>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+      {% elif claim.status == 'completed' %}
+      <div class="inline-notice inline-notice--success">{{ icon('check-circle') }} Handover complete. This item is now part of your home.</div>
+      {% endif %}
+
+      {% if claim.donor_note %}
+      <p class="request-note">Donor note: {{ claim.donor_note }}</p>
+      {% endif %}
+
+      <div class="request-actions">
+        {% if claim.conversation_id %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.messages', conversation=claim.conversation_id) }}">{{ icon('message-circle') }} Message {{ claim.donor_name.split()[0] }}</a>
+        {% else %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.start_conversation', listing_id=claim.listing_id) }}">{{ icon('message-circle') }} Message Donor</a>
+        {% endif %}
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.claim_detail', claim_id=claim.id) }}">View details {{ icon('arrow-right') }}</a>
+
+        {% if claim.status in ['pending', 'accepted'] %}
+        <form method="post" action="{{ url_for('dashboard.cancel_claim', claim_id=claim.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-warning btn-sm" type="submit" data-confirm="Withdraw your request for “{{ claim.listing_title }}”?">{{ icon('x-circle') }} Withdraw</button>
+        </form>
+        {% endif %}
+        {% if claim.status == 'accepted' and (claim.receive_method == 'pickup' or claim.delivery_status == 'delivered') %}
+        <form method="post" action="{{ url_for('dashboard.complete_claim', claim_id=claim.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-positive btn-sm" type="submit">{{ icon('check-circle') }} Confirm item received</button>
+        </form>
+        {% endif %}
+        {% if claim.status in ['rejected', 'cancelled'] %}
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('public.browse') }}">Find another item</a>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <span class="empty-icon">{{ icon('hand-heart') }}</span>
+  <h3>No requests in this view</h3>
+  <p>Browse the marketplace, read each description carefully and message the Donor if you need more detail before claiming.</p>
+  <a class="btn btn-primary" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Browse Marketplace</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon %}
+{% from "_logo.html" import logo %}
+
+{% block title %}{% block auth_title %}Welcome to Anti-Imbak{% endblock %}{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+{% block main_class %}auth-main{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+  <div class="container auth-grid">
+    <aside class="auth-panel">
+      <div class="auth-panel-glow" aria-hidden="true"></div>
+      <div class="auth-panel-inner">
+        {{ logo(tagline=True) }}
+        <div class="auth-panel-copy">
+          <span class="hero-kicker"><span class="live-pill"><span class="pulse-dot"></span> A donation-only community</span></span>
+          {% block auth_aside %}
+          <h1>Good things find their way back into use.</h1>
+          <p>Join a marketplace where the items are always free and every handover starts with a little care.</p>
+          {% endblock %}
+        </div>
+        <ul class="auth-points">
+          <li><span>{{ icon('gift') }}</span><div><strong>Everything is free</strong><small>No prices, no bidding, no hidden item costs.</small></div></li>
+          <li><span>{{ icon('shield-check') }}</span><div><strong>Built for safer handovers</strong><small>Clear profiles, reporting tools and safety checkpoints.</small></div></li>
+          <li><span>{{ icon('leaf') }}</span><div><strong>Keep useful things in use</strong><small>Every completed handover is one less thing wasted.</small></div></li>
+        </ul>
+        <div class="auth-panel-footer">
+          <div class="avatar-stack">
+            <span class="avatar avatar--sm"><img src="{{ url_for('static', filename='img/avatars/maya.jpg') }}" alt=""></span>
+            <span class="avatar avatar--sm"><img src="{{ url_for('static', filename='img/avatars/noah.jpg') }}" alt=""></span>
+            <span class="avatar avatar--sm"><img src="{{ url_for('static', filename='img/avatars/lina.jpg') }}" alt=""></span>
+            <span class="avatar avatar--sm"><img src="{{ url_for('static', filename='img/avatars/bea.jpg') }}" alt=""></span>
+          </div>
+          <p>Neighbours sharing with purpose across Metro Manila.</p>
+        </div>
+      </div>
+    </aside>
+
+    <div class="auth-card-wrap">
+      <div class="auth-card">
+        <div class="auth-mobile-brand">{{ logo(compact=True) }}</div>
+        {% block auth_content %}{% endblock %}
+      </div>
+      <p class="auth-legal">By continuing you agree to our <a href="{{ url_for('public.terms') }}">Terms of Use</a> and <a href="{{ url_for('public.privacy') }}">Privacy Notice</a>.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

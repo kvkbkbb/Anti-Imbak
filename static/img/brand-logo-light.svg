@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="title desc">
+  <title id="title">Anti-Imbak logo for light backgrounds</title>
+  <desc id="desc">Cyan angular Anti and deep navy rounded Imbak in a horizontal lockup with the tagline Giving Items a Second Purpose.</desc>
+  <defs>
+    <linearGradient id="cyan-dark" x1="16" y1="20" x2="100" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a9fb8"/>
+      <stop offset=".5" stop-color="#0b7f9c"/>
+      <stop offset="1" stop-color="#083f63"/>
+    </linearGradient>
+    <linearGradient id="navy" x1="290" y1="34" x2="580" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#101c34"/>
+      <stop offset=".6" stop-color="#0a1427"/>
+      <stop offset="1" stop-color="#344b6d"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(18 22) scale(.62)">
+    <rect width="512" height="512" rx="112" fill="#f2f8ff"/>
+    <rect x="2" y="2" width="508" height="508" rx="110" fill="none" stroke="#0b7f9c" stroke-opacity=".2" stroke-width="2"/>
+    <g opacity=".45" stroke="#0b7f9c" stroke-width="2" fill="none">
+      <ellipse cx="256" cy="256" rx="190" ry="84" transform="rotate(-24 256 256)"/>
+      <ellipse cx="256" cy="256" rx="190" ry="84" transform="rotate(27 256 256)" opacity=".5"/>
+    </g>
+    <path d="M150 372 256 118l106 254" fill="none" stroke="url(#cyan-dark)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M193 292h126" fill="none" stroke="url(#navy)" stroke-width="22" stroke-linecap="round"/>
+    <circle cx="256" cy="118" r="17" fill="#f2f8ff" stroke="#0b7f9c" stroke-width="7"/>
+    <path d="M374 113c3 18 9 24 27 27-18 3-24 9-27 27-3-18-9-24-27-27 18-3 24-9 27-27Z" fill="#0b7f9c"/>
+  </g>
+
+  <text x="196" y="92" fill="url(#cyan-dark)" font-family="'Chakra Petch', 'Bahnschrift', sans-serif" font-size="66" font-style="italic" font-weight="700" letter-spacing="-1">Anti</text>
+  <text x="328" y="92" fill="#5b7194" font-family="'Outfit', 'Segoe UI', sans-serif" font-size="60" font-weight="500">-</text>
+  <text x="354" y="92" fill="url(#navy)" font-family="'Outfit', 'Segoe UI', sans-serif" font-size="66" font-weight="800" letter-spacing="-1.5">Imbak</text>
+  <path d="M566 40c2.6 16 8 21.4 24 24-16 2.6-21.4 8-24 24-2.6-16-8-21.4-24-24 16-2.6 21.4-8 24-24Z" fill="#0b7f9c"/>
+  <text x="198" y="132" fill="#5d7292" font-family="'Manrope', 'Segoe UI', sans-serif" font-size="16" letter-spacing="4">GIVING ITEMS A SECOND PURPOSE.</text>
+</svg>

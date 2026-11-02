@@ -1,0 +1,248 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar, verified_badge %}
+
+{% block title %}{{ dispute.dispute_code }} — Disputes Management{% endblock %}
+{% block admin_breadcrumb %}<a href="{{ url_for('admin.disputes') }}">Disputes</a> {{ icon('chevron-right') }} {{ dispute.dispute_code }}{% endblock %}
+{% block admin_title %}{{ dispute.dispute_code }} · {{ dispute.summary }}{% endblock %}
+{% block admin_subtitle %}
+<p>{{ dispute.category }} · opened {{ dispute.created_at|time_ago }} by {{ dispute.reporter_name }}{% if dispute.other_name %} with {{ dispute.other_name }}{% endif %}.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.disputes') }}">{{ icon('arrow-left') }} Dispute queue</a>
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.activity', q=dispute.dispute_code) }}">{{ icon('list') }} Case audit</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="case-detail-grid">
+  <div class="case-detail-main">
+    <section class="panel case-hero">
+      <div class="case-hero-topline">
+        <span class="status status--{{ dispute.status|status_tone }}">{{ dispute.status|dispute_status_label }}</span>
+        <span class="priority priority--{{ dispute.priority|priority_tone }}">{{ dispute.priority|priority_label }} priority</span>
+        {% if dispute.assigned_name %}
+        <span class="mini-tag">{{ icon('shield-check') }} Owned by {{ dispute.assigned_name }}</span>
+        {% else %}
+        <span class="mini-tag mini-tag--warm">{{ icon('user') }} Unassigned</span>
+        {% endif %}
+      </div>
+      <h2>{{ dispute.summary }}</h2>
+      <p class="case-hero-detail">{{ dispute.details or 'No additional case detail was provided.' }}</p>
+      <div class="case-hero-meta">
+        <span>{{ icon('calendar') }} Opened {{ dispute.created_at|long_date }}</span>
+        <span>{{ icon('clock') }} Updated {{ dispute.updated_at|time_ago }}</span>
+        {% if dispute.resolved_at %}<span>{{ icon('check-circle') }} Closed {{ dispute.resolved_at|long_date }}</span>{% endif %}
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head panel-head--inline">
+        <div>
+          <span class="eyebrow">{{ icon('file') }} Evidence</span>
+          <h2>What was attached</h2>
+          <p>{{ evidence|length }} {{ evidence|length|plural('item') }} shared with this case. Evidence is stored in the marketplace database.</p>
+        </div>
+        <span class="mini-tag">{{ icon('shield-check') }} Moderator only</span>
+      </div>
+      {% if evidence %}
+      <div class="evidence-grid">
+        {% for item in evidence %}
+        <article class="evidence-card">
+          {% if item.kind == 'image' and item.file_url %}
+          <a class="evidence-media" href="{{ item.file_url }}" target="_blank" rel="noopener">
+            <img src="{{ item.file_url }}" alt="{{ item.title }}" loading="lazy">
+            <span class="evidence-kind">{{ icon('image') }} Photo</span>
+          </a>
+          {% elif item.kind == 'link' %}
+          <a class="evidence-media evidence-media--link" href="{{ item.file_url or '#' }}" target="_blank" rel="noopener">
+            <span class="evidence-placeholder">{{ icon('external-link') }}</span>
+            <span class="evidence-kind">{{ icon('external-link') }} Reference link</span>
+          </a>
+          {% else %}
+          <div class="evidence-media evidence-media--note">
+            <span class="evidence-placeholder">{{ icon('file') }}</span>
+            <span class="evidence-kind">{{ icon('file') }} Note</span>
+          </div>
+          {% endif %}
+          <div class="evidence-copy">
+            <strong>{{ item.title }}</strong>
+            <p>{{ item.note or 'No description attached.' }}</p>
+            <small>{{ item.created_at|time_ago }}{% if item.file_url and item.kind == 'link' %} · <a href="{{ item.file_url }}" target="_blank" rel="noopener">Open reference {{ icon('arrow-up-right') }}</a>{% endif %}</small>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="mini-empty">{{ icon('file') }}<p>No evidence was attached. Add your own case note to record what you reviewed.</p></div>
+      {% endif %}
+    </section>
+
+    {% if dispute.resolution %}
+    <section class="panel case-resolution">
+      <div class="panel-head panel-head--inline">
+        <div><span class="eyebrow">{{ icon('check-circle') }} Resolution</span><h2>Recorded outcome</h2></div>
+        <span class="status status--{{ dispute.status|status_tone }}">{{ dispute.status|dispute_status_label }}</span>
+      </div>
+      <blockquote>{{ dispute.resolution }}</blockquote>
+      <p class="case-resolution-note">{{ icon('info') }} This resolution is part of the permanent case history and is shared with both parties.</p>
+    </section>
+    {% endif %}
+
+    <section class="panel">
+      <div class="panel-head panel-head--inline">
+        <div>
+          <span class="eyebrow">{{ icon('clock') }} Timeline</span>
+          <h2>Case history</h2>
+          <p>Every status change, note and administrative action in order.</p>
+        </div>
+        <span class="mini-tag">{{ events|length }} {{ events|length|plural('event') }}</span>
+      </div>
+      {% if events %}
+      <ol class="case-timeline">
+        {% for event in events %}
+        <li class="case-timeline-item case-timeline-item--{{ event.event_type }}">
+          <span class="case-timeline-dot"></span>
+          <div class="case-timeline-copy">
+            <div class="case-timeline-head">
+              <strong>{{ event.event_type|replace('_', ' ')|title }}</strong>
+              <time>{{ event.created_at|time_ago }}</time>
+            </div>
+            <p>{{ event.note or 'No note recorded.' }}</p>
+            <small>{{ event.actor_name or 'System' }} · {{ event.created_at|long_date }}</small>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <div class="mini-empty">{{ icon('clock') }}<p>The case history is empty. The first action will appear here.</p></div>
+      {% endif %}
+    </section>
+  </div>
+
+  <aside class="case-detail-side">
+    <section class="panel case-facts">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('shield') }} Case record</span><h2>Case details</h2></div></div>
+      <dl>
+        <div><dt>Case code</dt><dd><span class="mono">{{ dispute.dispute_code }}</span></dd></div>
+        <div><dt>Category</dt><dd>{{ dispute.category }}</dd></div>
+        <div><dt>Priority</dt><dd><span class="priority priority--{{ dispute.priority|priority_tone }}">{{ dispute.priority|priority_label }}</span></dd></div>
+        <div><dt>Status</dt><dd><span class="status status--{{ dispute.status|status_tone }}">{{ dispute.status|dispute_status_label }}</span></dd></div>
+        <div><dt>Case owner</dt><dd>{{ dispute.assigned_name or 'Unassigned' }}</dd></div>
+        <div><dt>Opened</dt><dd>{{ dispute.created_at|long_date }}</dd></div>
+        {% if dispute.resolved_at %}<div><dt>Resolved</dt><dd>{{ dispute.resolved_at|long_date }}</dd></div>{% endif %}
+      </dl>
+    </section>
+
+    <section class="panel case-parties">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('users') }} People</span><h2>Parties involved</h2></div></div>
+      <article class="case-person">
+        <div class="case-person-head">
+          {{ avatar(dispute.reporter_name, dispute.reporter_avatar, 'avatar--md') }}
+          <div>
+            <strong>{{ dispute.reporter_name }} {{ verified_badge(dispute.reporter_verified, compact=True) }}</strong>
+            <span>{{ icon('flag') }} Reporter</span>
+          </div>
+        </div>
+        <p>{{ dispute.reporter_email }}</p>
+        <div class="case-person-actions">
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('public.member_profile', user_id=dispute.reporter_id) }}">{{ icon('user') }} Profile</a>
+          {% if dispute.listing_id %}<a class="text-link text-link--sm" href="{{ url_for('public.listing_detail', listing_id=dispute.listing_id) }}">Listing {{ icon('arrow-up-right') }}</a>{% endif %}
+        </div>
+      </article>
+      {% if dispute.other_id %}
+      <article class="case-person">
+        <div class="case-person-head">
+          {{ avatar(dispute.other_name, dispute.other_avatar, 'avatar--md') }}
+          <div>
+            <strong>{{ dispute.other_name }} {{ verified_badge(dispute.other_verified, compact=True) }}</strong>
+            <span>{{ icon('users') }} Other party</span>
+          </div>
+        </div>
+        <p>{{ dispute.other_email }}</p>
+        <div class="case-person-actions">
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('public.member_profile', user_id=dispute.other_id) }}">{{ icon('user') }} Profile</a>
+        </div>
+      </article>
+      {% endif %}
+      {% if dispute.listing_id %}
+      <a class="case-listing-link" href="{{ url_for('public.listing_detail', listing_id=dispute.listing_id) }}">
+        <span class="case-listing-media">{{ icon('gift') }}</span>
+        <span><strong>{{ dispute.listing_title }}</strong><small>{{ dispute.listing_area }}, {{ dispute.listing_city }} · Listing {{ dispute.listing_status|status_label }}</small></span>
+        {{ icon('arrow-up-right') }}
+      </a>
+      {% endif %}
+    </section>
+
+    <section class="panel case-actions">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('shield') }} Casework</span><h2>Administrative actions</h2></div></div>
+
+      {% if not dispute.assigned_name %}
+      <form method="post" action="{{ url_for('admin.dispute_action', dispute_id=dispute.id) }}" class="case-action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="assign">
+        <button class="btn btn-secondary btn-block" type="submit">{{ icon('user') }} Assign this case to me</button>
+      </form>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('admin.dispute_action', dispute_id=dispute.id) }}" class="case-action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="note">
+        <label class="field">
+          <span>Add a case note</span>
+          <textarea name="note" rows="3" maxlength="1000" placeholder="What did you review? What happens next? Empty notes use a predefined sample note."></textarea>
+        </label>
+        <button class="btn btn-primary btn-block" type="submit">{{ icon('message-circle') }} Save case note</button>
+      </form>
+
+      <form method="post" action="{{ url_for('admin.dispute_action', dispute_id=dispute.id) }}" class="case-action-form case-action-form--divided">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="status">
+        <label class="field">
+          <span>Change status</span>
+          <select name="status">
+            {% for status in dispute_statuses %}
+            <option value="{{ status }}" {% if dispute.status == status %}selected{% endif %}>{{ status|dispute_status_label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span>Resolution summary <small>(used when resolving)</small></span>
+          <textarea name="resolution" rows="2" maxlength="2000" placeholder="Summarise the decision for both parties.">{{ dispute.resolution or '' }}</textarea>
+        </label>
+        <button class="btn btn-secondary btn-block" type="submit">{{ icon('refresh') }} Update status &amp; notify</button>
+      </form>
+
+      {% if dispute.status not in ['resolved', 'closed'] %}
+      <form method="post" action="{{ url_for('admin.dispute_action', dispute_id=dispute.id) }}" class="case-action-form case-action-form--divided">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="resolve">
+        <label class="field">
+          <span>Resolve this case</span>
+          <textarea name="resolution" rows="3" maxlength="2000" placeholder="Write at least a sentence describing the resolution.">{{ dispute.resolution or '' }}</textarea>
+        </label>
+        <button class="btn btn-primary btn-block" type="submit" data-confirm="Resolve this dispute? Both parties will be notified with the resolution summary.">{{ icon('check-circle') }} Resolve dispute</button>
+      </form>
+      {% else %}
+      <form method="post" action="{{ url_for('admin.dispute_action', dispute_id=dispute.id) }}" class="case-action-form case-action-form--divided">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="reopen">
+        <input type="hidden" name="note" value="Case reopened for a fresh review.">
+        <button class="btn btn-ghost btn-block" type="submit" data-confirm="Reopen this dispute? The case returns to the active queue.">{{ icon('refresh') }} Reopen case</button>
+      </form>
+      {% endif %}
+
+      <div class="case-action-note">{{ icon('info') }} All actions create an audit log entry and add to the case history. No email or SMS is actually sent.</div>
+    </section>
+
+    <section class="panel case-related">
+      <span class="eyebrow">{{ icon('message-circle') }} Related queues</span>
+      <h2>Keep the casework moving</h2>
+      <p>Open user concerns for account or technical issues, or check the audit trail for every administrative action.</p>
+      <div class="case-related-actions">
+        <a class="btn btn-secondary btn-sm btn-block" href="{{ url_for('admin.support') }}">{{ icon('message-circle') }} User concerns</a>
+        <a class="btn btn-ghost btn-sm btn-block" href="{{ url_for('admin.reports') }}">{{ icon('flag') }} Trust &amp; safety</a>
+        <a class="btn btn-ghost btn-sm btn-block" href="{{ url_for('admin.activity') }}">{{ icon('list') }} Activity logs</a>
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

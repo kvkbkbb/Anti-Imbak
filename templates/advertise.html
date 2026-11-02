@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}Advertise with Anti-Imbak — Reach a Community That Cares{% endblock %}
+{% block meta_description %}Partner with Anti-Imbak through clearly labelled local advertising. Explore homepage, category and marketplace placements for purpose-led businesses.{% endblock %}
+{% block body_class %}site-page content-page advertise-page{% endblock %}
+
+{% block content %}
+<section class="content-hero advertise-hero">
+  <div class="content-hero-glow" aria-hidden="true"></div>
+  <div class="container content-hero-inner">
+    <span class="eyebrow eyebrow--violet">{{ icon('megaphone') }} Advertise with purpose</span>
+    <h1>Reach people who<br><span class="text-gradient">choose reuse first.</span></h1>
+    <p>Anti-Imbak brings together thoughtful neighbours who care about sustainability, community and responsible consumption. Partner with us through advertising that is clearly labelled, genuinely useful and respectful of the donation experience.</p>
+    <div class="content-hero-actions">
+      <a class="btn btn-primary" href="#advertise-form">{{ icon('send') }} Start a conversation</a>
+      <a class="btn btn-secondary" href="#placements">See placements</a>
+    </div>
+    <div class="advertise-hero-note">
+      <span class="pulse-dot"></span>
+      Every campaign is reviewed and clearly labelled. Placements sit beside community donations and are never disguised as one.
+    </div>
+  </div>
+</section>
+
+<section class="section" id="placements">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">{{ icon('grid') }} Where your business appears</span>
+        <h2>Visible, relevant and always labelled.</h2>
+        <p>Every paid placement carries a clear Sponsored label and is kept visually separate from community donations.</p>
+      </div>
+    </div>
+    <div class="ad-placement-grid">
+      <article class="ad-placement-card reveal">
+        <span class="placement-preview placement-preview--banner">
+          <span class="placement-skeleton"></span>
+          <span class="sponsored-flag">Sponsored</span>
+        </span>
+        <div class="ad-placement-copy">
+          <span class="eyebrow eyebrow--soft">Homepage Hero Banner</span>
+          <h3>A warm welcome, above the finds.</h3>
+          <p>A wide banner placed between the featured and recent donation rails — high visibility without interrupting discovery.</p>
+          <ul class="check-list check-list--tight">
+            <li>{{ icon('check') }} Desktop, tablet and mobile formats</li>
+            <li>{{ icon('check') }} Clearly labelled Paid advertisement</li>
+            <li>{{ icon('check') }} Impression and click reporting for every placement</li>
+          </ul>
+        </div>
+      </article>
+      <article class="ad-placement-card reveal">
+        <span class="placement-preview placement-preview--sidebar">
+          <span class="placement-skeleton placement-skeleton--card"></span>
+          <span class="sponsored-flag">Sponsored</span>
+        </span>
+        <div class="ad-placement-copy">
+          <span class="eyebrow eyebrow--soft">Sponsored Business Card</span>
+          <h3>A useful companion to the search.</h3>
+          <p>A compact card in the marketplace sidebar, shown beside filters and results without competing with donation listings.</p>
+          <ul class="check-list check-list--tight">
+            <li>{{ icon('check') }} Contextual to browsing intent</li>
+            <li>{{ icon('check') }} Space for one image and a clear CTA</li>
+            <li>{{ icon('check') }} Never styled as a donated item</li>
+          </ul>
+        </div>
+      </article>
+      <article class="ad-placement-card reveal">
+        <span class="placement-preview placement-preview--spotlight">
+          <span class="placement-skeleton placement-skeleton--wide"></span>
+          <span class="sponsored-flag">Sponsored</span>
+        </span>
+        <div class="ad-placement-copy">
+          <span class="eyebrow eyebrow--soft">Category Spotlight</span>
+          <h3>Meet the right category.</h3>
+          <p>Place a relevant message above results in a single category, such as repair services for Home Appliances or moving help for Furniture.</p>
+          <ul class="check-list check-list--tight">
+            <li>{{ icon('check') }} Choose one or more categories</li>
+            <li>{{ icon('check') }} Local relevance front and centre</li>
+            <li>{{ icon('check') }} Respectful, static creative only</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    {% if packages %}
+    <div class="package-board">
+      <div class="package-board-head">
+        <div>
+          <span class="eyebrow">{{ icon('wallet') }} Advertising rate card</span>
+          <h2>Simple packages, transparent pricing.</h2>
+          <p>Choose a package to start an enquiry. The partnerships team confirms availability and billing before anything goes live.</p>
+        </div>
+        <span class="status status--cyan">Clear pricing</span>
+      </div>
+      <div class="package-grid">
+        {% for package in packages %}
+        <article class="package-card {% if loop.index == 2 %}package-card--featured{% endif %}">
+          <span class="package-placement">{{ package.placement|replace('_', ' ')|title }}</span>
+          <h3>{{ package.name }}</h3>
+          <div class="package-price"><strong>{{ package.price|compact_money }}</strong><span>/ {{ package.duration_days }} days</span></div>
+          <p>{{ package.description }}</p>
+          <span class="status status--neutral">{{ icon('megaphone') }} Sponsored placement</span>
+          <a class="text-link text-link--sm" href="#advertise-form" data-package-jump="{{ package.id }}">Enquire about this package {{ icon('arrow-right') }}</a>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section advertise-principles-section">
+  <div class="container advertise-principles">
+    <div class="principles-copy">
+      <span class="eyebrow eyebrow--green">{{ icon('shield-check') }} Our advertising principles</span>
+      <h2>Good advertising should feel like a good neighbour.</h2>
+      <p>We keep the donation experience free from pressure and clutter. That means a few firm rules for every partner.</p>
+    </div>
+    <div class="principle-grid">
+      <article class="principle-card"><span>{{ icon('tag') }}</span><h3>Clearly separated</h3><p>Ads carry a visible Sponsored label and never masquerade as a donation.</p></article>
+      <article class="principle-card"><span>{{ icon('shield-check') }}</span><h3>Community-safe</h3><p>No misleading claims, unsafe products or high-pressure tactics. We review every placement.</p></article>
+      <article class="principle-card"><span>{{ icon('leaf') }}</span><h3>Relevant to reuse</h3><p>Repair, moving, cleaning, sustainable living and local services are a natural fit.</p></article>
+      <article class="principle-card"><span>{{ icon('chart') }}</span><h3>Measured honestly</h3><p>Basic impressions and clicks are counted in this environment. We do not invent reach figures.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="advertise-form">
+  <div class="container advertise-form-layout">
+    <div class="advertise-form-copy">
+      <span class="eyebrow">{{ icon('mail') }} Let's talk</span>
+      <h2>Tell us what you do.</h2>
+      <p>Share a little about your business and the package that caught your eye. Our partnerships team will reply by email within two business days in a live deployment.</p>
+      <div class="contact-notes">
+        <div>{{ icon('mail') }}<span><strong>hello@antiimbak.ph</strong><small>Partnerships &amp; advertising</small></span></div>
+        <div>{{ icon('clock') }}<span><strong>Mon–Sat, 9am–6pm</strong><small>Metro Manila time</small></span></div>
+        <div>{{ icon('shield-check') }}<span><strong>No payment online</strong><small>An enquiry starts a conversation, not a charge</small></span></div>
+      </div>
+      <div class="advertise-sample">
+        <div class="advertise-sample-media">
+          <img src="{{ url_for('static', filename='img/ads/cleaning.jpg') }}" alt="" loading="lazy">
+          <span class="sponsored-flag">Sponsored · Paid advertisement</span>
+        </div>
+        <div>
+          <span class="eyebrow eyebrow--soft">Example placement</span>
+          <strong>Come home to a fresh start.</strong>
+          <p>Eco-friendly deep cleaning for homes and move-ins across Metro Manila.</p>
+        </div>
+      </div>
+    </div>
+
+    <form method="post" class="panel-form advertise-form" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="form-row">
+        <label class="field">
+          <span class="field-label">Your name</span>
+          <input type="text" name="name" maxlength="80" required placeholder="Full name" value="{{ request.form.get('name', '') }}">
+        </label>
+        <label class="field">
+          <span class="field-label">Work email</span>
+          <input type="email" name="email" maxlength="120" required placeholder="you@company.ph" value="{{ request.form.get('email', '') }}">
+        </label>
+      </div>
+      <div class="form-row">
+        <label class="field">
+          <span class="field-label">Business name</span>
+          <input type="text" name="business_name" maxlength="100" required placeholder="Company or organisation" value="{{ request.form.get('business_name', '') }}">
+        </label>
+        <label class="field">
+          <span class="field-label">Business type</span>
+          <input type="text" name="business_type" maxlength="80" required placeholder="e.g. Repair services" value="{{ request.form.get('business_type', '') }}">
+        </label>
+      </div>
+      <label class="field">
+        <span class="field-label">Interested package</span>
+        <select name="package_id" required>
+          <option value="">Choose a package</option>
+          {% for package in packages %}
+          <option value="{{ package.id }}" {% if request.form.get('package_id') == package.id|string %}selected{% endif %}>{{ package.name }} — {{ package.price|compact_money }} / {{ package.duration_days }} days</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">What would you like us to know?</span>
+        <textarea name="message" rows="5" maxlength="1500" placeholder="Tell us about your business, the audience you want to reach, and any timing or creative ideas.">{{ request.form.get('message', '') }}</textarea>
+      </label>
+      <label class="checkbox-field">
+        <input type="checkbox" name="advertising_ack" required>
+        <span>I understand that this is an advertising enquiry and that no campaign or charge is created until the team confirms it.</span>
+      </label>
+      <button class="btn btn-primary btn-block" type="submit">{{ icon('send') }} Send advertising enquiry</button>
+      <p class="fine-print">We will only use these details to respond to your enquiry. See our <a href="{{ url_for('public.privacy') }}">Privacy Notice</a>.</p>
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="final-cta final-cta--compact reveal">
+      <div class="final-cta-orbit" aria-hidden="true"></div>
+      <span class="eyebrow eyebrow--light">{{ icon('megaphone') }} A better kind of reach</span>
+      <h2>Support reuse.<br>Meet your next neighbour.</h2>
+      <p>Purpose-led placements for businesses that believe useful things should stay useful.</p>
+      <div class="final-cta-actions">
+        <a class="btn btn-primary btn-lg" href="#advertise-form">Send an enquiry {{ icon('arrow-right') }}</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('public.about') }}">About Anti-Imbak</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/advertise.js') }}" defer></script>
+{% endblock %}

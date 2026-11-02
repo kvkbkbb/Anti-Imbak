@@ -1,0 +1,168 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}Request for {{ claim.listing_title }} — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}Request details{% endblock %}
+{% block dash_title %}{{ claim.listing_title }}{% endblock %}
+{% block dash_subtitle %}<p>Request from {{ claim.claimant_name }} · submitted {{ claim.created_at|time_ago }}</p>{% endblock %}
+{% block dash_actions %}
+  <a class="btn btn-secondary btn-sm" href="{{ url_for('dashboard.incoming_claims') if viewer == 'donor' else url_for('dashboard.my_claims') }}">{{ icon('arrow-left') }} Back to requests</a>
+{% endblock %}
+
+{% block dash_content %}
+<div class="claim-detail-grid">
+  <div class="member-section">
+    <div class="claim-summary-card">
+      <div class="claim-summary-top">
+        {% if claim.listing_image %}<img src="{{ claim.listing_image }}" alt="{{ claim.listing_title }}">{% endif %}
+        <div>
+          <h2>{{ claim.listing_title }}</h2>
+          <p>{{ claim.listing_condition|condition_label }} · {{ claim.item_size|item_size_label }} · {{ claim.listing_area }}, {{ claim.listing_city }}</p>
+          <span class="status status--{{ claim.status|status_tone }}">{{ claim.status|claim_status_label }}</span>
+        </div>
+      </div>
+      <dl class="claim-facts">
+        <div class="claim-fact"><dt>Handover method</dt><dd>{{ 'Partnered Delivery' if claim.receive_method == 'delivery' else 'Self Pickup' }}</dd></div>
+        {% if claim.receive_method == 'delivery' %}
+        <div class="claim-fact"><dt>Inclusive delivery fee</dt><dd>{% if claim.delivery_fee %}₱{{ '%.2f'|format(claim.delivery_fee) }}{% else %}Calculated at claim{% endif %}</dd></div>
+        {% if claim.partner_name %}<div class="claim-fact"><dt>Delivery partner</dt><dd>{{ claim.partner_name }} · {{ claim.partner_service }}</dd></div>{% endif %}
+        {% if claim.tracking_code %}<div class="claim-fact"><dt>Tracking</dt><dd>{{ claim.tracking_code }}</dd></div>{% endif %}
+        <div class="claim-fact"><dt>Drop-off</dt><dd>{{ claim.dropoff_address if claim.status != 'pending' else 'Shared after acceptance' }}</dd></div>
+        {% else %}
+        <div class="claim-fact"><dt>Pickup arrangement</dt><dd>Agree a public meeting point in Messages</dd></div>
+        {% endif %}
+        <div class="claim-fact"><dt>Donor</dt><dd>{{ claim.donor_name }}{% if claim.donor_contact %} · {{ claim.donor_contact }}{% endif %}</dd></div>
+        <div class="claim-fact"><dt>Recipient</dt><dd>{{ claim.claimant_name }}{% if claim.claimant_contact %} · {{ claim.claimant_contact }}{% endif %}</dd></div>
+      </dl>
+      <div class="request-actions">
+        {% if conversation_id %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.messages', conversation=conversation_id) }}">{{ icon('message-circle') }} Open conversation</a>
+        {% elif viewer == 'donor' %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.start_conversation', listing_id=claim.listing_id, user_id=claim.claimant_id) }}">{{ icon('message-circle') }} Message Recipient</a>
+        {% else %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.start_conversation', listing_id=claim.listing_id) }}">{{ icon('message-circle') }} Message Donor</a>
+        {% endif %}
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('public.listing_detail', listing_id=claim.listing_id) }}">View listing {{ icon('arrow-up-right') }}</a>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow">{{ icon('message-circle') }} The request</span>
+          <h2>{{ claim.claimant_name }} wrote</h2>
+        </div>
+        {{ avatar(claim.claimant_name, claim.claimant_avatar, 'avatar--sm') }}
+      </div>
+      <p class="request-note">{{ claim.message }}</p>
+      {% if claim.donor_note %}
+      <p class="request-note"><strong>Donor note:</strong> {{ claim.donor_note }}</p>
+      {% endif %}
+    </div>
+
+    {% if claim.receive_method == 'delivery' and claim.delivery_status and claim.status in ['accepted', 'completed'] %}
+    <div class="delivery-tracker">
+      <div class="delivery-tracker-head">
+        <div>
+          <span class="eyebrow">{{ icon('truck') }} Partnered Delivery</span>
+          <h3>{{ claim.delivery_status|delivery_status_label }}</h3>
+          <p>{{ claim.partner_name or 'Assigned delivery partner' }}{% if claim.delivery_distance %} · {{ '%.1f'|format(claim.delivery_distance) }} km{% endif %}</p>
+        </div>
+        <span class="delivery-code">{{ icon('package') }} <span data-copy-text>{{ claim.tracking_code }}</span></span>
+      </div>
+      <ol class="tracker-steps">
+        {% for step in delivery_steps %}
+        <li class="tracker-step {% if loop.index0 < delivery_step_index %}is-done{% elif loop.index0 == delivery_step_index %}is-current{% endif %}">
+          <span class="tracker-dot">{{ icon('check') if loop.index0 < delivery_step_index else icon('clock') if loop.index0 == delivery_step_index else icon('package') }}</span>
+          <span class="tracker-copy">
+            <strong>{{ step|delivery_status_label }}</strong>
+            <small>{{ delivery_step_copy[step] }}</small>
+          </span>
+        </li>
+        {% endfor %}
+      </ol>
+      <div class="delivery-tracker-meta">
+        <span>{{ icon('map-pin') }} From {{ claim.pickup_address }}</span>
+        <span>{{ icon('home') }} To {{ claim.dropoff_address }}</span>
+        <span>{{ icon('wallet') }} ₱{{ '%.2f'|format(claim.delivery_fee or 0) }} inclusive</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="panel">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('clock') }} Timeline</span><h2>Request history</h2></div></div>
+      <ol class="claim-timeline">
+        {% for event in timeline %}
+        <li class="tone-{{ event.tone }}"><strong>{{ event.label }}</strong><small>{{ event.at|time_ago }}</small></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+  <aside class="member-section">
+    <div class="panel">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('shield-check') }} Next step</span><h2>Keep the handover clear</h2></div></div>
+      {% if claim.status == 'pending' and viewer == 'donor' %}
+        <p class="fine-print">Accept only when you are ready to reserve the item. The Recipient will be notified and the delivery or pickup plan can then be confirmed.</p>
+        <form method="post" action="{{ url_for('dashboard.accept_claim', claim_id=claim.id) }}" class="stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label class="field-label" for="donor-note">Note to the Recipient (optional)</label>
+          <textarea id="donor-note" name="donor_note" rows="3" maxlength="800" placeholder="For example: I can hand it over on Saturday afternoon. Let us confirm the details in Messages."></textarea>
+          <button class="btn btn-positive btn-block" type="submit">{{ icon('check') }} Accept request</button>
+        </form>
+        <form method="post" action="{{ url_for('dashboard.reject_claim', claim_id=claim.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-destructive btn-block" type="submit" data-confirm="Decline this request? The Recipient will be notified.">{{ icon('x-circle') }} Decline request</button>
+        </form>
+      {% elif claim.status == 'accepted' %}
+        {% if viewer == 'donor' and not claim.handover_confirmed %}
+        <p class="fine-print">Confirm the handover plan after agreeing on the delivery or pickup details in Messages.</p>
+        <form method="post" action="{{ url_for('dashboard.confirm_handover', claim_id=claim.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-warning btn-block" type="submit">{{ icon('check-circle') }} Confirm handover plan</button>
+        </form>
+        {% elif claim.receive_method == 'delivery' and claim.delivery_status != 'delivered' %}
+          {% if claim.handover_confirmed %}
+          <p class="fine-print">The handover plan is confirmed. Move the delivery forward when each stage is genuinely complete.</p>
+          {% else %}
+          <div class="inline-notice inline-notice--warning">{{ icon('info') }} The Donor still needs to confirm the handover plan.</div>
+          {% endif %}
+          <form method="post" action="{{ url_for('dashboard.advance_delivery', claim_id=claim.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-positive btn-block" type="submit" {% if not claim.handover_confirmed %}disabled{% endif %}>
+              {{ icon('truck') }} Move to {{ next_delivery_status|delivery_status_label if next_delivery_status else 'next step' }}
+            </button>
+          </form>
+        {% else %}
+          {% if claim.receive_method == 'pickup' %}
+          <p class="fine-print">Use Messages to agree a public meeting point. Confirm receipt only when the item is in your hands.</p>
+          {% endif %}
+          <form method="post" action="{{ url_for('dashboard.complete_claim_as_donor' if viewer == 'donor' else 'dashboard.complete_claim', claim_id=claim.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-positive btn-block" type="submit">{{ icon('check-circle') }} Confirm handover complete</button>
+          </form>
+        {% endif %}
+      {% elif claim.status == 'completed' %}
+        <div class="inline-notice inline-notice--success">{{ icon('check-circle') }} This handover is complete. Thank you for keeping a useful item in circulation.</div>
+      {% else %}
+        <p class="fine-print">This request is closed. You can still message the other person or browse the marketplace for something else.</p>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div><span class="eyebrow">{{ icon('users') }} People</span><h2>Who is involved</h2></div></div>
+      <div class="interested-strip">
+        <span class="interested-person">{{ avatar(claim.donor_name, claim.donor_avatar, 'avatar--xs') }} {{ claim.donor_name }} · Donor</span>
+        <span class="interested-person">{{ avatar(claim.claimant_name, claim.claimant_avatar, 'avatar--xs') }} {{ claim.claimant_name }} · Recipient</span>
+      </div>
+      <p class="fine-print">Contact details are only shown after a request is accepted. Keep the conversation inside Anti-Imbak until then.</p>
+      {% if claim.status in ['accepted', 'completed'] %}
+      <div class="claim-facts">
+        {% if claim.donor_contact %}<div class="claim-fact"><dt>Donor contact</dt><dd>{{ claim.donor_contact }}</dd></div>{% endif %}
+        {% if claim.claimant_contact %}<div class="claim-fact"><dt>Recipient contact</dt><dd>{{ claim.claimant_contact }}</dd></div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+{% endblock %}
