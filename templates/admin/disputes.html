@@ -1,0 +1,137 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}Disputes Management — Anti-Imbak Admin{% endblock %}
+{% block admin_breadcrumb %}Disputes{% endblock %}
+{% block admin_title %}Disputes management{% endblock %}
+{% block admin_subtitle %}
+<p>Structured casework for handovers that need a human decision. Every note, status change and resolution is recorded.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.activity') }}">{{ icon('list') }} Activity logs</a>
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.support') }}">{{ icon('message-circle') }} User concerns{% if nav_counts.concerns %} <span class="btn-count">{{ nav_counts.concerns }}</span>{% endif %}</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--five">
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('shield') }}</span>
+    <div class="stat-copy"><span>Active cases</span><strong>{{ stats.active }}</strong><small>open or under review</small></div>
+  </article>
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('clock') }}</span>
+    <div class="stat-copy"><span>Open</span><strong>{{ stats.open }}</strong><small>awaiting first review</small></div>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('eye') }}</span>
+    <div class="stat-copy"><span>Under review</span><strong>{{ stats.under_review }}</strong><small>being investigated</small></div>
+  </article>
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('alert-triangle') }}</span>
+    <div class="stat-copy"><span>Urgent</span><strong>{{ stats.urgent }}</strong><small>needs priority attention</small></div>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('check-circle') }}</span>
+    <div class="stat-copy"><span>Resolved</span><strong>{{ stats.resolved }}</strong><small>resolution documented</small></div>
+  </article>
+</section>
+
+<nav class="dash-tabs admin-report-tabs" aria-label="Filter disputes by status">
+  <a href="{{ url_for('admin.disputes', status='active') }}" class="dash-tab {% if status_filter == 'active' %}is-active{% endif %}">Active <span>{{ stats.active }}</span></a>
+  <a href="{{ url_for('admin.disputes', status='open') }}" class="dash-tab {% if status_filter == 'open' %}is-active{% endif %}">Open <span>{{ stats.open }}</span></a>
+  <a href="{{ url_for('admin.disputes', status='under_review') }}" class="dash-tab {% if status_filter == 'under_review' %}is-active{% endif %}">Under review <span>{{ stats.under_review }}</span></a>
+  <a href="{{ url_for('admin.disputes', status='resolved') }}" class="dash-tab {% if status_filter == 'resolved' %}is-active{% endif %}">Resolved <span>{{ stats.resolved }}</span></a>
+  <a href="{{ url_for('admin.disputes', status='closed') }}" class="dash-tab {% if status_filter == 'closed' %}is-active{% endif %}">Closed</a>
+  <a href="{{ url_for('admin.disputes', status='all') }}" class="dash-tab {% if status_filter == 'all' %}is-active{% endif %}">All <span>{{ stats.all }}</span></a>
+</nav>
+
+<section class="panel panel--flush">
+  <form class="admin-filter-bar" method="get" action="{{ url_for('admin.disputes') }}">
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <label class="filter-search">
+      {{ icon('search') }}
+      <input type="search" name="q" value="{{ q }}" placeholder="Search case, member, listing or category" aria-label="Search disputes">
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Priority</span>
+      <select name="priority">
+        <option value="all" {% if priority_filter == 'all' %}selected{% endif %}>Any priority</option>
+        {% for priority in dispute_priorities %}
+        <option value="{{ priority }}" {% if priority_filter == priority %}selected{% endif %}>{{ priority|priority_label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-secondary btn-sm" type="submit">{{ icon('filter') }} Apply</button>
+    {% if q or priority_filter != 'all' %}
+    <a class="text-link text-link--sm" href="{{ url_for('admin.disputes', status=status_filter) }}">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if disputes %}
+  <div class="table-wrap">
+    <table class="data-table dispute-table">
+      <thead>
+        <tr><th>Case</th><th>Parties</th><th>Listing</th><th>Priority</th><th>Status</th><th>Owner</th><th>Updated</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for dispute in disputes %}
+        <tr>
+          <td>
+            <a class="dispute-case-link" href="{{ url_for('admin.dispute_detail', dispute_id=dispute.id) }}">
+              <span class="dispute-code">{{ dispute.dispute_code }}</span>
+              <strong>{{ dispute.summary }}</strong>
+              <small>{{ dispute.category }} · {{ dispute.created_at|time_ago }}</small>
+              <span class="dispute-evidence-note">{{ icon('file') }} {{ dispute.evidence_count }} evidence · {{ dispute.event_count }} history events</span>
+            </a>
+          </td>
+          <td>
+            <div class="dispute-party">
+              <span>{{ icon('user') }} {{ dispute.reporter_name }}</span>
+              {% if dispute.other_name %}<small>with {{ dispute.other_name }}</small>{% endif %}
+            </div>
+          </td>
+          <td>
+            {% if dispute.listing_id %}
+            <a class="cell-strong" href="{{ url_for('public.listing_detail', listing_id=dispute.listing_id) }}">{{ dispute.listing_title|truncate(34, True, '…') }} {{ icon('arrow-up-right') }}</a>
+            {% else %}
+            <span class="cell-muted">Account-level case</span>
+            {% endif %}
+          </td>
+          <td><span class="priority priority--{{ dispute.priority|priority_tone }}">{{ dispute.priority|priority_label }}</span></td>
+          <td><span class="status status--{{ dispute.status|status_tone }}">{{ dispute.status|dispute_status_label }}</span></td>
+          <td>
+            {% if dispute.assigned_name %}
+            <span class="cell-strong">{{ dispute.assigned_name }}</span>
+            <small class="cell-sub">Case owner</small>
+            {% else %}
+            <span class="cell-muted">Unassigned</span>
+            {% endif %}
+          </td>
+          <td><span class="cell-strong">{{ dispute.updated_at|time_ago }}</span></td>
+          <td><a class="icon-button" href="{{ url_for('admin.dispute_detail', dispute_id=dispute.id) }}" aria-label="Open {{ dispute.dispute_code }}">{{ icon('chevron-right') }}</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">{{ icon('shield-check') }}</span>
+    <h3>No disputes match this view</h3>
+    <p>Try another status, priority or search phrase. A clear queue is good news.</p>
+    <a class="btn btn-secondary" href="{{ url_for('admin.disputes', status='all') }}">View all cases {{ icon('arrow-right') }}</a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel report-guidance">
+  <div class="panel-head panel-head--inline">
+    <div><span class="eyebrow">{{ icon('book-open') }} Casework guide</span><h2>Resolve with a clear trail</h2></div>
+  </div>
+  <div class="report-guide-grid">
+    <div><span>{{ icon('eye') }}</span><strong>Read the evidence</strong><p>Open the listing and member profiles. Review every attachment and the full event history before deciding.</p></div>
+    <div><span>{{ icon('message-circle') }}</span><strong>Document each step</strong><p>Every note and status change is stored in the case history and, where relevant, shared with both parties.</p></div>
+    <div><span>{{ icon('check-circle') }}</span><strong>Write the resolution</strong><p>State what was reviewed and what happens next. Resolutions are visible in the audit trail.</p></div>
+  </div>
+</section>
+{% endblock %}

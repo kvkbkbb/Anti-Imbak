@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon, avatar %}
+{% set member_role = 'donor' if demo_role == 'admin' else demo_role %}
+{% set role_label = 'Donor' if member_role == 'donor' else 'Recipient' %}
+
+{% block body_class %}dashboard-page{% endblock %}
+{% block main_class %}dashboard-main{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell">
+  <div class="container dashboard-layout">
+    <aside class="dash-sidebar" aria-label="{{ role_label }} navigation">
+      <div class="dash-profile">
+        <a class="dash-profile-main" href="{{ url_for('dashboard.settings') }}">
+          {{ avatar(current_user.name, current_user.avatar_url, 'avatar--md') }}
+          <span>
+            <strong>{{ current_user.name }}</strong>
+            <small>{{ role_label }} workspace</small>
+          </span>
+          {{ icon('chevron-right') }}
+        </a>
+        <div class="dash-profile-meta">
+          <span class="status status--success">{{ icon('shield-check') }} Active</span>
+          <span class="dash-role-pill">{{ icon(demo_roles[demo_role].icon) }} {{ role_label }}</span>
+          {% if current_user.verified %}<span class="verified verified--compact" title="Community verified">{{ icon('badge-check') }}</span>{% endif %}
+        </div>
+      </div>
+
+      <nav class="dash-nav" aria-label="{{ role_label }} account">
+        <a href="{{ url_for('public.browse') }}" class="dash-nav-link">
+          <span class="dash-nav-icon">{{ icon('compass') }}</span><span>Browse Marketplace</span>
+        </a>
+
+        {% if member_role == 'donor' %}
+          <a href="{{ url_for('dashboard.donations') }}" class="dash-nav-link {% if active_page == 'donations' %}is-active{% endif %}">
+            <span class="dash-nav-icon">{{ icon('gift') }}</span><span>My Listings</span>
+          </a>
+          <a href="{{ url_for('dashboard.messages') }}" class="dash-nav-link {% if active_page == 'messages' %}is-active{% endif %}">
+            <span class="dash-nav-icon">{{ icon('message-circle') }}</span><span>Messages</span>
+            {% if unread_messages %}<span class="nav-count">{{ unread_messages }}</span>{% endif %}
+          </a>
+          <a href="{{ url_for('dashboard.incoming_claims') }}" class="dash-nav-link {% if active_page == 'claims' %}is-active{% endif %}">
+            <span class="dash-nav-icon">{{ icon('hand-heart') }}</span><span>Claim Requests</span>
+            {% if nav_counts.incoming %}<span class="nav-count">{{ nav_counts.incoming }}</span>{% endif %}
+          </a>
+        {% else %}
+          <a href="{{ url_for('dashboard.my_claims') }}" class="dash-nav-link {% if active_page == 'requests' %}is-active{% endif %}">
+            <span class="dash-nav-icon">{{ icon('hand-heart') }}</span><span>My Requests</span>
+            {% if nav_counts.claims %}<span class="nav-count nav-count--soft">{{ nav_counts.claims }}</span>{% endif %}
+          </a>
+          <a href="{{ url_for('dashboard.saved') }}" class="dash-nav-link {% if active_page == 'saved' %}is-active{% endif %}">
+            <span class="dash-nav-icon">{{ icon('heart') }}</span><span>Saved Items</span>
+          </a>
+          <a href="{{ url_for('dashboard.messages') }}" class="dash-nav-link {% if active_page == 'messages' %}is-active{% endif %}">
+            <span class="dash-nav-icon">{{ icon('message-circle') }}</span><span>Messages</span>
+            {% if unread_messages %}<span class="nav-count">{{ unread_messages }}</span>{% endif %}
+          </a>
+        {% endif %}
+
+        <a href="{{ url_for('dashboard.notifications') }}" class="dash-nav-link {% if active_page == 'notifications' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('bell') }}</span><span>Notifications</span>
+          {% if unread_notifications %}<span class="nav-count nav-count--soft">{{ unread_notifications }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('dashboard.settings') }}" class="dash-nav-link {% if active_page == 'settings' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('settings') }}</span><span>Account Settings</span>
+        </a>
+
+        {% if current_user.role == 'admin' %}
+        <span class="dash-nav-label">Operations</span>
+        <a href="{{ url_for('admin.overview') }}" class="dash-nav-link dash-nav-link--admin">
+          <span class="dash-nav-icon">{{ icon('shield-check') }}</span><span>Administrator Console</span>
+          {{ icon('arrow-up-right') }}
+        </a>
+        {% endif %}
+      </nav>
+
+      <p class="dash-sidebar-note">{{ icon('info') }} Keep handover details inside Messages so both sides have a record.</p>
+    </aside>
+
+    <div class="dash-content">
+      <header class="dash-topbar">
+        <div class="dash-topbar-copy">
+          <div class="page-breadcrumb">
+            <a href="{{ url_for('dashboard.index') }}">Workspace</a> {{ icon('chevron-right') }}
+            <span>{% block dash_breadcrumb %}{{ role_label }}{% endblock %}</span>
+            <span class="dash-perspective">{{ icon(demo_roles[demo_role].icon) }} {{ role_label }}</span>
+          </div>
+          <h1>{% block dash_title %}My Listings{% endblock %}</h1>
+          {% block dash_subtitle %}{% endblock %}
+        </div>
+        <div class="dash-topbar-actions">
+          {% block dash_actions %}{% endblock %}
+        </div>
+      </header>
+
+      <div class="dash-scroll">
+        {% block dash_content %}{% endblock %}
+
+        <footer class="dash-footer">
+          <span>{{ icon('leaf') }} Giving Items a Second Purpose.</span>
+          <span>Messages, requests and delivery updates stay together here.</span>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}Messages — Anti-Imbak{% endblock %}
+{% block body_class %}dashboard-page messages-page{% endblock %}
+{% block dash_breadcrumb %}Messages{% endblock %}
+{% block dash_title %}Messages{% endblock %}
+{% block dash_subtitle %}<p>Ask about condition, measurements or photos before claiming — and agree on the handover here.</p>{% endblock %}
+{% block dash_actions %}
+  <a class="btn btn-secondary btn-sm" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Browse Marketplace</a>
+{% endblock %}
+
+{% block dash_content %}
+<div class="message-workspace{% if selected %} has-selection{% endif %}" data-message-workspace>
+  <aside class="conversation-panel" aria-label="Conversations">
+    <div class="conversation-panel-head">
+      <div class="conversation-heading">
+        <span class="eyebrow eyebrow--soft">{{ icon('message-circle') }} Inbox</span>
+        <span class="conversation-total">{{ conversations|length }} {{ conversations|length|plural('chat') }}</span>
+      </div>
+      <h2>Conversations</h2>
+      <form class="conversation-search" method="get" action="{{ url_for('dashboard.messages') }}" role="search">
+        {{ icon('search') }}
+        <input type="search" name="q" value="{{ q }}" placeholder="Search people or listings" aria-label="Search conversations" data-conversation-search>
+        {% if q %}<a class="conversation-search-clear" href="{{ url_for('dashboard.messages') }}" aria-label="Clear conversation search">{{ icon('close') }}</a>{% endif %}
+      </form>
+    </div>
+
+    <div class="conversation-list" data-conversation-list>
+      {% for item in conversations %}
+      <a class="conversation-item {% if selected and selected.id == item.id %}is-active{% endif %} {% if item.unread_count %}is-unread{% endif %}"
+         href="{{ url_for('dashboard.messages', conversation=item.id, q=q) }}"
+         {% if selected and selected.id == item.id %}aria-current="true"{% endif %}
+         data-conversation-item>
+        <span class="conversation-avatar">
+          {{ avatar(item.other_name, item.other_avatar, 'avatar--md') }}
+          {% if item.unread_count %}<span class="conversation-unread" aria-label="{{ item.unread_count }} unread {{ item.unread_count|plural('message') }}">{{ item.unread_count }}</span>{% endif %}
+        </span>
+        <span class="conversation-copy">
+          <span class="conversation-name-row">
+            <strong>{{ item.other_name }}</strong>
+            <span class="conversation-time">{{ (item.last_message_at or item.updated_at)|time_ago }}</span>
+          </span>
+          <span class="conversation-context">{{ item.other_role }}{% if item.listing_title %} · {{ item.listing_title|truncate(32, True, '…') }}{% endif %}</span>
+          <span class="conversation-preview">{{ item.preview }}</span>
+        </span>
+      </a>
+      {% else %}
+      <div class="conversation-empty">
+        <span class="empty-icon">{{ icon('message-circle') }}</span>
+        {% if q %}
+        <strong>No conversations match “{{ q }}”.</strong>
+        <p>Try a name, listing title or a word from the last message.</p>
+        <a class="text-link text-link--sm" href="{{ url_for('dashboard.messages') }}">Clear search</a>
+        {% else %}
+        <strong>No conversations yet</strong>
+        <p>Open a listing and message its donor, or reply from an accepted request.</p>
+        <a class="text-link text-link--sm" href="{{ url_for('public.browse') }}">Browse Marketplace</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <div class="conversation-empty" role="status" data-conversation-no-results hidden>
+        <span class="empty-icon">{{ icon('search') }}</span>
+        <strong>No conversations match your search.</strong>
+        <p>Try another name or listing.</p>
+      </div>
+    </div>
+
+    <div class="conversation-panel-foot">
+      {{ icon('shield-check') }} Keep handover details in Messages so both sides have a record.
+    </div>
+  </aside>
+
+  <section class="chat-panel" aria-label="Active conversation">
+    {% if selected %}
+    <header class="chat-head">
+      <a class="chat-back" href="{{ url_for('dashboard.messages', q=q) if q else url_for('dashboard.messages') }}" aria-label="Back to conversations">{{ icon('chevron-left') }}</a>
+      <div class="chat-person">
+        {{ avatar(selected.other_name, selected.other_avatar, 'avatar--md') }}
+        <div class="chat-head-copy">
+          <strong>{{ selected.other_name }}</strong>
+          <small><span class="chat-presence" aria-hidden="true"></span>{{ selected.other_role }}{% if selected.listing_city %} · {{ selected.listing_city }}{% endif %}</small>
+        </div>
+      </div>
+      <div class="chat-head-actions">
+        {% if selected.listing_id %}
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('public.listing_detail', listing_id=selected.listing_id) }}" aria-label="Open the listing">{{ icon('package') }} <span>Listing</span></a>
+        {% endif %}
+        {% if selected.claim_id %}
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('dashboard.claim_detail', claim_id=selected.claim_id) }}" aria-label="Open the request">{{ icon('hand-heart') }} <span>Request</span></a>
+        {% endif %}
+      </div>
+    </header>
+
+    {% if selected.listing_id %}
+    <div class="chat-context">
+      {% if selected.listing_image %}<img src="{{ selected.listing_image }}" alt="{{ selected.listing_title }}">{% endif %}
+      <span class="chat-context-copy">
+        <strong>{{ selected.listing_title }}</strong>
+        <small>{{ selected.listing_status|status_label if selected.listing_status else 'Listing removed' }}{% if selected.listing_area %} · {{ selected.listing_area }}{% endif %}</small>
+      </span>
+      {% if selected.listing_status %}<span class="status status--{{ selected.listing_status|status_tone }}">{{ selected.listing_status|status_label }}</span>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="chat-thread" data-chat-thread tabindex="0" role="log" aria-label="Conversation history">
+      {% for message in messages %}
+      {% set is_mine = message.sender_id == current_user.id %}
+      <div class="chat-message {% if is_mine %}is-mine{% else %}is-theirs{% endif %}">
+        {% if not is_mine %}{{ avatar(message.sender_name, message.sender_avatar, 'avatar--xs') }}{% endif %}
+        <div class="chat-bubble-wrap">
+          <div class="chat-bubble">
+            {{ message.body }}
+            {% if message.attachment_url %}
+            <a class="chat-attachment" href="{{ message.attachment_url }}" target="_blank" rel="noopener">
+              <img src="{{ message.attachment_url }}" alt="Photo shared by {{ message.sender_name }}" loading="lazy">
+            </a>
+            {% endif %}
+          </div>
+          <span class="chat-meta">{{ 'You' if is_mine else message.sender_name.split()[0] }} · {{ message.created_at|time_ago }}</span>
+        </div>
+      </div>
+      {% else %}
+      <div class="chat-empty chat-empty--thread">
+        <span class="empty-icon">{{ icon('message-circle') }}</span>
+        <strong>Start the conversation</strong>
+        <p>Ask about the item's condition, size or available handover window. Be clear and kind.</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <form class="chat-composer" method="post" action="{{ url_for('dashboard.send_message', conversation_id=selected.id) }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="chat-composer-row">
+        <textarea name="body" rows="2" maxlength="2000" placeholder="Write a clear, respectful message…" aria-label="Message" data-chat-input></textarea>
+        <button class="btn btn-primary chat-send" type="submit" aria-label="Send message">{{ icon('send') }} <span>Send</span></button>
+      </div>
+      <div class="chat-composer-tools">
+        <label class="chat-attach">
+          {{ icon('camera') }} Attach photo
+          <input type="file" name="attachment" accept="image/*" data-file-input>
+        </label>
+        {% if selected.listing_image %}
+        <label class="chat-use-photo">
+          <input type="checkbox" name="use_listing_photo"> Use the listing photo
+        </label>
+        {% endif %}
+        <span class="chat-file-note" data-file-note>Photos help confirm condition.</span>
+      </div>
+    </form>
+    {% else %}
+    <div class="chat-empty">
+      <span class="empty-icon">{{ icon('message-circle') }}</span>
+      <strong>Select a conversation</strong>
+      <p>Your Donor and Recipient conversations appear here, alongside the listing you are discussing.</p>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('public.browse') }}">Browse Marketplace</a>
+    </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

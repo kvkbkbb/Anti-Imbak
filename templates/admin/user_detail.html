@@ -1,0 +1,174 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar, status_badge %}
+
+{% block title %}{{ user.name }} — Admin — Anti-Imbak{% endblock %}
+{% block admin_breadcrumb %}<a href="{{ url_for('admin.users') }}">Members</a> {{ icon('chevron-right') }} {{ user.name }}{% endblock %}
+{% block admin_title %}{{ user.name }}{% endblock %}
+{% block admin_subtitle %}
+<p>{{ user.email }} · joined {{ user.created_at|long_date }} · {{ user.role|title }} account</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-ghost btn-sm" href="{{ url_for('admin.users') }}">{{ icon('arrow-left') }} Directory</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-detail-grid">
+  <div class="admin-detail-main">
+    <section class="panel admin-profile-panel">
+      <div class="admin-profile-head">
+        {{ avatar(user.name, user.avatar_url, 'avatar--xl') }}
+        <div class="admin-profile-identity">
+          <div class="admin-profile-tags">
+            <span class="status status--{{ 'success' if user.status == 'active' else 'danger' }}">{{ user.status|title }}</span>
+            {% if user.role == 'admin' %}<span class="mini-tag mini-tag--cyan">{{ icon('shield-check') }} Administrator</span>{% endif %}
+            {% if user.verified %}<span class="mini-tag mini-tag--cyan">{{ icon('badge-check') }} Verified</span>{% endif %}
+            {% if not user.email_verified %}<span class="mini-tag mini-tag--warm">{{ icon('mail') }} Email unconfirmed</span>{% endif %}
+          </div>
+          <h2>{{ user.name }}</h2>
+          <a href="mailto:{{ user.email }}">{{ icon('mail') }} {{ user.email }}</a>
+          <p class="admin-profile-location">{{ icon('map-pin') }} {{ user.location or 'No area shared' }}{% if user.city %}, {{ user.city }}{% endif %}</p>
+        </div>
+      </div>
+      {% if user.bio %}
+      <blockquote class="admin-profile-bio">{{ user.bio }}</blockquote>
+      {% endif %}
+      <div class="admin-profile-meta">
+        <div><span>Contact number</span><strong>{{ user.contact_number or 'Not shared' }}</strong></div>
+        <div><span>Member since</span><strong>{{ user.member_since|long_date if user.member_since else user.created_at|long_date }}</strong></div>
+        <div><span>Last sign-in</span><strong>{{ user.last_login|time_ago if user.last_login else 'Never recorded' }}</strong></div>
+        <div><span>Coordinates</span><strong>{{ '%.4f, %.4f'|format(user.latitude or 0, user.longitude or 0) if user.latitude else 'Not shared' }}</strong></div>
+      </div>
+    </section>
+
+    <section class="panel panel--flush">
+      <div class="panel-head panel-head--inline panel-head--padded">
+        <div><span class="eyebrow">{{ icon('gift') }} Marketplace footprint</span><h2>Recent donations</h2></div>
+        <a class="text-link text-link--sm" href="{{ url_for('admin.listings', q=user.name) }}">All listings {{ icon('arrow-right') }}</a>
+      </div>
+      {% if listings %}
+      <div class="table-wrap">
+        <table class="data-table data-table--compact">
+          <thead><tr><th>Listing</th><th>Status</th><th>Views</th><th>Listed</th></tr></thead>
+          <tbody>
+            {% for listing in listings %}
+            <tr>
+              <td>
+                <strong><a href="{{ url_for('public.listing_detail', listing_id=listing.id) }}">{{ listing.title }}</a></strong>
+                <small>{{ listing.category_name }} · {{ listing.area }}, {{ listing.city }}</small>
+              </td>
+              <td><span class="status status--{{ listing.status|status_tone }}">{{ listing.status|status_label }}</span></td>
+              <td>{{ listing.views }}</td>
+              <td>{{ listing.created_at|time_ago }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="mini-empty">{{ icon('gift') }}<p>No listings from this member yet.</p></div>
+      {% endif %}
+    </section>
+
+    <section class="panel panel--flush">
+      <div class="panel-head panel-head--inline panel-head--padded">
+        <div><span class="eyebrow">{{ icon('hand-heart') }} Claim activity</span><h2>Requested items</h2></div>
+      </div>
+      {% if claims %}
+      <div class="table-wrap">
+        <table class="data-table data-table--compact">
+          <thead><tr><th>Item</th><th>Method</th><th>Status</th><th>Requested</th></tr></thead>
+          <tbody>
+            {% for claim in claims %}
+            <tr>
+              <td><strong>{{ claim.listing_title }}</strong><small>{{ claim.message|truncate(70, True, '…') }}</small></td>
+              <td><span class="mini-tag">{{ claim.receive_method|title }}</span></td>
+              <td><span class="status status--{{ claim.status|status_tone }}">{{ claim_status_label(claim.status) }}</span></td>
+              <td>{{ claim.created_at|time_ago }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="mini-empty">{{ icon('hand-heart') }}<p>No claim requests from this member yet.</p></div>
+      {% endif %}
+    </section>
+
+    <section class="panel panel--flush">
+      <div class="panel-head panel-head--inline panel-head--padded">
+        <div><span class="eyebrow eyebrow--danger">{{ icon('flag') }} Trust &amp; safety</span><h2>Reports involving this member</h2></div>
+        <a class="text-link text-link--sm" href="{{ url_for('admin.reports') }}">Safety queue {{ icon('arrow-right') }}</a>
+      </div>
+      {% if reports %}
+      <div class="admin-mini-list">
+        {% for report in reports %}
+        <div class="admin-mini-row">
+          <span class="admin-mini-icon admin-mini-icon--danger">{{ icon('flag') }}</span>
+          <span><strong>{{ report.reason }}</strong><small>{{ report.listing_title or 'Account-level report' }} · {{ report.details|truncate(90, True, '…') if report.details else 'No extra detail shared.' }}</small></span>
+          <span class="status status--{{ report.status|status_tone }}">{{ report.status|title }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="mini-empty">{{ icon('shield-check') }}<p>No reports involve this member.</p></div>
+      {% endif %}
+    </section>
+  </div>
+
+  <aside class="admin-detail-side">
+    <section class="panel admin-action-panel">
+      <span class="eyebrow">{{ icon('settings') }} Account controls</span>
+      <h2>Moderation actions</h2>
+      {% if user.id == current_user.id %}
+      <div class="inline-notice">{{ icon('info') }} This is your own account. Use another administrator account for status changes.</div>
+      {% else %}
+      <div class="admin-action-stack">
+        {% if user.role != 'admin' %}
+          {% if user.status == 'active' %}
+          <form method="post" action="{{ url_for('admin.user_action', user_id=user.id) }}" data-confirm="Suspend {{ user.name }}? Their access will be paused immediately.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="action" value="suspend">
+            <button class="btn btn-danger btn-block" type="submit">{{ icon('alert-circle') }} Suspend account</button>
+          </form>
+          {% else %}
+          <form method="post" action="{{ url_for('admin.user_action', user_id=user.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="action" value="reactivate">
+            <button class="btn btn-primary btn-block" type="submit">{{ icon('check-circle') }} Reactivate account</button>
+          </form>
+          {% endif %}
+        {% else %}
+        <div class="inline-notice">{{ icon('shield-check') }} Administrator accounts cannot be suspended from this panel.</div>
+        {% endif %}
+        <form method="post" action="{{ url_for('admin.user_action', user_id=user.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="action" value="{{ 'unverify' if user.verified else 'verify' }}">
+          <button class="btn btn-secondary btn-block" type="submit">{{ icon('badge-check') }} {{ 'Remove verification' if user.verified else 'Mark as community verified' }}</button>
+        </form>
+        <a class="btn btn-ghost btn-block" href="mailto:{{ user.email }}">{{ icon('mail') }} Email member</a>
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <span class="eyebrow">{{ icon('chart') }} Community record</span>
+      <div class="admin-stat-list">
+        <div><span>Donations</span><strong>{{ stats.donations }}</strong></div>
+        <div><span>Completed gifts</span><strong>{{ stats.gifts }}</strong></div>
+        <div><span>Claims made</span><strong>{{ stats.claims }}</strong></div>
+        <div><span>Items received</span><strong>{{ stats.received }}</strong></div>
+        <div><span>Open reports</span><strong class="{% if stats.reports %}text-danger{% endif %}">{{ stats.reports }}</strong></div>
+      </div>
+    </section>
+
+    <section class="panel editor-tips">
+      <span class="eyebrow">{{ icon('shield-check') }} Moderator notes</span>
+      <ul class="check-list check-list--tight">
+        <li>{{ icon('check') }} Verify members only after a reliable handover.</li>
+        <li>{{ icon('check') }} Suspension pauses listings and claims, not history.</li>
+        <li>{{ icon('check') }} Every action is recorded in the audit trail.</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

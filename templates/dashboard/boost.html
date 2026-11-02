@@ -1,0 +1,118 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}Boost {{ listing.title }} — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}Boost listing{% endblock %}
+{% block dash_title %}Give it a little lift.{% endblock %}
+{% block dash_subtitle %}
+<p>An optional boost changes visibility only. Your donation stays completely free for the person who receives it.</p>
+{% endblock %}
+{% block dash_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('public.listing_detail', listing_id=listing.id) }}">{{ icon('eye') }} View listing</a>
+<a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.donations') }}">{{ icon('arrow-left') }} Back</a>
+{% endblock %}
+
+{% block dash_content %}
+{% if request.args.get('new') %}
+<div class="form-alert form-alert--success" role="status">
+  {{ icon('check-circle') }}
+  <div><strong>Your listing is live.</strong><p>It is already visible in the marketplace. A boost is optional — you can skip this step and keep the standard free listing.</p></div>
+  <a class="text-link text-link--sm" href="{{ url_for('dashboard.donations') }}">Skip for now</a>
+</div>
+{% endif %}
+
+<div class="boost-layout">
+  <div class="boost-main">
+    <section class="panel boost-listing">
+      <div class="boost-listing-head">
+        <span class="eyebrow">{{ icon('gift') }} You are boosting</span>
+        <span class="status status--{{ listing.status|status_tone }}">{{ listing.status|status_label }}</span>
+      </div>
+      <div class="boost-listing-body">
+        <div class="boost-thumb">
+          {% if listing.images %}<img src="{{ listing.images[0].image_url }}" alt="{{ listing.title }}" loading="lazy">{% else %}{{ icon('image') }}{% endif %}
+        </div>
+        <div>
+          <h2>{{ listing.title }}</h2>
+          <p>{{ listing.category_name }} · {{ listing.area }}, {{ listing.city }}</p>
+          <div class="boost-meta">
+            <span>{{ icon('eye') }} {{ listing.views }} views</span>
+            <span>{{ icon('clock') }} Listed {{ listing.created_at|time_ago }}</span>
+            {% if listing.is_featured %}<span class="mini-tag mini-tag--cyan">{{ icon('sparkles') }} Featured until {{ listing.featured_until|long_date }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <form method="post" class="boost-form" data-boost-form>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <fieldset class="package-options">
+        <legend class="sr-only">Choose a visibility package</legend>
+        {% for key, package in packages.items() %}
+        <label class="package-option {% if package.fee == 0 %}package-option--free{% elif key == 'featured' %}package-option--recommended{% endif %}">
+          <input type="radio" name="package" value="{{ key }}" {% if (key == 'standard' and not listing.is_featured) or (key == 'featured' and listing.is_featured) or loop.first and not listing.is_featured %}checked{% endif %}
+                 data-package-option data-package-name="{{ package.name }}" data-package-price="{{ package.fee }}" data-package-days="{{ package.days }}" data-package-eyebrow="{{ package.eyebrow }}">
+          <span class="package-option-inner">
+            <span class="package-option-top">
+              <span class="package-badge">{{ package.eyebrow }}</span>
+              {% if key == 'featured' %}<span class="package-star">{{ icon('sparkles') }}</span>{% endif %}
+            </span>
+            <span class="package-option-name">{{ package.name }}</span>
+            <span class="package-option-tagline">{{ package.tagline }}</span>
+            <span class="package-option-price">
+              {% if package.fee == 0 %}<strong>Free</strong><small>forever</small>{% else %}<strong>{{ package.fee|compact_money }}</strong><small>for {{ package.days }} days</small>{% endif %}
+            </span>
+            <span class="package-option-features">
+              {% for feature in package.features %}<span>{{ icon('check') }} {{ feature }}</span>{% endfor %}
+            </span>
+            <span class="package-select-indicator">{{ icon('check') }}</span>
+          </span>
+        </label>
+        {% endfor %}
+      </fieldset>
+
+      <div class="boost-checkout panel">
+        <div class="panel-head panel-head--inline">
+          <div><span class="eyebrow">{{ icon('wallet') }} Promotion summary</span><h2>Review your selection</h2></div>
+          <span class="status status--neutral">{{ icon('receipt') }} Recorded</span>
+        </div>
+        <div class="checkout-summary">
+          <div><span>Selected package</span><strong data-checkout-name>Standard</strong></div>
+          <div><span>Visibility period</span><strong data-checkout-days>No expiry</strong></div>
+          <div><span>Total</span><strong data-checkout-price>₱0</strong></div>
+          <div><span>Billing</span><strong>Added to your account record</strong></div>
+        </div>
+        <label class="checkbox-field">
+          <input type="checkbox" name="promotion_ack" value="on">
+          <span>I confirm this promotion record. I understand that boosting changes visibility only and never changes the item's free price or the review of claims.</span>
+        </label>
+        <div class="checkout-actions">
+          <a class="btn btn-ghost" href="{{ url_for('dashboard.donations') }}">Keep standard — skip</a>
+          <button class="btn btn-primary" type="submit">{{ icon('sparkles') }} Activate selected option</button>
+        </div>
+        <p class="fine-print">Promotion totals are recorded on your account. Card payment is not collected here; the administrator team confirms settlement separately. Featured visibility is applied immediately and expires automatically.</p>
+      </div>
+    </form>
+  </div>
+
+  <aside class="boost-side">
+    <div class="panel editor-tips">
+      <span class="eyebrow">{{ icon('sparkles') }} What a boost does</span>
+      <ul class="check-list check-list--tight">
+        <li>{{ icon('check') }} Places the listing ahead of standard finds.</li>
+        <li>{{ icon('check') }} Adds a visible Featured label.</li>
+        <li>{{ icon('check') }} May appear in homepage discovery rails.</li>
+        <li>{{ icon('check') }} Changes nothing about claims or safety.</li>
+      </ul>
+    </div>
+    <div class="panel editor-tips">
+      <span class="eyebrow">{{ icon('wallet') }} Why it exists</span>
+      <p>Optional boosts help fund the marketplace without ever charging for a donated item. This keeps giving free for everyone.</p>
+    </div>
+    <div class="panel editor-tips editor-tips--secure">
+      <span class="eyebrow">{{ icon('shield-check') }} Fair visibility</span>
+      <p>Boosted listings are always labelled. Donors cannot pay to bypass moderation, claim review or safety rules.</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

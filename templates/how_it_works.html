@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}How It Works — Anti-Imbak{% endblock %}
+{% block meta_description %}Learn how Anti-Imbak's donation-only marketplace works for Donors and Recipients, from discovery and claim requests to safe handovers and Partnered Delivery.{% endblock %}
+{% block body_class %}site-page content-page{% endblock %}
+
+{% block content %}
+<section class="content-hero">
+  <div class="content-hero-glow" aria-hidden="true"></div>
+  <div class="container content-hero-inner">
+    <span class="eyebrow">{{ icon('refresh') }} A simple exchange</span>
+    <h1>Good things move<br><span class="text-gradient">when people share.</span></h1>
+    <p>Anti-Imbak removes the price negotiation from giving. Donors offer useful things freely, Recipients explain what would help, and both sides arrange a safe handover.</p>
+    <div class="content-hero-actions">
+      <a class="btn btn-primary" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Browse donations</a>
+      <a class="btn btn-secondary" href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">{{ icon('gift') }} Donate an item</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading section-heading--center">
+      <div>
+        <span class="eyebrow">{{ icon('list') }} From Donor to Recipient</span>
+        <h2>Four simple steps</h2>
+        <p>The same flow works whether you are clearing a cupboard or furnishing a first home.</p>
+      </div>
+    </div>
+    <div class="journey">
+      <article class="journey-step reveal">
+        <div class="journey-marker"><span>01</span></div>
+        <div class="journey-content">
+          <span class="journey-icon">{{ icon('camera') }}</span>
+          <div>
+            <span class="eyebrow eyebrow--soft">Donor</span>
+            <h3>List it honestly</h3>
+            <p>Add clear photos, an honest condition, a category and a general area. All listings are free; there is no price field.</p>
+          </div>
+        </div>
+      </article>
+      <article class="journey-step reveal">
+        <div class="journey-marker"><span>02</span></div>
+        <div class="journey-content">
+          <span class="journey-icon">{{ icon('search') }}</span>
+          <div>
+            <span class="eyebrow eyebrow--soft">Recipient</span>
+            <h3>Find something useful</h3>
+            <p>Search by keyword, category, city and condition. Sort by newest, featured or nearest to find something that genuinely fits.</p>
+          </div>
+        </div>
+      </article>
+      <article class="journey-step reveal">
+        <div class="journey-marker"><span>03</span></div>
+        <div class="journey-content">
+          <span class="journey-icon">{{ icon('message-circle') }}</span>
+          <div>
+            <span class="eyebrow eyebrow--soft">Recipient and Donor</span>
+            <h3>Request and agree</h3>
+            <p>Send a short claim request explaining why the item would help. The Donor reviews every request and accepts the one that fits. Choose Partnered Delivery or Self Pickup.</p>
+          </div>
+        </div>
+      </article>
+      <article class="journey-step reveal">
+        <div class="journey-marker"><span>04</span></div>
+        <div class="journey-content">
+          <span class="journey-icon">{{ icon('shield-check') }}</span>
+          <div>
+            <span class="eyebrow eyebrow--soft">Together</span>
+            <h3>Complete the handover</h3>
+            <p>Meet in a public, well-lit place for Self Pickup, or follow the delivery updates in your workspace. Confirm receipt once the item arrives.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section faq-section">
+  <div class="container faq-layout">
+    <div class="faq-intro">
+      <span class="eyebrow">{{ icon('info') }} Questions, answered</span>
+      <h2>A few useful answers.</h2>
+      <p>Still unsure about something? Write to <a href="mailto:hello@antiimbak.ph">hello@antiimbak.ph</a>.</p>
+      <a class="btn btn-secondary" href="{{ url_for('public.safety') }}">{{ icon('shield-check') }} Read safety guidelines</a>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>Is every item really free? {{ icon('chevron-down') }}</summary>
+        <p>Yes. Anti-Imbak does not allow prices on items. Optional paid services — a featured boost or a delivery arrangement — never change the fact that the donation itself is free.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why does a claim need a Donor's approval? {{ icon('chevron-down') }}</summary>
+        <p>A donation is a personal handover. The Donor reviews each request, considers the item's fit and chooses the arrangement that feels responsible. Claiming is a request, not an automatic purchase.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does delivery work? {{ icon('chevron-down') }}</summary>
+        <p>Partnered Delivery is the default when a claim is sent. The fee depends on the item's size and distance, stays within ₱50–₱150, and is shown before the request is submitted. You can choose Self Pickup instead and arrange the meeting in Messages.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What happens if something feels unsafe? {{ icon('chevron-down') }}</summary>
+        <p>Stop the exchange, leave the situation and use the listing's report button. Reports go privately to the safety team. You can also email hello@antiimbak.ph. In an emergency, contact local authorities first.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section final-cta-section">
+  <div class="container">
+    <div class="final-cta final-cta--compact reveal">
+      <h2>Ready to give something<br>a second purpose?</h2>
+      <div class="final-cta-actions">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('public.browse') }}">Explore free items</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">Donate an item</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

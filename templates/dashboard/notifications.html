@@ -1,0 +1,53 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, notification_icon %}
+
+{% block title %}Notifications — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}Notifications{% endblock %}
+{% block dash_title %}Notifications{% endblock %}
+{% block dash_subtitle %}
+<p>{{ unread_notifications }} unread {{ unread_notifications|plural('update') }}. Claim decisions, delivery steps and messages from the community live here.</p>
+{% endblock %}
+{% block dash_actions %}
+{% if unread_notifications %}
+<form method="post" action="{{ url_for('dashboard.read_all_notifications') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <button class="btn btn-secondary btn-sm" type="submit">{{ icon('check-circle') }} Mark all as read</button>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block dash_content %}
+{% if notifications %}
+<section class="panel panel--flush">
+  <div class="notification-page-list">
+    {% for notification in notifications %}
+    <a class="notification-page-item {% if not notification.is_read %}is-unread{% endif %}" href="{{ url_for('dashboard.open_notification', notification_id=notification.id) }}">
+      <span class="notification-page-icon">{{ notification_icon(notification.type) }}</span>
+      <span class="notification-page-copy">
+        <span class="notification-page-top">
+          <strong>{{ notification.title }}</strong>
+          <time>{{ notification.created_at|time_ago }}</time>
+        </span>
+        <p>{{ notification.message }}</p>
+        <span class="notification-page-meta">
+          <span class="mini-tag">{{ notification.type|replace('_', ' ')|title }}</span>
+          {% if notification.link %}<span class="text-link text-link--sm">Open related page {{ icon('arrow-right') }}</span>{% endif %}
+        </span>
+      </span>
+      {% if not notification.is_read %}<span class="unread-dot" aria-label="Unread"></span>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</section>
+<p class="table-note">{{ icon('info') }} Alerts come from activity in your account, including claim decisions, delivery progress, messages and administrator announcements. Everything stays inside Anti-Imbak.</p>
+{% else %}
+<div class="panel">
+  <div class="empty-state">
+    <span class="empty-icon">{{ icon('bell') }}</span>
+    <h3>All quiet for now.</h3>
+    <p>Claim decisions, delivery updates and messages will arrive here. In the meantime, browse something useful.</p>
+    <a class="btn btn-secondary" href="{{ url_for('public.browse') }}">Browse donations {{ icon('arrow-right') }}</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

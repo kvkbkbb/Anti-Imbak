@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block body_class %}dashboard-page admin-page{% endblock %}
+{% block main_class %}dashboard-main{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell admin-shell">
+  <div class="container dashboard-layout">
+    <aside class="dash-sidebar admin-sidebar" aria-label="Administrator navigation">
+      <div class="dash-profile admin-profile">
+        <a class="dash-profile-main" href="{{ url_for('admin.overview') }}">
+          {{ avatar(current_user.name, current_user.avatar_url, 'avatar--md') }}
+          <span>
+            <strong>{{ current_user.name }}</strong>
+            <small>Administrator</small>
+          </span>
+          {{ icon('shield-check') }}
+        </a>
+        <div class="dash-profile-meta">
+          <span class="admin-pill">{{ icon('shield-check') }} Administrator</span>
+        </div>
+      </div>
+
+      <nav class="dash-nav" aria-label="Admin navigation">
+        <span class="dash-nav-label">Operations</span>
+        <a href="{{ url_for('admin.overview') }}" class="dash-nav-link {% if active_page == 'overview' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('dashboard') }}</span><span>Overview</span>
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="dash-nav-link {% if active_page == 'users' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('users') }}</span><span>Members</span>
+        </a>
+        <a href="{{ url_for('admin.listings') }}" class="dash-nav-link {% if active_page == 'listings' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('gift') }}</span><span>Listings</span>
+        </a>
+        <a href="{{ url_for('admin.reports') }}" class="dash-nav-link {% if active_page == 'reports' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('flag') }}</span><span>Trust &amp; safety</span>
+          {% if nav_counts.reports %}<span class="nav-count nav-count--danger">{{ nav_counts.reports }}</span>{% endif %}
+        </a>
+        <span class="dash-nav-label">Casework</span>
+        <a href="{{ url_for('admin.disputes') }}" class="dash-nav-link {% if active_page == 'disputes' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('shield') }}</span><span>Disputes</span>
+          {% if nav_counts.disputes %}<span class="nav-count nav-count--danger">{{ nav_counts.disputes }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('admin.support') }}" class="dash-nav-link {% if active_page == 'support' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('message-circle') }}</span><span>User concerns</span>
+          {% if nav_counts.concerns %}<span class="nav-count nav-count--warm">{{ nav_counts.concerns }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('admin.activity') }}" class="dash-nav-link {% if active_page == 'activity' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('list') }}</span><span>Activity logs</span>
+        </a>
+        <span class="dash-nav-label">Platform</span>
+        <a href="{{ url_for('admin.revenue') }}" class="dash-nav-link {% if active_page == 'revenue' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('wallet') }}</span><span>Delivery fees &amp; revenue</span>
+        </a>
+        <a href="{{ url_for('admin.content') }}" class="dash-nav-link {% if active_page == 'content' %}is-active{% endif %}">
+          <span class="dash-nav-icon">{{ icon('megaphone') }}</span><span>Ads &amp; content</span>
+        </a>
+        <span class="dash-nav-label">Your space</span>
+        <a href="{{ url_for('dashboard.index') }}" class="dash-nav-link">
+          <span class="dash-nav-icon">{{ icon('user') }}</span><span>Member workspace</span>
+        </a>
+        <a href="{{ url_for('dashboard.messages') }}" class="dash-nav-link">
+          <span class="dash-nav-icon">{{ icon('message-circle') }}</span><span>Messages</span>
+          {% if unread_messages %}<span class="nav-count">{{ unread_messages }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('public.index') }}" class="dash-nav-link">
+          <span class="dash-nav-icon">{{ icon('globe') }}</span><span>View marketplace</span>{{ icon('arrow-up-right') }}
+        </a>
+      </nav>
+
+      <p class="dash-sidebar-note">{{ icon('info') }} Every moderation action is recorded in the activity log.</p>
+    </aside>
+
+    <div class="dash-content">
+      <header class="dash-topbar">
+        <div class="dash-topbar-copy">
+          <div class="page-breadcrumb">
+            <a href="{{ url_for('admin.overview') }}">Administrator</a> {{ icon('chevron-right') }}
+            <span>{% block admin_breadcrumb %}Overview{% endblock %}</span>
+          </div>
+          <h1>{% block admin_title %}Overview{% endblock %}</h1>
+          {% block admin_subtitle %}{% endblock %}
+        </div>
+        <div class="dash-topbar-actions">
+          {% block admin_actions %}{% endblock %}
+        </div>
+      </header>
+
+      <div class="dash-scroll">
+        {% block admin_content %}{% endblock %}
+
+        <footer class="dash-footer">
+          <span>{{ icon('shield-check') }} Anti-Imbak administrator console</span>
+          <span>Figures are calculated from the marketplace database.</span>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

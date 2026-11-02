@@ -1,0 +1,259 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar, status_badge %}
+
+{% block title %}Admin Overview — Anti-Imbak{% endblock %}
+{% block body_class %}dashboard-page admin-page admin-overview{% endblock %}
+{% block admin_breadcrumb %}Overview{% endblock %}
+{% block admin_title %}Operations overview{% endblock %}
+{% block admin_subtitle %}
+<p>A live view of the community, the moderation queue and the platform's transparent revenue.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.reports') }}">{{ icon('flag') }} Safety queue{% if stats.open_reports %} <span class="btn-count">{{ stats.open_reports }}</span>{% endif %}</a>
+<a class="btn btn-primary btn-sm" href="{{ url_for('admin.content') }}">{{ icon('megaphone') }} Content</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--five">
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('users') }}</span>
+    <div class="stat-copy"><span>Members</span><strong>{{ stats.total_users }}</strong><small>{{ stats.active_users }} active</small></div>
+    <a class="stat-link" href="{{ url_for('admin.users') }}">{{ icon('arrow-up-right') }}</a>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('gift') }}</span>
+    <div class="stat-copy"><span>Live listings</span><strong>{{ stats.total_listings }}</strong><small>not removed</small></div>
+    <a class="stat-link" href="{{ url_for('admin.listings') }}">{{ icon('arrow-up-right') }}</a>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('check-circle') }}</span>
+    <div class="stat-copy"><span>Completed handovers</span><strong>{{ stats.successful_claims }}</strong><small>{{ stats.pending_claims }} claims pending</small></div>
+  </article>
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('flag') }}</span>
+    <div class="stat-copy"><span>Open reports</span><strong>{{ stats.open_reports }}</strong><small>awaiting review</small></div>
+    <a class="stat-link" href="{{ url_for('admin.reports') }}">{{ icon('arrow-up-right') }}</a>
+  </article>
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('wallet') }}</span>
+    <div class="stat-copy"><span>Platform revenue</span><strong>{{ stats.total_revenue|compact_money }}</strong><small>boosts and ads</small></div>
+    <a class="stat-link" href="{{ url_for('admin.revenue') }}">{{ icon('arrow-up-right') }}</a>
+  </article>
+</section>
+
+<section class="revenue-ribbon">
+  <div><span>{{ icon('sparkles') }} Featured boosts</span><strong>{{ stats.featured_revenue|money }}</strong></div>
+  <div><span>{{ icon('truck') }} Delivery fees handled</span><strong>{{ stats.delivery_fees|money }}</strong></div>
+  <div><span>{{ icon('megaphone') }} Advertising</span><strong>{{ stats.ad_revenue|money }}</strong></div>
+  <div class="revenue-ribbon-note"><span class="pulse-dot"></span> Delivery fees are passed in full to the delivery partner. Platform revenue comes only from optional boosts and advertising.</div>
+</section>
+
+<div class="dash-grid dash-grid--main">
+  <section class="panel activity-panel">
+    <div class="panel-head">
+      <div>
+        <span class="eyebrow">{{ icon('chart') }} Last 7 days</span>
+        <h2>Community activity</h2>
+        <p>New members, listings and claims recorded per day.</p>
+      </div>
+      <div class="chart-legend">
+        <span><i class="legend-dot legend-dot--violet"></i> Members</span>
+        <span><i class="legend-dot legend-dot--cyan"></i> Listings</span>
+        <span><i class="legend-dot legend-dot--warm"></i> Claims</span>
+      </div>
+    </div>
+    <div class="activity-chart activity-chart--three" role="img" aria-label="Seven-day platform activity chart">
+      {% for day in days %}
+      <div class="activity-day">
+        <div class="activity-bars">
+          <span class="activity-bar activity-bar--member" style="height: {{ ((day.users / max_activity) * 100)|round(1) }}%" title="{{ day.users }} members on {{ day.date }}"></span>
+          <span class="activity-bar activity-bar--donation" style="height: {{ ((day.listings / max_activity) * 100)|round(1) }}%" title="{{ day.listings }} listings on {{ day.date }}"></span>
+          <span class="activity-bar activity-bar--claim" style="height: {{ ((day.claims / max_activity) * 100)|round(1) }}%" title="{{ day.claims }} claims on {{ day.date }}"></span>
+        </div>
+        <span class="activity-label">{{ day.label }}</span>
+        <span class="activity-date">{{ day.date }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="activity-foot">
+      <div><span>Active ads</span><strong>{{ stats.active_ads }}</strong></div>
+      <div><span>Pending claims</span><strong>{{ stats.pending_claims }}</strong></div>
+      <div><span>Open reports</span><strong>{{ stats.open_reports }}</strong></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head panel-head--inline">
+      <div><span class="eyebrow">{{ icon('grid') }} Distribution</span><h2>Listings by category</h2></div>
+    </div>
+    <div class="category-bars">
+      {% for category in category_counts %}
+      <div class="category-bar-row">
+        <span class="category-bar-label">{{ icon(category.icon) }} {{ category.name }}</span>
+        <span class="category-bar-track"><span style="width: {{ ((category.total / max_category) * 100)|round(1) }}%"></span></span>
+        <strong>{{ category.total }}</strong>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+<div class="dash-grid dash-grid--two">
+  <section class="panel">
+    <div class="panel-head panel-head--inline">
+      <div><span class="eyebrow eyebrow--danger">{{ icon('flag') }} Trust &amp; safety</span><h2>Open reports</h2></div>
+      <a class="text-link text-link--sm" href="{{ url_for('admin.reports') }}">Full queue {{ icon('arrow-right') }}</a>
+    </div>
+    {% if recent_reports %}
+    <div class="admin-mini-list">
+      {% for report in recent_reports %}
+      <a class="admin-mini-row" href="{{ url_for('admin.reports') }}">
+        <span class="admin-mini-icon admin-mini-icon--danger">{{ icon('flag') }}</span>
+        <span><strong>{{ report.reason }}</strong><small>{{ report.listing_title or 'Removed listing' }} · reported by {{ report.reporter_name }}</small></span>
+        <time>{{ report.created_at|time_ago }}</time>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="mini-empty">{{ icon('check-circle') }}<p>The safety queue is clear. Nice work.</p></div>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head panel-head--inline">
+      <div><span class="eyebrow">{{ icon('hand-heart') }} Marketplace</span><h2>Claims waiting</h2></div>
+      <a class="text-link text-link--sm" href="{{ url_for('admin.listings') }}">Listings {{ icon('arrow-right') }}</a>
+    </div>
+    {% if pending_claims %}
+    <div class="admin-mini-list">
+      {% for claim in pending_claims %}
+      <div class="admin-mini-row">
+        <span class="admin-mini-icon">{{ icon('clock') }}</span>
+        <span><strong>{{ claim.claimant_name }}</strong><small>{{ claim.listing_title }}</small></span>
+        <time>{{ claim.created_at|time_ago }}</time>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="mini-empty">{{ icon('gift') }}<p>No pending claims right now.</p></div>
+    {% endif %}
+  </section>
+</div>
+
+<div class="dash-grid dash-grid--two">
+  <section class="panel">
+    <div class="panel-head panel-head--inline">
+      <div><span class="eyebrow eyebrow--danger">{{ icon('shield') }} Casework</span><h2>Active disputes</h2></div>
+      <a class="text-link text-link--sm" href="{{ url_for('admin.disputes') }}">Disputes management {% if nav_counts.disputes %}<span class="btn-count">{{ nav_counts.disputes }}</span> {% endif %}{{ icon('arrow-right') }}</a>
+    </div>
+    {% if recent_disputes %}
+    <div class="admin-mini-list">
+      {% for dispute in recent_disputes %}
+      <a class="admin-mini-row" href="{{ url_for('admin.dispute_detail', dispute_id=dispute.id) }}">
+        <span class="admin-mini-icon admin-mini-icon--danger">{{ icon('shield') }}</span>
+        <span>
+          <strong>{{ dispute.summary }}</strong>
+          <small>{{ dispute.dispute_code }} · {{ dispute.reporter_name }}{% if dispute.other_name %} with {{ dispute.other_name }}{% endif %}</small>
+        </span>
+        <span class="admin-mini-stack">
+          <span class="priority priority--{{ dispute.priority|priority_tone }}">{{ dispute.priority|priority_label }}</span>
+          <time>{{ dispute.created_at|time_ago }}</time>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="mini-empty">{{ icon('check-circle') }}<p>No active disputes. Every handover is running smoothly.</p></div>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head panel-head--inline">
+      <div><span class="eyebrow">{{ icon('message-circle') }} Support desk</span><h2>User concerns</h2></div>
+      <a class="text-link text-link--sm" href="{{ url_for('admin.support') }}">Open support desk {% if nav_counts.concerns %}<span class="btn-count">{{ nav_counts.concerns }}</span> {% endif %}{{ icon('arrow-right') }}</a>
+    </div>
+    {% if recent_concerns %}
+    <div class="admin-mini-list">
+      {% for concern in recent_concerns %}
+      <a class="admin-mini-row" href="{{ url_for('admin.support_detail', concern_id=concern.id) }}">
+        <span class="admin-mini-icon admin-mini-icon--cyan">{{ icon('message-circle') }}</span>
+        <span>
+          <strong>{{ concern.subject }}</strong>
+          <small>{{ concern.ticket_code }} · {{ concern.user_name }} · {{ concern.category }}</small>
+        </span>
+        <span class="admin-mini-stack">
+          <span class="status status--{{ concern.status|status_tone }}">{{ concern.status|support_status_label }}</span>
+          <time>{{ concern.created_at|time_ago }}</time>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="mini-empty">{{ icon('check-circle') }}<p>No open user concerns. Everyone has an answer.</p></div>
+    {% endif %}
+  </section>
+</div>
+
+<div class="dash-grid dash-grid--two dash-grid--stack">
+  <section class="panel panel--flush">
+    <div class="panel-head panel-head--inline panel-head--padded">
+      <div><span class="eyebrow">{{ icon('receipt') }} Ledger</span><h2>Recent transactions</h2></div>
+      <a class="text-link text-link--sm" href="{{ url_for('admin.revenue') }}">Revenue ledger {{ icon('arrow-right') }}</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table data-table--compact">
+        <thead><tr><th>Type</th><th>Description</th><th>Amount</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for transaction in recent_transactions %}
+          <tr>
+            <td><span class="mini-tag">{{ transaction.type|title }}</span></td>
+            <td><strong class="table-clip">{{ transaction.description }}</strong><small>{{ transaction.user_name or 'Advertising client' }}</small></td>
+            <td>{{ transaction.amount|money }}</td>
+            <td>{{ transaction.created_at|time_ago }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">No transactions yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head panel-head--inline">
+      <div><span class="eyebrow">{{ icon('sparkles') }} Visibility</span><h2>Active featured listings</h2></div>
+      <a class="text-link text-link--sm" href="{{ url_for('admin.listings', featured='featured') }}">Manage {{ icon('arrow-right') }}</a>
+    </div>
+    {% if active_featured %}
+    <div class="admin-mini-list">
+      {% for listing in active_featured %}
+      <a class="admin-mini-row" href="{{ url_for('public.listing_detail', listing_id=listing.id) }}">
+        <span class="admin-mini-icon admin-mini-icon--cyan">{{ icon('sparkles') }}</span>
+        <span><strong>{{ listing.title }}</strong><small>{{ listing.donor_name }} · until {{ listing.featured_until|long_date }}</small></span>
+        {{ icon('arrow-up-right') }}
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="mini-empty">{{ icon('sparkles') }}<p>No featured listings are active.</p></div>
+    {% endif %}
+  </section>
+</div>
+
+<section class="panel panel--flush">
+  <div class="panel-head panel-head--inline panel-head--padded">
+    <div><span class="eyebrow">{{ icon('list') }} Audit trail</span><h2>Recent admin actions</h2></div>
+  </div>
+  <div class="admin-log-list">
+    {% for log in recent_logs %}
+    <div class="admin-log-row">
+      <span class="log-dot"></span>
+      <div><strong>{{ log.action }}</strong><p>{{ log.details or (log.target_type ~ ' #' ~ log.target_id) }}</p></div>
+      <span>{{ log.admin_name }} · {{ log.created_at|time_ago }}</span>
+    </div>
+    {% else %}
+    <div class="mini-empty"><p>No admin actions recorded yet.</p></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

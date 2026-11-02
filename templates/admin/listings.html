@@ -1,0 +1,176 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, status_badge %}
+
+{% block title %}Listings — Anti-Imbak Admin{% endblock %}
+{% block admin_breadcrumb %}Listings{% endblock %}
+{% block admin_title %}Marketplace listings{% endblock %}
+{% block admin_subtitle %}
+<p>Inspect every donation, feature standout items and remove unsafe content with a clear trail.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Public marketplace</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--four">
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('package') }}</span>
+    <div class="stat-copy"><span>All listings</span><strong>{{ stats.all }}</strong><small>including removed</small></div>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('check-circle') }}</span>
+    <div class="stat-copy"><span>Available now</span><strong>{{ stats.available }}</strong><small>visible to members</small></div>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('sparkles') }}</span>
+    <div class="stat-copy"><span>Featured</span><strong>{{ stats.featured }}</strong><small>paid or editorial</small></div>
+  </article>
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('trash') }}</span>
+    <div class="stat-copy"><span>Removed</span><strong>{{ stats.removed }}</strong><small>hidden from public view</small></div>
+  </article>
+</section>
+
+<section class="panel panel--flush">
+  <div class="panel-head panel-head--inline panel-head--padded">
+    <div>
+      <span class="eyebrow">{{ icon('gift') }} Donation inventory</span>
+      <h2>Browse and moderate listings</h2>
+      <p>{{ listings|length }} {{ listings|length|plural('listing') }} in this view.</p>
+    </div>
+    <a class="text-link text-link--sm" href="{{ url_for('admin.listings', featured='featured') }}">{{ icon('sparkles') }} Featured only</a>
+  </div>
+
+  <form class="admin-filter-bar" method="get" action="{{ url_for('admin.listings') }}">
+    <label class="filter-search">
+      {{ icon('search') }}
+      <input type="search" name="q" value="{{ q }}" placeholder="Search title, Donor or city" aria-label="Search listings">
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Status</span>
+      <select name="status">
+        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Any status</option>
+        {% for value in ['available', 'reserved', 'claimed', 'unavailable', 'removed'] %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ value|status_label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Category</span>
+      <select name="category">
+        <option value="">Any category</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}" {% if category_filter == category.id %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Visibility</span>
+      <select name="featured">
+        <option value="all" {% if featured_filter == 'all' %}selected{% endif %}>All visibility</option>
+        <option value="featured" {% if featured_filter == 'featured' %}selected{% endif %}>Featured</option>
+        <option value="standard" {% if featured_filter == 'standard' %}selected{% endif %}>Standard</option>
+      </select>
+    </label>
+    <button class="btn btn-secondary btn-sm" type="submit">{{ icon('filter') }} Apply</button>
+    {% if q or status_filter != 'all' or category_filter or featured_filter != 'all' %}
+    <a class="text-link text-link--sm" href="{{ url_for('admin.listings') }}">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if listings %}
+  <div class="table-wrap">
+    <table class="data-table admin-listings-table">
+      <thead>
+        <tr>
+          <th scope="col">Listing</th>
+          <th scope="col">Donor</th>
+          <th scope="col">Status</th>
+          <th scope="col">Signals</th>
+          <th scope="col">Listed</th>
+          <th scope="col" class="cell-actions">Moderate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for listing in listings %}
+        <tr>
+          <td>
+            <div class="table-item">
+              <a class="table-thumb" href="{{ url_for('public.listing_detail', listing_id=listing.id) }}">
+                {% if listing.primary_image %}<img src="{{ listing.primary_image }}" alt="" loading="lazy">{% else %}{{ icon('image') }}{% endif %}
+              </a>
+              <div class="table-item-copy">
+                <strong><a href="{{ url_for('public.listing_detail', listing_id=listing.id) }}">{{ listing.title }}</a></strong>
+                <span>{{ icon(listing.category_icon) }} {{ listing.category_name }} · {{ listing.condition }}</span>
+                <small>{{ icon('map-pin') }} {{ listing.area }}, {{ listing.city }}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="cell-strong">{{ listing.donor_name }}</span>
+            <small class="cell-sub">{{ listing.donor_email }}</small>
+          </td>
+          <td>
+            <span class="status status--{{ listing.status|status_tone }}">{{ listing.status|status_label }}</span>
+            {% if listing.is_featured %}
+            <small class="cell-sub">{{ icon('sparkles') }} Until {{ listing.featured_until|long_date }}</small>
+            {% endif %}
+          </td>
+          <td>
+            <div class="signal-list">
+              <span>{{ icon('hand-heart') }} {{ listing.pending_claims }} pending</span>
+              <span>{{ icon('eye') }} {{ listing.views }} views</span>
+              {% if listing.open_reports %}<span class="signal-list-danger">{{ icon('flag') }} {{ listing.open_reports }} {{ listing.open_reports|plural('report') }}</span>{% endif %}
+            </div>
+          </td>
+          <td>
+            <span class="cell-strong">{{ listing.created_at|long_date }}</span>
+            <small class="cell-sub">{{ listing.created_at|time_ago }}</small>
+          </td>
+          <td class="cell-actions">
+            <div class="row-actions">
+              <a class="icon-button" href="{{ url_for('public.listing_detail', listing_id=listing.id) }}" title="View public page" aria-label="View {{ listing.title }}">{{ icon('eye') }}</a>
+              <details class="action-menu">
+                <summary class="icon-button" aria-label="Moderate {{ listing.title }}">{{ icon('menu-dots') }}</summary>
+                <div class="action-menu-panel">
+                  {% if listing.status == 'removed' %}
+                  <form method="post" action="{{ url_for('admin.listing_action', listing_id=listing.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="restore">
+                    <button type="submit" class="action-menu-item">{{ icon('refresh') }} Restore listing</button>
+                  </form>
+                  {% else %}
+                  <form method="post" action="{{ url_for('admin.listing_action', listing_id=listing.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="{{ 'unfeature' if listing.is_featured else 'feature' }}">
+                    <button type="submit" class="action-menu-item">{{ icon('sparkles') }} {{ 'Remove feature' if listing.is_featured else 'Feature for 14 days' }}</button>
+                  </form>
+                  <form method="post" action="{{ url_for('admin.listing_action', listing_id=listing.id) }}" data-confirm="Remove &quot;{{ listing.title }}&quot; from the marketplace? Active requests will be closed and the Donor will be notified.">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="action" value="remove">
+                    <button type="submit" class="action-menu-item action-menu-item--danger">{{ icon('trash') }} Remove listing</button>
+                  </form>
+                  {% endif %}
+                  {% if listing.open_reports %}
+                  <a class="action-menu-item" href="{{ url_for('admin.reports') }}">{{ icon('flag') }} Open safety queue</a>
+                  {% endif %}
+                </div>
+              </details>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="table-note">{{ icon('info') }} Removing a listing is reversible and never deletes its history. Editorial features are a no-charge visibility grant; paid boosts are recorded in the revenue ledger.</div>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">{{ icon('search') }}</span>
+    <h3>No listings match this view</h3>
+    <p>Adjust the status, category or visibility filters to find the donation you need.</p>
+    <a class="btn btn-secondary" href="{{ url_for('admin.listings') }}">Clear filters {{ icon('arrow-right') }}</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

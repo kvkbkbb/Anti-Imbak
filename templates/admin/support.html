@@ -1,0 +1,135 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon, avatar, verified_badge %}
+
+{% block title %}User Concerns &amp; Support — Anti-Imbak Admin{% endblock %}
+{% block admin_breadcrumb %}User concerns{% endblock %}
+{% block admin_title %}User concerns &amp; support{% endblock %}
+{% block admin_subtitle %}
+<p>One response desk for account questions, technical snags and listing concerns. Every reply is stored in the member's thread.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.disputes') }}">{{ icon('shield') }} Disputes{% if nav_counts.disputes %} <span class="btn-count">{{ nav_counts.disputes }}</span>{% endif %}</a>
+<a class="btn btn-secondary btn-sm" href="{{ url_for('admin.activity') }}">{{ icon('list') }} Activity logs</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--five">
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('message-circle') }}</span>
+    <div class="stat-copy"><span>Active concerns</span><strong>{{ stats.active }}</strong><small>open or in progress</small></div>
+  </article>
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('mail') }}</span>
+    <div class="stat-copy"><span>New</span><strong>{{ stats.open }}</strong><small>no reply yet</small></div>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('clock') }}</span>
+    <div class="stat-copy"><span>In progress</span><strong>{{ stats.in_progress }}</strong><small>conversation open</small></div>
+  </article>
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('alert-triangle') }}</span>
+    <div class="stat-copy"><span>Urgent</span><strong>{{ stats.urgent }}</strong><small>needs a quick reply</small></div>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('check-circle') }}</span>
+    <div class="stat-copy"><span>Resolved</span><strong>{{ stats.resolved }}</strong><small>answer confirmed</small></div>
+  </article>
+</section>
+
+<nav class="dash-tabs admin-report-tabs" aria-label="Filter user concerns by status">
+  <a href="{{ url_for('admin.support', status='active') }}" class="dash-tab {% if status_filter == 'active' %}is-active{% endif %}">Active <span>{{ stats.active }}</span></a>
+  <a href="{{ url_for('admin.support', status='open') }}" class="dash-tab {% if status_filter == 'open' %}is-active{% endif %}">Open <span>{{ stats.open }}</span></a>
+  <a href="{{ url_for('admin.support', status='in_progress') }}" class="dash-tab {% if status_filter == 'in_progress' %}is-active{% endif %}">In progress <span>{{ stats.in_progress }}</span></a>
+  <a href="{{ url_for('admin.support', status='resolved') }}" class="dash-tab {% if status_filter == 'resolved' %}is-active{% endif %}">Resolved <span>{{ stats.resolved }}</span></a>
+  <a href="{{ url_for('admin.support', status='closed') }}" class="dash-tab {% if status_filter == 'closed' %}is-active{% endif %}">Closed</a>
+  <a href="{{ url_for('admin.support', status='all') }}" class="dash-tab {% if status_filter == 'all' %}is-active{% endif %}">All <span>{{ stats.all }}</span></a>
+</nav>
+
+<section class="panel panel--flush">
+  <form class="admin-filter-bar" method="get" action="{{ url_for('admin.support') }}">
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <label class="filter-search">
+      {{ icon('search') }}
+      <input type="search" name="q" value="{{ q }}" placeholder="Search ticket, subject, message or member" aria-label="Search user concerns">
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Category</span>
+      <select name="category">
+        <option value="all" {% if category_filter == 'all' %}selected{% endif %}>Any category</option>
+        {% for category in categories %}
+        <option value="{{ category }}" {% if category_filter == category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="filter-select">
+      <span class="sr-only">Priority</span>
+      <select name="priority">
+        <option value="all" {% if priority_filter == 'all' %}selected{% endif %}>Any priority</option>
+        {% for priority in dispute_priorities %}
+        <option value="{{ priority }}" {% if priority_filter == priority %}selected{% endif %}>{{ priority|priority_label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="btn btn-secondary btn-sm" type="submit">{{ icon('filter') }} Apply</button>
+    {% if q or priority_filter != 'all' or category_filter != 'all' %}
+    <a class="text-link text-link--sm" href="{{ url_for('admin.support', status=status_filter) }}">Clear</a>
+    {% endif %}
+  </form>
+
+  {% if concerns %}
+  <div class="table-wrap">
+    <table class="data-table support-table">
+      <thead>
+        <tr><th>Ticket</th><th>Member</th><th>Category</th><th>Priority</th><th>Status</th><th>Messages</th><th>Last activity</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for concern in concerns %}
+        <tr>
+          <td>
+            <a class="dispute-case-link" href="{{ url_for('admin.support_detail', concern_id=concern.id) }}">
+              <span class="dispute-code">{{ concern.ticket_code }}</span>
+              <strong>{{ concern.subject }}</strong>
+              <small>{{ concern.message|truncate(72, True, '…') }}</small>
+            </a>
+          </td>
+          <td>
+            <div class="support-member">
+              {{ avatar(concern.user_name, concern.user_avatar, 'avatar--xs') }}
+              <span><strong>{{ concern.user_name }}</strong><small>{{ concern.user_email }}</small></span>
+            </div>
+          </td>
+          <td><span class="mini-tag">{{ concern.category }}</span></td>
+          <td><span class="priority priority--{{ concern.priority|priority_tone }}">{{ concern.priority|priority_label }}</span></td>
+          <td><span class="status status--{{ concern.status|status_tone }}">{{ concern.status|support_status_label }}</span></td>
+          <td><strong>{{ concern.message_count }}</strong><small class="cell-sub">thread {{ concern.message_count|plural('message') }}</small></td>
+          <td>
+            <span class="cell-strong">{{ concern.last_message_at|time_ago if concern.last_message_at else concern.created_at|time_ago }}</span>
+            <small class="cell-sub">{{ concern.assigned_name or 'Unassigned' }}</small>
+          </td>
+          <td><a class="icon-button" href="{{ url_for('admin.support_detail', concern_id=concern.id) }}" aria-label="Open {{ concern.ticket_code }}">{{ icon('chevron-right') }}</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <span class="empty-icon">{{ icon('message-circle') }}</span>
+    <h3>No concerns match this view</h3>
+    <p>Try another status, category or search phrase. An empty queue means every member has an answer.</p>
+    <a class="btn btn-secondary" href="{{ url_for('admin.support', status='all') }}">View all concerns {{ icon('arrow-right') }}</a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel report-guidance">
+  <div class="panel-head panel-head--inline">
+    <div><span class="eyebrow">{{ icon('book-open') }} Support guide</span><h2>Answer with care and a clear next step</h2></div>
+  </div>
+  <div class="report-guide-grid">
+    <div><span>{{ icon('eye') }}</span><strong>Read the full thread</strong><p>Member replies and support responses are kept in one conversation so nobody has to repeat themselves.</p></div>
+    <div><span>{{ icon('send') }}</span><strong>Reply inside the thread</strong><p>Sending a reply moves the concern to In progress, auto-assigns it to you and notifies the member.</p></div>
+    <div><span>{{ icon('check-circle') }}</span><strong>Close the loop</strong><p>Set a resolution summary before marking a concern resolved. The outcome stays in the member's notification history.</p></div>
+  </div>
+</section>
+{% endblock %}

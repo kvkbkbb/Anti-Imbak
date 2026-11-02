@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon %}
+
+{% set is_privacy = page == 'privacy' %}
+{% block title %}{{ 'Privacy Notice' if is_privacy else 'Terms of Use' }} — Anti-Imbak{% endblock %}
+{% block meta_description %}{{ 'How Anti-Imbak handles personal information.' if is_privacy else 'The terms that govern giving, receiving and using the Anti-Imbak donation marketplace.' }}{% endblock %}
+{% block body_class %}site-page content-page legal-page{% endblock %}
+
+{% block content %}
+<section class="content-hero legal-hero">
+  <div class="content-hero-glow" aria-hidden="true"></div>
+  <div class="container content-hero-inner">
+    <span class="eyebrow">{{ icon('shield-check' if is_privacy else 'file') }} {{ 'Your information, handled with care' if is_privacy else 'Clear rules for a generous community' }}</span>
+    <h1>{{ 'Privacy Notice' if is_privacy else 'Terms of Use' }}</h1>
+    <p>{% if is_privacy %}This notice explains what information Anti-Imbak collects, why it is needed, how it is protected and the choices you have.{% else %}These terms describe how the Anti-Imbak marketplace works, what we expect from members and how we keep exchanges fair and safe.{% endif %}</p>
+    <div class="legal-meta">
+      <span>{{ icon('calendar') }} Last updated 31 October 2026</span>
+      <span>{{ icon('info') }} Community policy · Anti-Imbak</span>
+    </div>
+  </div>
+</section>
+
+<section class="section legal-section">
+  <div class="container legal-layout">
+    <aside class="legal-toc">
+      <span class="eyebrow eyebrow--soft">On this page</span>
+      {% if is_privacy %}
+      <a href="#privacy-collect">Information we collect</a>
+      <a href="#privacy-use">How we use it</a>
+      <a href="#privacy-share">When it is shared</a>
+      <a href="#privacy-retention">Retention &amp; security</a>
+      <a href="#privacy-rights">Your choices</a>
+      <a href="#privacy-contact">Contact</a>
+      {% else %}
+      <a href="#terms-use">Using the marketplace</a>
+      <a href="#terms-free">Free items &amp; claims</a>
+      <a href="#terms-handover">Safe handovers</a>
+      <a href="#terms-delivery">Partnered Delivery</a>
+      <a href="#terms-ads">Boosts &amp; advertising</a>
+      <a href="#terms-conduct">Community conduct</a>
+      <a href="#terms-liability">Liability &amp; changes</a>
+      {% endif %}
+      <div class="legal-toc-note">
+        <span>{{ icon('mail') }}</span>
+        <p>Questions? Write to <a href="mailto:hello@antiimbak.ph">hello@antiimbak.ph</a>.</p>
+      </div>
+    </aside>
+
+    <article class="legal-document">
+      {% if is_privacy %}
+      <div class="legal-intro">
+        <span class="eyebrow">{{ icon('lock') }} Privacy</span>
+        <h2>Your information belongs to you.</h2>
+        <p>Anti-Imbak is a donation-only marketplace. We aim to collect the minimum information needed to create an account, coordinate a safe handover and keep the community trustworthy. This notice explains our current practices and should be read together with our Terms of Use.</p>
+      </div>
+
+      <section class="legal-block" id="privacy-collect">
+        <span class="legal-number">01</span>
+        <h3>Information we collect</h3>
+        <ul class="legal-list">
+          <li><strong>Account details:</strong> your name, email address, hashed password, city and role.</li>
+          <li><strong>Profile details:</strong> an optional photo, contact number, general area and bio.</li>
+          <li><strong>Marketplace activity:</strong> listings, photos, claims, saved items, delivery requests, reports and notifications.</li>
+          <li><strong>Safety and moderation records:</strong> reports, administrative notes and actions taken on an account or listing.</li>
+          <li><strong>Technical basics:</strong> a signed session cookie used to keep you logged in and protect forms against cross-site request forgery.</li>
+        </ul>
+        <p>We do not collect payment card details. Optional boosts and advertising are recorded as marketplace transactions. Partnered Delivery fees are paid to the delivery partner and are not retained by Anti-Imbak.</p>
+      </section>
+
+      <section class="legal-block" id="privacy-use">
+        <span class="legal-number">02</span>
+        <h3>How we use your information</h3>
+        <ul class="legal-list">
+          <li>To create and secure your account, authenticate you and provide the dashboard.</li>
+          <li>To publish your donation listing and show only the public details you choose to share.</li>
+          <li>To pass a claim request to the relevant Donor and coordinate an accepted handover.</li>
+          <li>To send in-app notifications about claims, delivery progress, moderation and platform announcements.</li>
+          <li>To investigate reports, prevent misuse and enforce our community guidelines.</li>
+          <li>To calculate transparent platform figures such as completed handovers and recorded revenue.</li>
+        </ul>
+      </section>
+
+      <section class="legal-block" id="privacy-share">
+        <span class="legal-number">03</span>
+        <h3>When information is shared</h3>
+        <p>We do not sell personal information. Limited details are shared in these circumstances:</p>
+        <ul class="legal-list">
+          <li><strong>With the other member in a claim:</strong> once a Donor accepts a claim, the parties may see the details needed to coordinate the handover.</li>
+          <li><strong>With delivery partners:</strong> an address and contact detail are shared only to fulfil a delivery the Recipient requested. The delivery fee is passed in full to the partner.</li>
+          <li><strong>With administrators:</strong> authorised staff can review accounts, listings and reports to keep the community safe.</li>
+          <li><strong>When required by law:</strong> if a lawful request or an emergency requires disclosure.</li>
+        </ul>
+        <p>Advertisers receive aggregate impression and click counts, not your personal details.</p>
+      </section>
+
+      <section class="legal-block" id="privacy-retention">
+        <span class="legal-number">04</span>
+        <h3>Retention and security</h3>
+        <p>Account, listing and moderation records are kept while the account is active and as long as needed for safety, dispute resolution and record-keeping. Data is stored in the application's SQLite database.</p>
+        <p>Passwords are stored as one-way hashes. Forms use CSRF protection and responses include security headers. No system is perfectly secure; please choose a unique password and never share passwords or one-time codes with another member.</p>
+      </section>
+
+      <section class="legal-block" id="privacy-rights">
+        <span class="legal-number">05</span>
+        <h3>Your choices and rights</h3>
+        <ul class="legal-list">
+          <li>Update your name, city, contact number, bio and avatar from <a href="{{ url_for('dashboard.settings') }}">Account Settings</a>.</li>
+          <li>Edit, mark unavailable or remove your listings from <a href="{{ url_for('dashboard.donations') }}">My Listings</a>.</li>
+          <li>Withdraw a pending or accepted claim before the item is dispatched.</li>
+          <li>Request access, correction or deletion of personal information by emailing us.</li>
+          <li>Report content that feels misleading or unsafe using the report button on a listing.</li>
+        </ul>
+        <div class="inline-notice">{{ icon('info') }} Deleting a listing does not automatically erase moderation records that are needed for community safety. We will explain what can be removed when you contact us.</div>
+      </section>
+
+      <section class="legal-block" id="privacy-contact">
+        <span class="legal-number">06</span>
+        <h3>Contact us</h3>
+        <p>For privacy questions or requests, email <a href="mailto:hello@antiimbak.ph">hello@antiimbak.ph</a> with the subject “Privacy request”. We aim to respond within ten business days. If you believe your information has been mishandled, please tell us first so we can investigate.</p>
+      </section>
+
+      {% else %}
+      <div class="legal-intro">
+        <span class="eyebrow">{{ icon('file') }} Terms</span>
+        <h2>A marketplace built on giving, not selling.</h2>
+        <p>By creating an account or using Anti-Imbak, you agree to these terms. The short version: donated items are always free, claims are requests rather than purchases, and everyone is expected to treat others with care. This agreement applies to your use of the marketplace.</p>
+      </div>
+
+      <section class="legal-block" id="terms-use">
+        <span class="legal-number">01</span>
+        <h3>Using the marketplace</h3>
+        <ul class="legal-list">
+          <li>You must provide accurate account information and keep your login secure.</li>
+          <li>You must be legally able to enter into these terms in your jurisdiction.</li>
+          <li>One person should not maintain multiple accounts to manipulate claims or promotions.</li>
+          <li>We may suspend or remove access where these terms or our safety guidelines are broken.</li>
+        </ul>
+      </section>
+
+      <section class="legal-block" id="terms-free">
+        <span class="legal-number">02</span>
+        <h3>Free items and claim requests</h3>
+        <ul class="legal-list">
+          <li><strong>Every donation is free.</strong> Listings may not include a price, deposit, trade requirement or request for payment for the item itself.</li>
+          <li>A claim is a request to the Donor. It does not create a sale, a guaranteed entitlement or a binding contract to hand over the item.</li>
+          <li>Donors choose which request to accept and may decline others with a brief note.</li>
+          <li>Listings must describe the item honestly, including faults, missing parts and the true condition.</li>
+          <li>Recipients must explain their genuine interest and must not resell donated items as a commercial practice.</li>
+          <li>Partnered Delivery fees and promotional boosts are separate services and never change the free status of the item.</li>
+        </ul>
+      </section>
+
+      <section class="legal-block" id="terms-handover">
+        <span class="legal-number">03</span>
+        <h3>Safe handovers</h3>
+        <p>Members are responsible for arranging a safe handover. Follow the guidance on our <a href="{{ url_for('public.safety') }}">Safety &amp; Trust</a> page, including meeting in public places, bringing a companion where helpful, inspecting items and never sharing passwords or financial details.</p>
+        <p>Anti-Imbak does not supervise handovers, inspect items or guarantee their quality or legality. In an emergency, contact local authorities first.</p>
+      </section>
+
+      <section class="legal-block" id="terms-delivery">
+        <span class="legal-number">04</span>
+        <h3>Partnered Delivery</h3>
+        <p>Partnered Delivery is the default way to receive a claimed item. The fee is based on the item's size and the distance between the two members, stays between ₱50 and ₱150 inclusive, and is passed in full to the delivery partner. The donated item itself stays free.</p>
+        <ul class="legal-list">
+          <li>Self Pickup is available at the Recipient's choice and has no delivery fee. The meeting place is agreed with the Donor in Messages.</li>
+          <li>The delivery fee is shown before the claim request is submitted.</li>
+          <li>Delivery progress is recorded in the Recipient's workspace: Request Accepted, Awaiting Dispatch, Delivery in Progress, Arriving Soon and Successfully Delivered.</li>
+          <li>The delivery partner's own handling terms apply to the delivery service.</li>
+        </ul>
+      </section>
+
+      <section class="legal-block" id="terms-ads">
+        <span class="legal-number">05</span>
+        <h3>Boosts, advertising and platform revenue</h3>
+        <ul class="legal-list">
+          <li>Donors may optionally promote a listing through the boost page. The listing stays free; only visibility changes.</li>
+          <li>Advertising placements are paid and clearly labelled. Advertisers are responsible for the accuracy of their claims and the legality of their offers.</li>
+          <li>Anti-Imbak may refuse or remove advertising that conflicts with community safety or the values of the marketplace.</li>
+          <li>Platform revenue comes from optional boosts and advertising. Delivery fees are passed to partners and are not platform revenue.</li>
+        </ul>
+      </section>
+
+      <section class="legal-block" id="terms-conduct">
+        <span class="legal-number">06</span>
+        <h3>Community conduct and prohibited items</h3>
+        <p>Do not list stolen, recalled, dangerous, illegal or heavily regulated items; weapons, live animals, medicines, alcohol, tobacco, financial instruments and intimate content are not permitted. Do not harass, threaten, discriminate or attempt to defraud another member.</p>
+        <p>Reports are reviewed privately. We may remove a listing, close active claims, suspend an account or preserve records where needed to protect the community.</p>
+      </section>
+
+      <section class="legal-block" id="terms-liability">
+        <span class="legal-number">07</span>
+        <h3>Liability and changes</h3>
+        <p>Anti-Imbak provides the platform “as is”. To the extent permitted by law, we are not responsible for the condition, safety, legality or availability of donated items, or for the conduct of members. Nothing in these terms excludes rights that cannot lawfully be excluded.</p>
+        <p>We may update these terms as the service evolves. Material changes will be announced in the dashboard. Continued use after an update means you accept the revised terms.</p>
+      </section>
+      {% endif %}
+
+      <div class="legal-footer-note">
+        <span>{{ icon('shield-check') }}</span>
+        <div>
+          <strong>{{ 'Privacy questions?' if is_privacy else 'Need something clarified?' }}</strong>
+          <p>Write to <a href="mailto:hello@antiimbak.ph">hello@antiimbak.ph</a>. This policy is provided for information and is not legal advice.</p>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

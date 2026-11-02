@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon, listing_card, pagination, empty_state %}
+
+{% block title %}Browse Free Donations — Anti-Imbak{% endblock %}
+{% block meta_description %}Browse free donated items near you. Search by category, location and condition on Anti-Imbak.{% endblock %}
+{% block body_class %}site-page marketplace-page{% endblock %}
+
+{% block content %}
+<section class="market-hero">
+  <div class="container">
+    <div class="page-breadcrumb"><a href="{{ url_for('public.index') }}">Home</a> {{ icon('chevron-right') }} <span>Browse donations</span></div>
+    <span class="eyebrow">{{ icon('compass') }} Free marketplace</span>
+    <h1>Browse donations</h1>
+    <p>Every item is donated by a community member and listed at zero pesos. Search, filter, and request what you need.</p>
+  </div>
+</section>
+
+<section class="market-body">
+  <div class="container">
+    <nav class="category-rail" aria-label="Donation categories">
+      <a href="{{ url_for('public.browse', q=q, location=location, condition=condition, availability=availability, sort=sort) }}" class="category-pill {% if not selected_category %}is-current{% endif %}">{{ icon('grid') }} All items</a>
+      {% for category in categories %}
+        <a href="{{ url_for('public.browse', category=category.slug, q=q, location=location, condition=condition, availability=availability, sort=sort) }}" class="category-pill {% if selected_category and selected_category.id == category.id %}is-current{% endif %}">
+          {{ icon(category.icon) }} {{ category.name }} <span>{{ category.listing_count }}</span>
+        </a>
+      {% endfor %}
+    </nav>
+
+    <form method="get" action="{{ url_for('public.browse') }}" class="filter-panel" role="search">
+      <div class="search-field">
+        <label class="sr-only" for="market-search">Search donations</label>
+        {{ icon('search') }}
+        <input id="market-search" type="search" name="q" value="{{ q }}" placeholder="Search an item, a story, a city…" autocomplete="off">
+        {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+      <div class="filter-row">
+        <label class="select-field">
+          <span>Location</span>
+          <select name="location">
+            <option value="">All cities</option>
+            {% for city in cities %}<option value="{{ city }}" {% if location == city %}selected{% endif %}>{{ city }}</option>{% endfor %}
+          </select>
+          {{ icon('chevron-down') }}
+        </label>
+        <label class="select-field">
+          <span>Condition</span>
+          <select name="condition">
+            <option value="">Any condition</option>
+            {% for option in conditions %}<option value="{{ option }}" {% if condition == option %}selected{% endif %}>{{ option }}</option>{% endfor %}
+          </select>
+          {{ icon('chevron-down') }}
+        </label>
+        <label class="select-field">
+          <span>Availability</span>
+          <select name="availability">
+            <option value="available" {% if availability == 'available' %}selected{% endif %}>Available now</option>
+            <option value="all" {% if availability == 'all' %}selected{% endif %}>All listings</option>
+            <option value="reserved" {% if availability == 'reserved' %}selected{% endif %}>Reserved</option>
+            <option value="claimed" {% if availability == 'claimed' %}selected{% endif %}>Claimed</option>
+            <option value="unavailable" {% if availability == 'unavailable' %}selected{% endif %}>Unavailable</option>
+          </select>
+          {{ icon('chevron-down') }}
+        </label>
+        <label class="select-field">
+          <span>Sort by</span>
+          <select name="sort">
+            <option value="featured" {% if sort == 'featured' %}selected{% endif %}>Featured first</option>
+            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest first</option>
+            <option value="nearest" {% if sort == 'nearest' %}selected{% endif %}>Nearest to me</option>
+          </select>
+          {{ icon('chevron-down') }}
+        </label>
+        <button class="btn btn-secondary filter-submit" type="submit">{{ icon('filter') }} Apply filters</button>
+      </div>
+      {% if active_filter_count %}
+      <div class="active-filters">
+        <span class="active-filters-label">{{ active_filter_count }} active {{ active_filter_count|plural('filter') }}</span>
+        {% if q %}<span class="filter-chip">{{ icon('search') }} “{{ q }}”</span>{% endif %}
+        {% if selected_category %}<span class="filter-chip">{{ icon(selected_category.icon) }} {{ selected_category.name }}</span>{% endif %}
+        {% if location %}<span class="filter-chip">{{ icon('map-pin') }} {{ location }}</span>{% endif %}
+        {% if condition %}<span class="filter-chip">{{ icon('tag') }} {{ condition }}</span>{% endif %}
+        {% if availability != 'available' %}<span class="filter-chip">{{ icon('list') }} {{ 'All listings' if availability == 'all' else availability|status_label }}</span>{% endif %}
+        {% if sort != 'featured' %}<span class="filter-chip">{{ sort|capitalize }}</span>{% endif %}
+        <a class="clear-filters" href="{{ url_for('public.browse') }}">Clear all {{ icon('close') }}</a>
+      </div>
+      {% endif %}
+    </form>
+
+    <div class="market-results">
+      <div class="results-heading">
+        <div>
+          <h2>{{ total }} {{ total|plural('donation') }} found</h2>
+          <p>
+            {% if sort == 'nearest' %}{{ icon('map-pin') }} Sorted by distance from {{ near_label }}
+            {% elif sort == 'newest' %}{{ icon('clock') }} Newest community listings first
+            {% else %}{{ icon('sparkles') }} Featured finds first, followed by recent donations{% endif %}
+          </p>
+        </div>
+        <a class="text-link text-link--sm" href="{{ url_for('public.browse') }}">Reset</a>
+      </div>
+      {% if listings %}
+        <div class="listing-grid market-grid">
+          {% for listing in listings %}{{ listing_card(listing) }}{% endfor %}
+        </div>
+        {{ pagination(page, total_pages, page_url) }}
+      {% else %}
+        {{ empty_state('search', 'No matches just yet', 'Try widening your filters, searching another keyword, or being the first to donate something useful in this category.', 'Clear filters', url_for('public.browse')) }}
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

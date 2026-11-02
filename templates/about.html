@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "_ui.html" import icon %}
+{% from "_logo.html" import logo %}
+
+{% block title %}About Anti-Imbak — Giving Items a Second Purpose{% endblock %}
+{% block meta_description %}Anti-Imbak is a donation-only online marketplace connecting useful items with people and communities who can give them a second purpose.{% endblock %}
+{% block body_class %}site-page content-page about-page{% endblock %}
+
+{% block content %}
+<section class="about-hero about-hero--simple">
+  <div class="about-hero-glow" aria-hidden="true"></div>
+  <div class="container about-hero-grid">
+    <div class="about-hero-copy">
+      <span class="eyebrow">{{ icon('users') }} About Anti-Imbak</span>
+      <h1>Useful things deserve <span class="text-gradient">another chapter.</span></h1>
+      <p>Anti-Imbak is a donation-only online marketplace that connects unused but useful items with people and communities who can benefit from them.</p>
+      <p>Every listing is free. Donors share what they no longer need, Recipients explain what would help, and both sides arrange a safe handover.</p>
+    </div>
+    <div class="about-hero-mark reveal">
+      <div class="about-logo-panel">
+        {{ logo(tagline=True) }}
+        <span class="about-brand-line"></span>
+        <span class="about-brand-caption">A marketplace where generosity is the product.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section about-block">
+  <div class="container mission-grid">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">{{ icon('compass') }} Vision</span>
+        <h2>A community where useful things never go to waste.</h2>
+      </div>
+    </div>
+    <div class="mission-copy">
+      <p class="lead">We imagine neighbourhoods where giving and receiving are ordinary, dignified and easy — and where a useful item always finds its next person.</p>
+      <p>Long term, Anti-Imbak aims to make reuse a natural first choice, reduce unnecessary waste, and strengthen local connections through generous, direct handovers.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section about-block">
+  <div class="container mission-grid">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">{{ icon('flag') }} Mission</span>
+        <h2>Make giving and receiving simple, safe and free.</h2>
+      </div>
+    </div>
+    <div class="mission-copy">
+      <p class="lead">Anti-Imbak gives every useful item a second purpose by connecting people who no longer need something with people who do.</p>
+      <ul class="check-list">
+        <li>{{ icon('check') }} Keep every donated item free — no prices, bidding or pressure to buy.</li>
+        <li>{{ icon('check') }} Make browsing, claiming and handovers clear, respectful and easy to follow.</li>
+        <li>{{ icon('check') }} Protect members with honest listings, private contact details and safety reminders.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section values-section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">{{ icon('sparkles') }} Values</span>
+        <h2>The principles that guide the platform.</h2>
+      </div>
+    </div>
+    <div class="values-grid">
+      <article class="value-card reveal"><span>01</span>{{ icon('leaf') }}<h3>Sustainability</h3><p>Keep usable materials in circulation and reduce the demand for new production.</p></article>
+      <article class="value-card reveal"><span>02</span>{{ icon('hand-heart') }}<h3>Generosity</h3><p>Make giving simple, dignified and free from the expectation of a return.</p></article>
+      <article class="value-card reveal"><span>03</span>{{ icon('users') }}<h3>Community</h3><p>Build local connections through direct, respectful handovers between neighbours.</p></article>
+      <article class="value-card reveal"><span>04</span>{{ icon('shield-check') }}<h3>Trust</h3><p>Give people clear information, safety tools and a responsible way to raise concerns.</p></article>
+      <article class="value-card reveal"><span>05</span>{{ icon('globe') }}<h3>Accessibility</h3><p>Design for different devices, abilities and budgets so more people can take part.</p></article>
+      <article class="value-card reveal"><span>06</span>{{ icon('refresh') }}<h3>Responsibility</h3><p>Be honest about how the platform sustains itself and careful with people's data.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section final-cta-section about-motto">
+  <div class="container">
+    <div class="final-cta final-cta--compact reveal">
+      <span class="eyebrow eyebrow--light">{{ icon('sparkles') }} Motto</span>
+      <h2>Giving Items a Second Purpose.</h2>
+    </div>
+  </div>
+</section>
+{% endblock %}

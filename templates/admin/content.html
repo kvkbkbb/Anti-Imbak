@@ -1,0 +1,347 @@
+{% extends "admin/base.html" %}
+{% from "_ui.html" import icon %}
+
+{% block title %}Ads &amp; Content — Anti-Imbak Admin{% endblock %}
+{% block admin_breadcrumb %}Ads &amp; content{% endblock %}
+{% block admin_title %}Advertising &amp; content{% endblock %}
+{% block admin_subtitle %}
+<p>Manage paid placements, donation categories, public safety guidance and community announcements.</p>
+{% endblock %}
+{% block admin_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('public.advertise') }}">{{ icon('megaphone') }} Public ad page</a>
+{% endblock %}
+
+{% block admin_content %}
+<section class="stat-grid stat-grid--four">
+  <article class="stat-card">
+    <span class="stat-icon">{{ icon('megaphone') }}</span>
+    <div class="stat-copy"><span>Active ads</span><strong>{{ stats.active_ads }}</strong><small>currently placed</small></div>
+  </article>
+  <article class="stat-card stat-card--warm">
+    <span class="stat-icon">{{ icon('mail') }}</span>
+    <div class="stat-copy"><span>New inquiries</span><strong>{{ stats.new_inquiries }}</strong><small>awaiting a reply</small></div>
+  </article>
+  <article class="stat-card stat-card--green">
+    <span class="stat-icon">{{ icon('grid') }}</span>
+    <div class="stat-copy"><span>Active categories</span><strong>{{ stats.categories }}</strong><small>visible to Donors</small></div>
+  </article>
+  <article class="stat-card stat-card--violet">
+    <span class="stat-icon">{{ icon('shield-check') }}</span>
+    <div class="stat-copy"><span>Safety tips</span><strong>{{ stats.tips }}</strong><small>published guidance</small></div>
+  </article>
+</section>
+
+<nav class="admin-anchor-nav" aria-label="Content sections">
+  <a href="#advertisements">{{ icon('megaphone') }} Advertisements</a>
+  <a href="#packages">{{ icon('tag') }} Packages</a>
+  <a href="#categories">{{ icon('grid') }} Categories</a>
+  <a href="#safety">{{ icon('shield-check') }} Safety</a>
+  <a href="#announcement">{{ icon('bell') }} Announcement</a>
+  <a href="#inquiries">{{ icon('mail') }} Inquiries</a>
+</nav>
+
+<section class="panel anchor-section" id="advertisements">
+  <div class="panel-head">
+    <div>
+      <span class="eyebrow">{{ icon('megaphone') }} Placements</span>
+      <h2>Create an advertisement</h2>
+      <p>Every paid placement is clearly labelled to visitors. Use internal or HTTPS calls to action only.</p>
+    </div>
+    <span class="status status--cyan">{{ icon('megaphone') }} Administrator placement</span>
+  </div>
+  <form class="settings-form content-form" method="post" action="{{ url_for('admin.create_ad') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="form-row">
+      <label class="field">
+        <span class="field-label">Advertiser name</span>
+        <input type="text" name="advertiser_name" minlength="2" maxlength="80" required placeholder="e.g. Kalinga Moving Co.">
+      </label>
+      <label class="field">
+        <span class="field-label">Business type</span>
+        <input type="text" name="business_type" minlength="2" maxlength="80" required placeholder="e.g. Local moving service">
+      </label>
+    </div>
+    <label class="field">
+      <span class="field-label">Advertisement headline</span>
+      <input type="text" name="title" minlength="5" maxlength="120" required placeholder="A clear, honest headline.">
+    </label>
+    <label class="field">
+      <span class="field-label">Body copy <small>Optional</small></span>
+      <textarea name="body" rows="3" maxlength="500" placeholder="What would the community like to know?"></textarea>
+    </label>
+    <div class="form-row">
+      <label class="field">
+        <span class="field-label">Call-to-action label</span>
+        <input type="text" name="cta_label" maxlength="40" value="Learn more">
+      </label>
+      <label class="field">
+        <span class="field-label">Call-to-action link</span>
+        <input type="text" name="cta_url" maxlength="500" required value="{{ url_for('public.advertise') }}" placeholder="/advertise or https://…">
+        <span class="field-hint">Internal path or full HTTPS link.</span>
+      </label>
+    </div>
+    <div class="form-row form-row--three">
+      <label class="field">
+        <span class="field-label">Placement</span>
+        <select name="placement" required data-ad-placement>
+          <option value="home_banner">Homepage banner</option>
+          <option value="browse_sidebar">Browse sidebar</option>
+          <option value="category">Category page</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Category <small>For category placement</small></span>
+        <select name="category_id">
+          <option value="">No category</option>
+          {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Advertising creative</span>
+        <select name="image">
+          {% for key, path in ad_images.items() %}
+          <option value="{{ key }}">{{ key|title if key != 'none' else 'No image' }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    <div class="form-row form-row--three">
+      <label class="field">
+        <span class="field-label">Package</span>
+        <select name="package_id" required>
+          {% for package in packages %}
+          <option value="{{ package.id }}">{{ package.name }} · {{ package.price|money }} / {{ package.duration_days }} days</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Campaign length (days)</span>
+        <input type="number" name="days" min="1" max="365" value="30" required>
+      </label>
+      <label class="checkbox-field checkbox-field--boxed">
+        <input type="checkbox" name="record_revenue" value="on" checked>
+        <span>Record the package price as a completed advertising transaction in the revenue ledger.</span>
+      </label>
+    </div>
+    <div class="settings-actions">
+      <button class="btn btn-primary" type="submit">{{ icon('megaphone') }} Create advertisement</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel panel--flush anchor-section" id="current-ads">
+  <div class="panel-head panel-head--inline panel-head--padded">
+    <div><span class="eyebrow">{{ icon('list') }} Live inventory</span><h2>All advertisements</h2></div>
+  </div>
+  {% if ads %}
+  <div class="table-wrap">
+    <table class="data-table admin-ads-table">
+      <thead>
+        <tr>
+          <th scope="col">Campaign</th>
+          <th scope="col">Placement</th>
+          <th scope="col">Package</th>
+          <th scope="col">Performance</th>
+          <th scope="col">Window</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="cell-actions">Manage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ad in ads %}
+        <tr>
+          <td>
+            <div class="table-item">
+              <span class="table-thumb table-thumb--square">{% if ad.image_url %}<img src="{{ ad.image_url }}" alt="" loading="lazy">{% else %}{{ icon('megaphone') }}{% endif %}</span>
+              <div class="table-item-copy">
+                <strong>{{ ad.title }}</strong>
+                <span>{{ ad.advertiser_name }} · {{ ad.business_type }}</span>
+                <small>{% if ad.category_name %}{{ icon('tag') }} {{ ad.category_name }}{% else %}All categories{% endif %}</small>
+              </div>
+            </div>
+          </td>
+          <td><span class="mini-tag">{{ ad.placement|replace('_', ' ')|title }}</span></td>
+          <td>{{ ad.package_name or 'No package' }}</td>
+          <td>
+            <div class="activity-counts">
+              <span><strong>{{ ad.impressions }}</strong> impressions</span>
+              <span><strong>{{ ad.clicks }}</strong> clicks</span>
+            </div>
+          </td>
+          <td><span class="cell-strong">{{ ad.starts_at|long_date }}</span><small class="cell-sub">to {{ ad.ends_at|long_date }}</small></td>
+          <td><span class="status status--{{ ad.status|status_tone }}">{{ ad.status|title }}</span></td>
+          <td class="cell-actions">
+            <form method="post" action="{{ url_for('admin.ad_status', ad_id=ad.id) }}" class="inline-status-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <select name="status" aria-label="Status for {{ ad.title }}">
+                {% for value in ['active', 'paused', 'expired'] %}
+                <option value="{{ value }}" {% if ad.status == value %}selected{% endif %}>{{ value|title }}</option>
+                {% endfor %}
+              </select>
+              <button class="icon-button" type="submit" title="Update advertisement status">{{ icon('refresh') }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="mini-empty">{{ icon('megaphone') }}<p>No advertisements have been created.</p></div>
+  {% endif %}
+</section>
+
+<section class="panel anchor-section" id="packages">
+  <div class="panel-head panel-head--inline">
+    <div><span class="eyebrow">{{ icon('tag') }} Commercial</span><h2>Advertising packages</h2></div>
+    <span class="text-link text-link--sm">{{ icon('info') }} Toggling availability only affects new inquiries.</span>
+  </div>
+  <div class="package-admin-grid">
+    {% for package in packages %}
+    <article class="package-admin-card {% if not package.active %}is-inactive{% endif %}">
+      <div class="package-admin-head">
+        <span class="mini-tag">{{ package.placement|replace('_', ' ')|title }}</span>
+        <span class="status status--{{ 'success' if package.active else 'neutral' }}">{{ 'Available' if package.active else 'Hidden' }}</span>
+      </div>
+      <h3>{{ package.name }}</h3>
+      <p class="package-admin-price">{{ package.price|money }} <small>/ {{ package.duration_days }} days</small></p>
+      <p>{{ package.description or 'No description recorded.' }}</p>
+      <form method="post" action="{{ url_for('admin.package_toggle', package_id=package.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-ghost btn-sm btn-block" type="submit">{{ icon('pause' if package.active else 'play') }} {{ 'Hide package' if package.active else 'Show package' }}</button>
+      </form>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel anchor-section" id="categories">
+  <div class="panel-head">
+    <div><span class="eyebrow">{{ icon('grid') }} Taxonomy</span><h2>Donation categories</h2><p>Inactive categories disappear from Donor and marketplace views, but stay intact in existing listings.</p></div>
+  </div>
+  <div class="category-admin-layout">
+    <div class="category-admin-list">
+      {% for category in categories %}
+      <div class="category-admin-row {% if not category.active %}is-inactive{% endif %}">
+        <span class="category-admin-icon">{{ icon(category.icon) }}</span>
+        <div>
+          <strong>{{ category.name }}</strong>
+          <span class="cell-sub">{{ category.description or 'No description recorded.' }}</span>
+        </div>
+        <span class="status status--{{ 'success' if category.active else 'neutral' }}">{{ 'Active' if category.active else 'Hidden' }}</span>
+        <form method="post" action="{{ url_for('admin.toggle_category', category_id=category.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="icon-button" type="submit" title="{{ 'Hide' if category.active else 'Show' }} {{ category.name }}">{{ icon('pause' if category.active else 'play') }}</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    <form class="category-admin-form" method="post" action="{{ url_for('admin.create_category') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <span class="eyebrow">{{ icon('plus') }} New category</span>
+      <label class="field">
+        <span class="field-label">Category name</span>
+        <input type="text" name="name" minlength="2" maxlength="60" required placeholder="e.g. Garden &amp; Outdoor">
+      </label>
+      <label class="field">
+        <span class="field-label">Icon</span>
+        <select name="icon">
+          {% for icon_name in category_icons %}
+          <option value="{{ icon_name }}">{{ icon_name|title }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Short description <small>Optional</small></span>
+        <textarea name="description" rows="2" maxlength="240" placeholder="What belongs in this category?"></textarea>
+      </label>
+      <button class="btn btn-primary btn-block" type="submit">{{ icon('plus') }} Add category</button>
+    </form>
+  </div>
+</section>
+
+<div class="dash-grid dash-grid--two">
+  <section class="panel anchor-section" id="safety">
+    <div class="panel-head">
+      <div><span class="eyebrow">{{ icon('shield-check') }} Public guidance</span><h2>Safety guidelines</h2><p>One tip per line. Between 3 and 12 tips, each under 300 characters.</p></div>
+    </div>
+    <form class="settings-form" method="post" action="{{ url_for('admin.update_safety') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label class="field">
+        <span class="field-label">Published tips</span>
+        <textarea name="tips" rows="9" required>{% for tip in tips %}{{ tip.text }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+        <span class="field-hint">These appear on the public Safety &amp; Trust page.</span>
+      </label>
+      <div class="settings-actions">
+        <button class="btn btn-primary" type="submit">{{ icon('check-circle') }} Publish safety tips</button>
+        <a class="text-link text-link--sm" href="{{ url_for('public.safety') }}">Preview page {{ icon('arrow-up-right') }}</a>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel anchor-section" id="announcement">
+    <div class="panel-head">
+      <div><span class="eyebrow">{{ icon('bell') }} Broadcast</span><h2>Send an announcement</h2><p>Delivered as an in-app notification to every active member.</p></div>
+    </div>
+    <form class="settings-form" method="post" action="{{ url_for('admin.announcement') }}" data-confirm="Send this announcement to every active member?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label class="field">
+        <span class="field-label">Title</span>
+        <input type="text" name="title" minlength="4" maxlength="100" required placeholder="e.g. Community safety update">
+      </label>
+      <label class="field">
+        <span class="field-label">Message</span>
+        <textarea name="message" rows="5" minlength="10" maxlength="600" required placeholder="Write a clear, friendly announcement."></textarea>
+        <span class="field-hint">10–600 characters.</span>
+      </label>
+      <div class="settings-actions">
+        <button class="btn btn-primary" type="submit">{{ icon('send') }} Send announcement</button>
+      </div>
+    </form>
+    <div class="inline-notice">{{ icon('info') }} Announcements are in-app only. Email and SMS delivery are not connected in this prototype.</div>
+  </section>
+</div>
+
+<section class="panel panel--flush anchor-section" id="inquiries">
+  <div class="panel-head panel-head--inline panel-head--padded">
+    <div><span class="eyebrow">{{ icon('mail') }} Sales pipeline</span><h2>Advertising inquiries</h2><p>{{ inquiries|length }} {{ inquiries|length|plural('inquiry', 'inquiries') }} received.</p></div>
+  </div>
+  {% if inquiries %}
+  <div class="table-wrap">
+    <table class="data-table admin-inquiries-table">
+      <thead><tr><th>Contact</th><th>Business</th><th>Interest</th><th>Message</th><th>Received</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for inquiry in inquiries %}
+        <tr>
+          <td>
+            <strong>{{ inquiry.name }}</strong>
+            <a class="cell-sub" href="mailto:{{ inquiry.email }}">{{ inquiry.email }}</a>
+          </td>
+          <td><span class="cell-strong">{{ inquiry.business_name }}</span><small class="cell-sub">{{ inquiry.business_type }}</small></td>
+          <td>{{ inquiry.package_name or 'General inquiry' }}</td>
+          <td><p class="table-copy">{{ inquiry.message or 'No message included.' }}</p></td>
+          <td>{{ inquiry.created_at|time_ago }}</td>
+          <td>
+            <form method="post" action="{{ url_for('admin.inquiry_status', inquiry_id=inquiry.id) }}" class="inline-status-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <select name="status" aria-label="Status for {{ inquiry.business_name }}">
+                {% for value in ['new', 'contacted', 'closed'] %}
+                <option value="{{ value }}" {% if inquiry.status == value %}selected{% endif %}>{{ value|title }}</option>
+                {% endfor %}
+              </select>
+              <button class="icon-button" type="submit" title="Update inquiry status">{{ icon('refresh') }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="mini-empty">{{ icon('mail') }}<p>No advertising inquiries yet.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

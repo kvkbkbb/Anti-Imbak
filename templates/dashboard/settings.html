@@ -1,0 +1,173 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+{% set role_name = 'Administrator' if profile.role == 'admin' else 'Community member' %}
+
+{% block title %}Account Settings — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}Account settings{% endblock %}
+{% block dash_title %}Account settings{% endblock %}
+{% block dash_subtitle %}
+<p>Keep your public details warm, your private details private, and your handover conversations in one place.</p>
+{% endblock %}
+{% block dash_actions %}
+<a class="btn btn-secondary btn-sm" href="{{ url_for('dashboard.donations') if demo_role != 'recipient' else url_for('dashboard.my_claims') }}">
+  {{ icon('dashboard') }} {{ 'My Listings' if demo_role != 'recipient' else 'My Requests' }}
+</a>
+{% endblock %}
+
+{% block dash_content %}
+<div class="settings-layout">
+  <div class="settings-main">
+    <section class="panel form-section">
+      <div class="form-section-head">
+        <span class="form-step">01</span>
+        <div><span class="eyebrow">{{ icon('user') }} Public profile</span><h2>How you appear to the community</h2><p>Your name, avatar and city appear on your listings, requests and messages.</p></div>
+      </div>
+      <form method="post" enctype="multipart/form-data" class="settings-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="profile">
+        <div class="avatar-edit">
+          {{ avatar(profile.name, profile.avatar_url, 'avatar--xl') }}
+          <div>
+            <label class="btn btn-secondary btn-sm" for="avatar-upload">{{ icon('camera') }} Change photo</label>
+            <input id="avatar-upload" type="file" name="avatar" accept="image/png,image/jpeg,image/webp" class="sr-only" data-image-input>
+            <span class="field-hint">JPG, PNG or WebP · 5 MB maximum. A new photo replaces the old one.</span>
+            <div class="upload-preview upload-preview--small" data-image-preview></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="field">
+            <span class="field-label">Full name</span>
+            <input type="text" name="name" minlength="2" maxlength="80" required value="{{ profile.name }}">
+          </label>
+          <label class="field">
+            <span class="field-label">Email address</span>
+            <input type="email" value="{{ profile.email }}" disabled>
+            <span class="field-hint">Contact an administrator if you need to change your sign-in email.</span>
+          </label>
+        </div>
+        <div class="form-row">
+          <label class="field">
+            <span class="field-label">City</span>
+            <select name="city" required>
+              {% for city in cities %}<option value="{{ city }}" {% if profile.city == city %}selected{% endif %}>{{ city }}</option>{% endfor %}
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">Area or neighbourhood</span>
+            <input type="text" name="location" maxlength="120" placeholder="e.g. Teachers Village" value="{{ profile.location or '' }}">
+            <span class="field-hint">A general area is enough. Never publish a full home address.</span>
+          </label>
+        </div>
+        <label class="field">
+          <span class="field-label">Contact number <small>Optional</small></span>
+          <input type="tel" name="contact_number" maxlength="30" placeholder="e.g. 0917 555 0124" value="{{ profile.contact_number or '' }}">
+          <span class="field-hint">Only revealed to the other member after a request is accepted.</span>
+        </label>
+        <label class="field">
+          <span class="field-label">Short bio <small>Optional</small></span>
+          <textarea name="bio" rows="4" maxlength="500" placeholder="A line or two about you, what you like to share, or why reuse matters to you.">{{ profile.bio or '' }}</textarea>
+          <span class="field-hint">Public. Keep it friendly and free of private contact details.</span>
+        </label>
+        <div class="settings-actions">
+          <button class="btn btn-primary" type="submit">{{ icon('check-circle') }} Save profile</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel form-section">
+      <div class="form-section-head">
+        <span class="form-step">02</span>
+        <div><span class="eyebrow">{{ icon('lock') }} Security</span><h2>Change your password</h2><p>Use at least 8 characters with a letter and a number.</p></div>
+      </div>
+      <form method="post" class="settings-form" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="password">
+        <label class="field">
+          <span class="field-label">Current password</span>
+          <div class="input-with-icon input-with-action">
+            {{ icon('lock') }}
+            <input type="password" name="current_password" autocomplete="current-password" required placeholder="Your current password" data-password-input>
+            <button type="button" class="input-action" data-password-toggle aria-label="Show password">{{ icon('eye') }}</button>
+          </div>
+        </label>
+        <div class="form-row">
+          <label class="field">
+            <span class="field-label">New password</span>
+            <div class="input-with-icon input-with-action">
+              {{ icon('lock') }}
+              <input type="password" name="new_password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters" data-password-input data-password-strength>
+              <button type="button" class="input-action" data-password-toggle aria-label="Show password">{{ icon('eye') }}</button>
+            </div>
+            <span class="password-meter" data-password-meter aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          </label>
+          <label class="field">
+            <span class="field-label">Confirm new password</span>
+            <div class="input-with-icon input-with-action">
+              {{ icon('lock') }}
+              <input type="password" name="confirm_password" autocomplete="new-password" minlength="8" required placeholder="Repeat new password" data-password-confirm>
+              <button type="button" class="input-action" data-password-toggle aria-label="Show password">{{ icon('eye') }}</button>
+            </div>
+            <span class="field-hint" data-password-match></span>
+          </label>
+        </div>
+        <div class="settings-actions">
+          <button class="btn btn-primary" type="submit">{{ icon('shield-check') }} Update password</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel form-section">
+      <div class="form-section-head">
+        <span class="form-step">03</span>
+        <div><span class="eyebrow">{{ icon('bell') }} Notifications</span><h2>How we keep in touch</h2><p>Every update arrives inside your Anti-Imbak account.</p></div>
+      </div>
+      <div class="settings-info-grid">
+        <div><span>{{ icon('message-circle') }}</span><div><strong>Messages</strong><p>New replies about an item or a handover.</p></div><span class="status status--success">On</span></div>
+        <div><span>{{ icon('truck') }}</span><div><strong>Delivery steps</strong><p>Dispatch, transit, arrival and handover confirmation.</p></div><span class="status status--success">On</span></div>
+        <div><span>{{ icon('megaphone') }}</span><div><strong>Announcements</strong><p>Community news and administrator updates.</p></div><span class="status status--success">On</span></div>
+      </div>
+      <div class="inline-notice">{{ icon('info') }} Email and SMS delivery are not connected. All notifications appear on your <a href="{{ url_for('dashboard.notifications') }}">notifications page</a>.</div>
+    </section>
+  </div>
+
+  <aside class="settings-side">
+    <div class="panel account-summary">
+      <span class="eyebrow">{{ icon('shield-check') }} Account summary</span>
+      <div class="account-summary-identity">
+        {{ avatar(profile.name, profile.avatar_url, 'avatar--lg') }}
+        <div><strong>{{ profile.name }}</strong><span>{{ profile.email }}</span></div>
+      </div>
+      <div class="mini-stat-list">
+        <div><span>Account type</span><strong>{{ role_name }}</strong></div>
+        <div><span>Member since</span><strong>{{ profile.member_since|long_date if profile.member_since else '—' }}</strong></div>
+        <div><span>Verification</span><strong>{{ 'Community verified' if profile.verified else 'Not verified' }}</strong></div>
+        <div><span>City</span><strong>{{ profile.city or '—' }}</strong></div>
+      </div>
+      {% if profile.verified %}
+      <div class="verified-panel">{{ icon('badge-check') }} <span>Your profile carries a community verification badge.</span></div>
+      {% else %}
+      <div class="inline-notice inline-notice--compact">{{ icon('info') }} Verification is reviewed by the Anti-Imbak team. Keep your handovers reliable to build trust.</div>
+      {% endif %}
+    </div>
+
+    <div class="panel account-stats">
+      <span class="eyebrow">{{ icon('gift') }} Your impact</span>
+      <div class="account-impact">
+        <div><strong>{{ stats.donated }}</strong><span>gifts completed</span></div>
+        <div><strong>{{ stats.claimed }}</strong><span>items received</span></div>
+      </div>
+      <a class="text-link text-link--sm" href="{{ url_for('dashboard.my_claims', status='completed') }}">View completed requests {{ icon('arrow-right') }}</a>
+    </div>
+
+    <div class="panel editor-tips editor-tips--secure">
+      <span class="eyebrow">{{ icon('lock') }} Privacy at a glance</span>
+      <ul class="check-list check-list--tight">
+        <li>{{ icon('check') }} Email and contact number stay private.</li>
+        <li>{{ icon('check') }} Handover details are agreed inside Messages and shown only to the people involved.</li>
+        <li>{{ icon('check') }} You can edit or remove a listing at any time.</li>
+      </ul>
+      <a class="text-link text-link--sm" href="{{ url_for('public.privacy') }}">Read the privacy notice {{ icon('arrow-right') }}</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

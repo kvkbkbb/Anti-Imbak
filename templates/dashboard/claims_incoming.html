@@ -1,0 +1,98 @@
+{% extends "dashboard/base.html" %}
+{% from "_ui.html" import icon, avatar %}
+
+{% block title %}Claim Requests — Anti-Imbak{% endblock %}
+{% block dash_breadcrumb %}Claim Requests{% endblock %}
+{% block dash_title %}Claim Requests{% endblock %}
+{% block dash_subtitle %}<p>Read why each person is asking, check their profile, and keep the handover conversation in Messages.</p>{% endblock %}
+{% block dash_actions %}
+  <a class="btn btn-secondary btn-sm" href="{{ url_for('dashboard.messages') }}">{{ icon('message-circle') }} Open Messages{% if unread_messages %}<span class="btn-count">{{ unread_messages }}</span>{% endif %}</a>
+{% endblock %}
+
+{% block dash_content %}
+<div class="dash-tabs" role="navigation" aria-label="Filter claim requests">
+  {% for key, label in [('pending', 'Awaiting review'), ('accepted', 'Accepted'), ('completed', 'Completed'), ('rejected', 'Not selected'), ('cancelled', 'Withdrawn'), ('all', 'All')] %}
+  <a class="dash-tab {% if status_filter == key %}is-active{% endif %}" href="{{ url_for('dashboard.incoming_claims', status=key) }}">
+    {{ label }}<span class="dash-tab-count">{{ counts.get(key, counts.get('all', 0) if key == 'all' else 0) }}</span>
+  </a>
+  {% endfor %}
+</div>
+
+{% if claims %}
+<div class="request-list">
+  {% for claim in claims %}
+  <article class="request-card request-card--{{ claim.status }}">
+    <div class="request-thumb">
+      {% if claim.listing_image %}
+        <img src="{{ claim.listing_image }}" alt="{{ claim.listing_title }}" loading="lazy">
+      {% else %}
+        <span class="listing-image listing-image--empty">{{ icon('image') }}</span>
+      {% endif %}
+    </div>
+    <div class="request-body">
+      <div class="request-top">
+        <div>
+          <h3><a href="{{ url_for('dashboard.claim_detail', claim_id=claim.id) }}">{{ claim.listing_title }}</a></h3>
+          <div class="request-person">
+            {{ avatar(claim.claimant_name, claim.claimant_avatar, 'avatar--xs') }}
+            <span><strong>{{ claim.claimant_name }}</strong> · Recipient since {{ claim.claimant_joined|long_date }}</span>
+            {% if claim.claimant_verified %}{{ icon('badge-check') }}{% endif %}
+          </div>
+        </div>
+        <span class="status status--{{ claim.status|status_tone }}">{{ claim.status|claim_status_label }}</span>
+      </div>
+
+      <p class="request-note">“{{ claim.message|truncate(260, True, '…') }}”</p>
+
+      <div class="request-facts">
+        <span>{{ icon('truck' if claim.receive_method == 'delivery' else 'map-pin') }} {{ 'Partnered Delivery' if claim.receive_method == 'delivery' else 'Self Pickup' }}</span>
+        {% if claim.receive_method == 'delivery' and claim.delivery_fee %}
+        <span>{{ icon('wallet') }} ₱{{ '%.2f'|format(claim.delivery_fee) }} inclusive</span>
+        {% endif %}
+        {% if claim.delivery_status and claim.status in ['accepted', 'completed'] %}
+        <span>{{ icon('package') }} {{ claim.delivery_status|delivery_status_label }}</span>
+        {% endif %}
+        <span>{{ icon('clock') }} Requested {{ claim.created_at|time_ago }}</span>
+      </div>
+
+      {% if claim.donor_note and claim.status != 'pending' %}
+      <p class="request-note">Your note: {{ claim.donor_note }}</p>
+      {% endif %}
+
+      <div class="request-actions">
+        {% if claim.conversation_id %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.messages', conversation=claim.conversation_id) }}">{{ icon('message-circle') }} Message {{ claim.claimant_name.split()[0] }}</a>
+        {% else %}
+        <a class="btn btn-informational btn-sm" href="{{ url_for('dashboard.start_conversation', listing_id=claim.listing_id, user_id=claim.claimant_id) }}">{{ icon('message-circle') }} Start conversation</a>
+        {% endif %}
+        <a class="btn btn-ghost btn-sm" href="{{ url_for('dashboard.claim_detail', claim_id=claim.id) }}">View details {{ icon('arrow-right') }}</a>
+
+        {% if claim.status == 'pending' %}
+        <form method="post" action="{{ url_for('dashboard.accept_claim', claim_id=claim.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-positive btn-sm" type="submit">{{ icon('check') }} Accept request</button>
+        </form>
+        <form method="post" action="{{ url_for('dashboard.reject_claim', claim_id=claim.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-destructive btn-sm" type="submit" data-confirm="Decline {{ claim.claimant_name }}'s request? They will be notified.">{{ icon('x-circle') }} Decline</button>
+        </form>
+        {% elif claim.status == 'accepted' and not claim.handover_confirmed %}
+        <form method="post" action="{{ url_for('dashboard.confirm_handover', claim_id=claim.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-warning btn-sm" type="submit">{{ icon('check-circle') }} Confirm handover plan</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <span class="empty-icon">{{ icon('hand-heart') }}</span>
+  <h3>No requests in this view</h3>
+  <p>When someone asks for one of your listings, their reason and profile will appear here.</p>
+  <a class="btn btn-secondary" href="{{ url_for('dashboard.donations') }}">Review my listings</a>
+</div>
+{% endif %}
+{% endblock %}
