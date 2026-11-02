@@ -5430,3 +5430,44 @@
   line-height: 1.4;
 }
 .listing-repair-note .icon { width: 0.76rem; height: 0.76rem; flex: 0 0 auto; }
+
+/* --------------------------------------------------------------------------
+   Member workspace: page-level scrollbar
+   Member pages use the browser scrollbar on desktop so it sits outside the
+   workspace instead of inside the content column. Admin pages keep their own
+   rules in admin.css. Messages keeps its internal conversation/chat scrolling.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1121px) {
+  .dashboard-page:not(.admin-page) {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .dashboard-page:not(.admin-page) .dashboard-main {
+    height: auto;
+    padding: clamp(1rem, 2.4vw, 2rem) 0 clamp(3rem, 6vw, 5rem);
+    overflow: visible;
+  }
+
+  .dashboard-page:not(.admin-page) .dashboard-shell,
+  .dashboard-page:not(.admin-page) .dashboard-layout {
+    height: auto;
+  }
+
+  .dashboard-page:not(.admin-page) .dash-content {
+    display: block;
+    height: auto;
+  }
+
+  .dashboard-page:not(.admin-page) .dash-scroll {
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .dashboard-page:not(.admin-page) .dash-sidebar {
+    top: calc(var(--header-h) + 1rem);
+    max-height: calc(100vh - var(--header-h) - 2rem);
+  }
+}

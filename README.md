@@ -6,6 +6,8 @@ Anti-Imbak is a donation-only community marketplace. People give away items they
 
 This is a complete, self-contained community marketplace built with Flask, SQLite, Jinja templates, and vanilla JavaScript. It runs locally with no Node.js build step, no external database, and no third-party services.
 
+**Live static preview:** <https://payonilanz.github.io/Anti-Imbak/> — a GitHub Pages snapshot of the public marketplace. GitHub Pages only serves static files, so sign-in, search filters, and donation actions remain in the Flask app; the preview links back to the quick start below.
+
 ---
 
 ## Quick start
@@ -36,6 +38,17 @@ The SQLite database is created automatically at `instance/antiimbak.db` the firs
 | `ANTI_IMBAK_SECRET` | Overrides the generated Flask secret. Otherwise `instance/secret.key` is created on first run. |
 | `ANTI_IMBAK_COOKIE_SECURE` | Set to `1` to mark session cookies `Secure` behind HTTPS. |
 | `PORT` | Local port used by `python app.py` (default `5000`). |
+
+### GitHub Pages preview
+
+The public marketplace is also published as a static snapshot. Regenerate it after changing templates, styles, or seed data:
+
+```powershell
+python db.py
+python tools/build_pages.py
+```
+
+The script renders the guest-facing pages and the three signed-in sample workspaces against a temporary copy of the seeded database, then writes them to `docs/`. GitHub Pages deploys that folder from the `main` branch. The snapshot covers the landing page, marketplace categories, listing details, member profiles, sponsored pages, the public content pages, and read-only Donor, Recipient, and Administrator workspaces. Because Pages cannot run Flask, forms and account actions show a short notice, and the preview bar links to the public site and each workspace snapshot.
 
 ---
 
@@ -159,6 +172,9 @@ Anti-Imbak/
 |-- schema.sql              # Canonical SQLite schema
 |-- services.py             # Shared helpers, auth utilities, delivery quotes
 |-- requirements.txt
+|-- tools/
+|   `-- build_pages.py      # Renders the static GitHub Pages preview into docs/
+|-- docs/                   # Generated GitHub Pages site (committed)
 |-- instance/
 |   `-- antiimbak.db        # Created at runtime
 |-- routes/
@@ -178,7 +194,8 @@ Anti-Imbak/
     |   |-- pages.css       # Public page modules
     |   |-- dashboard.css   # Member dashboard modules
     |   |-- admin.css       # Admin console modules
-    |   `-- responsive.css  # Tablet and mobile overrides (loaded last)
+    |   |-- responsive.css  # Tablet and mobile overrides (loaded last)
+    |   `-- theme.css       # Optional light theme palette
     |-- js/
     |   |-- app.js          # Menus, modals, toggles, previews, messaging helpers
     |   `-- advertise.js    # Advertising form helpers

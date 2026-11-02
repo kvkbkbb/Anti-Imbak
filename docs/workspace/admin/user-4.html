@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050917" data-theme-color>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("antiimbak-theme");
+        document.documentElement.dataset.theme = saved === "light" ? "light" : "dark";
+      } catch (error) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    })();
+  </script>
+  <title>Lina Villanueva — Admin — Anti-Imbak</title>
+  <meta name="description" content="Anti-Imbak is a donation-only marketplace connecting useful items with people and communities who can give them a second purpose.">
+  <meta property="og:title" content="Anti-Imbak — Giving Items a Second Purpose">
+  <meta property="og:description" content="Give what you don't need. Find what you truly need.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="../../static/img/brand-icon.svg">
+  <link rel="preload" href="../../static/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../static/fonts/outfit-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../static/css/styles.css">
+  <link rel="stylesheet" href="../../static/css/pages.css">
+  <link rel="stylesheet" href="../../static/css/dashboard.css">
+  <link rel="stylesheet" href="../../static/css/admin.css">
+  <link rel="stylesheet" href="../../static/css/responsive.css">
+  <link rel="stylesheet" href="../../static/css/theme.css">
+  
+<link rel="stylesheet" href="../../static/css/preview.css"></head>
+<body class="dashboard-page admin-page"><div class="static-preview-bar" role="note"><span class="static-preview-badge">Static preview</span><span class="static-preview-copy">GitHub Pages snapshot. Accounts and actions run in the Flask app.</span><span class="static-preview-links"><a href="../../index.html">Public</a><a href="../donor/index.html">Donor</a><a href="../recipient/index.html">Recipient</a><a href="../admin/index.html" class="is-current" aria-current="page">Admin</a></span><a href="https://github.com/payonilanz/Anti-Imbak#quick-start" target="_blank" rel="noopener">Run locally &rarr;</a></div>
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="m3 10.8 9-7.8 9 7.8"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></symbol>
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></symbol>
+  <symbol id="icon-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/></symbol>
+  <symbol id="icon-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13"/><path d="M12 8H7.5a2.5 2.5 0 1 1 2.5-2.5L12 8Zm0 0h4.5a2.5 2.5 0 1 0-2.5-2.5L12 8Z"/></symbol>
+  <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+  <symbol id="icon-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 3.5 1 9a7 7 0 0 1-9 9Z"/><path d="M2 21c0-3 1.9-5.4 5.1-6"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></symbol>
+  <symbol id="icon-shield-check" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 16v3M17.5 17.5h3M5 3v2M4 4h2"/></symbol>
+  <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></symbol>
+  <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+  <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="icon-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="icon-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="13" cy="18" r="2"/></symbol>
+  <symbol id="icon-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v5M14 11v5"/></symbol>
+  <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></symbol>
+  <symbol id="icon-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="icon-package" viewBox="0 0 24 24"><path d="m7.5 4.3 9 5.2"/><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="icon-truck" viewBox="0 0 24 24"><path d="M10 17h4V5H2v12h3M20 17h2v-3.3a4 4 0 0 0-1.2-2.8L19 9h-5v8h3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="icon-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+  <symbol id="icon-alert-triangle" viewBox="0 0 24 24"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="icon-flag" viewBox="0 0 24 24"><path d="M4 22V4M4 5c5-3 8 3 16 0v10c-8 3-11-3-16 0"/></symbol>
+  <symbol id="icon-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></symbol>
+  <symbol id="icon-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="icon-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.8.6a2 2 0 0 1 1.7 2.1Z"/></symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+  <symbol id="icon-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M20 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/><path d="M16 13h2"/></symbol>
+  <symbol id="icon-tag" viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-8-8a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l8 8a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></symbol>
+  <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 8A7 7 0 0 1 19 10l1 2M4 12l1 2a7 7 0 0 0 12.9 2"/></symbol>
+  <symbol id="icon-recycle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 3.5 6 3.5 9S14.5 18 12 21c-2.5-3-3.5-6-3.5-9S9.5 6 12 3Z"/></symbol>
+  <symbol id="icon-external-link" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="icon-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-3.8-.8L3 21l1.8-5.2a8.4 8.4 0 1 1 16.2-4.3Z"/></symbol>
+  <symbol id="icon-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16v-5M12 16V7M17 16v-3"/></symbol>
+  <symbol id="icon-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-6v14L3 13v-2Z"/><path d="m6 14 2 6h3l-2-5"/></symbol>
+  <symbol id="icon-book-open" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2V4ZM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7V4Z"/></symbol>
+  <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></symbol>
+  <symbol id="icon-gamepad" viewBox="0 0 24 24"><path d="M6 6h12a5 5 0 0 1 4.8 6.4l-1.4 5A3.5 3.5 0 0 1 16 19l-1.2-1.5a2 2 0 0 0-1.6-.8h-2.4a2 2 0 0 0-1.6.8L8 19a3.5 3.5 0 0 1-5.4-1.6l-1.4-5A5 5 0 0 1 6 6Z"/><path d="M7 11h3M8.5 9.5v3M16 11h.01M18 13h.01"/></symbol>
+  <symbol id="icon-shirt" viewBox="0 0 24 24"><path d="m16 3 5 3-2 4-3-1v12H8V9l-3 1-2-4 5-3a4 4 0 0 0 8 0Z"/></symbol>
+  <symbol id="icon-armchair" viewBox="0 0 24 24"><path d="M5 11a2 2 0 0 1 2 2v2h10v-2a2 2 0 1 1 4 0v6H3v-6a2 2 0 0 1 2-2Z"/><path d="M5 15V8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v7M6 19v2M18 19v2"/></symbol>
+  <symbol id="icon-fridge" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M5 10h14M8 5v2M8 13v3"/></symbol>
+  <symbol id="icon-utensils" viewBox="0 0 24 24"><path d="M6 2v8M3 2v5a3 3 0 0 0 6 0V2M6 10v12M17 2v20M17 2c3 0 4 3 4 6s-1 5-4 5"/></symbol>
+  <symbol id="icon-dumbbell" viewBox="0 0 24 24"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10M1 10v4M23 10v4"/></symbol>
+  <symbol id="icon-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="icon-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="icon-lamp" viewBox="0 0 24 24"><path d="M9 3h6l3 8H6l3-8ZM12 11v8M8 21h8"/></symbol>
+  <symbol id="icon-bicycle" viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="m5.5 17.5 4-8h6l3 8M9 9.5h7M12 17.5l-2.5-8M14 5h3"/></symbol>
+  <symbol id="icon-badge-check" viewBox="0 0 24 24"><path d="m12 2 2.2 2.1 3-.2 1 2.8 2.6 1.6-1 2.8 1 2.8-2.6 1.6-1 2.8-3-.2L12 20.2l-2.2-2.1-3 .2-1-2.8L3.2 14l1-2.8-1-2.8 2.6-1.6 1-2.8 3 .2L12 2Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="icon-hand-heart" viewBox="0 0 24 24"><path d="M11 14 9.5 12.5a2.1 2.1 0 0 1 3-3l.5.5.5-.5a2.1 2.1 0 0 1 3 3L14 14"/><path d="M12 21v-3M3 13l4-4 3 1M21 13l-4-4-4 1M7 21h10a4 4 0 0 0 4-4v-3M3 14v3a4 4 0 0 0 4 4"/></symbol>
+  <symbol id="icon-flame" viewBox="0 0 24 24"><path d="M12 22c4.4 0 7-3 7-7 0-5-5-6-4-13-4 2-7 6-7 10 0 1.5.5 3 1.5 3.5C9.5 14 9 12 10 10c1 5 2 5 2 12Z"/></symbol>
+  <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="icon-menu-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+  <symbol id="icon-receipt" viewBox="0 0 24 24"><path d="M4 2v20l3-2 2.5 2 2.5-2 2.5 2 2.5-2 3 2V2l-3 2-2.5-2L12 4 9.5 2 7 4 4 2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+  <symbol id="icon-credit-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12M7 11l5 5 5-5"/><path d="M4 19v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></symbol>
+  <symbol id="icon-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+  <symbol id="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24"><path d="m6 4 14 8-14 8V4Z"/></symbol>
+  <symbol id="icon-chevron-up" viewBox="0 0 24 24"><path d="m5 15 7-7 7 7"/></symbol>
+  <symbol id="icon-spark" viewBox="0 0 24 24"><path d="M12 2c1.5 6 4 8.5 10 10-6 1.5-8.5 4-10 10-1.5-6-4-8.5-10-10 6-1.5 8.5-4 10-10Z"/></symbol>
+</svg>
+
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<div class="viewas-bar">
+  <div class="container viewas-inner">
+    <div class="viewas-intro">
+      <span class="viewas-dot" aria-hidden="true"></span>
+      <span class="viewas-label">View as:</span>
+    </div>
+    <form class="viewas-switch" method="post" action="#" data-preview-missing="" aria-label="Switch role view">
+      <input type="hidden" name="csrf_token" value="ANLYyIPLcvFRW9P9_cPJa9GCo9E8av9aEn84UDBZBh0">
+      
+      <button class="viewas-role" type="submit" formaction="#" data-preview-missing="" title="Switch to the Public Marketplace view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-globe"></use></svg><span>Public Marketplace</span>
+      </button>
+      
+      <button class="viewas-role" type="submit" formaction="#" data-preview-missing="" title="Switch to the Donor view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg><span>Donor</span>
+      </button>
+      
+      <button class="viewas-role" type="submit" formaction="#" data-preview-missing="" title="Switch to the Recipient view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-hand-heart"></use></svg><span>Recipient</span>
+      </button>
+      
+      <button class="viewas-role is-active" type="submit" formaction="#" data-preview-missing="" aria-current="true" title="Switch to the Administrator view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg><span>Administrator</span>
+      </button>
+      
+    </form>
+    <div class="viewas-actions">
+      <span class="viewas-current">Currently <strong>Administrator</strong></span>
+      <form method="post" action="#" data-preview-missing="">
+        <input type="hidden" name="csrf_token" value="ANLYyIPLcvFRW9P9_cPJa9GCo9E8av9aEn84UDBZBh0">
+        <button class="viewas-reset" type="submit" data-confirm="Reset the sample data? Listings, requests, conversations, reports and records return to their original state."><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-refresh"></use></svg><span>Reset sample data</span></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<header class="site-header" data-site-header>
+  <div class="container nav-shell">
+    <a class="brand brand--compact" href="../../index.html" aria-label="Anti-Imbak — Giving Items a Second Purpose">
+  <span class="brand-orbit" aria-hidden="true">
+    <svg viewBox="0 0 138 58" fill="none">
+      <path class="orbit-line orbit-line--one" d="M5 45C13 13 56 3 79 8c16 4 16 15 2 20" />
+      <path class="orbit-line orbit-line--two" d="M2 49C39 61 96 54 129 23" />
+      <circle class="orbit-dot" cx="89" cy="33" r="1.6" />
+    </svg>
+  </span>
+  <span class="brand-type">
+    <span class="brand-anti">Anti</span><span class="brand-hyphen">-</span><span class="brand-imbak">Imbak</span>
+    <span class="brand-spark" aria-hidden="true">✦</span>
+  </span>
+  
+</a>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="../../index.html" class="nav-link ">Home</a>
+      <a href="../../browse.html" class="nav-link ">Browse</a>
+      <a href="../../how-it-works.html" class="nav-link ">How It Works</a>
+      <a href="../../about.html" class="nav-link ">About</a>
+    </nav>
+    <div class="nav-actions">
+      
+        <a class="icon-button message-button" href="../donor/messages.html" aria-label="Messages">
+          <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-message-circle"></use></svg>
+          
+        </a>
+        <a class="icon-button notification-button" href="../donor/notifications.html" aria-label="Notifications, 2 unread">
+          <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-bell"></use></svg>
+          <span class="notification-dot">2</span>
+        </a>
+        <button class="icon-button theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="false" title="Switch to light mode" data-theme-toggle>
+          <span class="theme-toggle-sun"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-sun"></use></svg></span>
+          <span class="theme-toggle-moon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-moon"></use></svg></span>
+        </button>
+        
+          <a class="nav-link nav-link--admin" href="index.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> Admin</a>
+        
+        
+        <div class="user-menu" data-user-menu>
+          <button class="user-chip" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="user-menu-panel" aria-label="Open your account menu" data-user-menu-toggle>
+            <span class="avatar avatar--xs">
+  
+    <img src="../../static/img/avatars/aria.jpg" alt="" loading="lazy">
+  
+</span>
+            <span class="user-chip-copy"><small>Administrator</small><strong>Aria</strong></span>
+            <svg class="icon user-chip-caret" aria-hidden="true" focusable="false"><use href="#icon-chevron-down"></use></svg>
+          </button>
+          <div class="user-menu-panel" id="user-menu-panel" data-user-menu-panel hidden>
+            <div class="user-menu-head">
+              <span class="avatar avatar--md">
+  
+    <img src="../../static/img/avatars/aria.jpg" alt="" loading="lazy">
+  
+</span>
+              <span class="user-menu-identity">
+                <strong>Aria Santos</strong>
+                <small>admin@antiimbak.com</small>
+              </span>
+              <span class="user-menu-role">Admin</span>
+            </div>
+            <nav class="user-menu-links" aria-label="Your account pages">
+              
+                <a class="user-menu-link" href="index.html">
+                  <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> <span>Administrator Console</span>
+                </a>
+              
+              
+                <a class="user-menu-link " href="../donor/donations.html">
+                  <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg> <span>My Listings</span>
+                </a>
+                <a class="user-menu-link " href="../donor/messages.html">
+                  <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-message-circle"></use></svg> <span>Messages</span>
+                  
+                </a>
+                <a class="user-menu-link " href="../donor/incoming-claims.html">
+                  <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-hand-heart"></use></svg> <span>Claim Requests</span>
+                  
+                </a>
+              
+              <a class="user-menu-link " href="../donor/notifications.html">
+                <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-bell"></use></svg> <span>Notifications</span>
+                <span class="user-menu-count">2</span>
+              </a>
+              <a class="user-menu-link " href="../donor/settings.html">
+                <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-settings"></use></svg> <span>Account Settings</span>
+              </a>
+              <a class="user-menu-link" href="../../browse.html">
+                <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg> <span>Browse Marketplace</span>
+              </a>
+            </nav>
+            <div class="user-menu-foot">
+              <form method="post" action="#" data-preview-missing="" class="user-menu-form">
+                <input type="hidden" name="csrf_token" value="ANLYyIPLcvFRW9P9_cPJa9GCo9E8av9aEn84UDBZBh0">
+                <button class="user-menu-link user-menu-link--danger" type="submit"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-log-out"></use></svg> <span>Log out</span></button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <form method="post" action="#" data-preview-missing="" class="inline-form">
+          <input type="hidden" name="csrf_token" value="ANLYyIPLcvFRW9P9_cPJa9GCo9E8av9aEn84UDBZBh0">
+          <button class="icon-button" type="submit" aria-label="Log out" title="Log out"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-log-out"></use></svg></button>
+        </form>
+      
+      <a class="btn btn-primary btn-sm nav-donate" href="../donor/new-donation.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg><span>Donate an Item</span></a>
+      <button class="icon-button menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-menu"></use></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true">
+  <div class="mobile-menu-head">
+    <a class="brand brand--compact" href="../../index.html" aria-label="Anti-Imbak — Giving Items a Second Purpose">
+  <span class="brand-orbit" aria-hidden="true">
+    <svg viewBox="0 0 138 58" fill="none">
+      <path class="orbit-line orbit-line--one" d="M5 45C13 13 56 3 79 8c16 4 16 15 2 20" />
+      <path class="orbit-line orbit-line--two" d="M2 49C39 61 96 54 129 23" />
+      <circle class="orbit-dot" cx="89" cy="33" r="1.6" />
+    </svg>
+  </span>
+  <span class="brand-type">
+    <span class="brand-anti">Anti</span><span class="brand-hyphen">-</span><span class="brand-imbak">Imbak</span>
+    <span class="brand-spark" aria-hidden="true">✦</span>
+  </span>
+  
+</a>
+    <button class="icon-button" type="button" aria-label="Close menu" data-menu-close><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <a href="../../index.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-home"></use></svg> <span>Home</span></a>
+    <a href="../../browse.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg> <span>Browse</span></a>
+    
+    <a href="../donor/messages.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-message-circle"></use></svg> <span>Messages</span></a>
+    
+    <a href="../../how-it-works.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-refresh"></use></svg> <span>How It Works</span></a>
+    <a href="../../about.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-users"></use></svg> <span>About</span></a>
+    <a href="../../safety.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> <span>Safety &amp; Trust</span></a>
+    <a href="../../advertise.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-megaphone"></use></svg> <span>Advertise</span></a>
+  </nav>
+  <div class="mobile-menu-actions">
+    
+      <a class="btn btn-secondary btn-block" href="../donor/index.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-dashboard"></use></svg> Your workspace</a>
+      
+        <a class="btn btn-secondary btn-block" href="index.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> Administrator console</a>
+      
+      <a class="btn btn-primary btn-block" href="../donor/new-donation.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg> Donate an Item</a>
+      <form method="post" action="#" data-preview-missing="">
+        <input type="hidden" name="csrf_token" value="ANLYyIPLcvFRW9P9_cPJa9GCo9E8av9aEn84UDBZBh0">
+        <button type="submit" class="btn btn-ghost btn-block"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-log-out"></use></svg> Log out</button>
+      </form>
+    
+  </div>
+  <p class="mobile-menu-note">Giving Items a Second Purpose.</p>
+</div>
+<div class="menu-scrim" data-menu-scrim></div>
+
+<div class="toast-stack" aria-live="polite" aria-atomic="false">
+  
+    
+  
+</div>
+
+<main id="main-content" class="dashboard-main">
+  
+<div class="dashboard-shell admin-shell">
+  <div class="container dashboard-layout">
+    <aside class="dash-sidebar admin-sidebar" aria-label="Administrator navigation">
+      <div class="dash-profile admin-profile">
+        <a class="dash-profile-main" href="index.html">
+          <span class="avatar avatar--md">
+  
+    <img src="../../static/img/avatars/aria.jpg" alt="" loading="lazy">
+  
+</span>
+          <span>
+            <strong>Aria Santos</strong>
+            <small>Administrator</small>
+          </span>
+          <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg>
+        </a>
+        <div class="dash-profile-meta">
+          <span class="admin-pill"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> Administrator</span>
+        </div>
+      </div>
+
+      <nav class="dash-nav" aria-label="Admin navigation">
+        <span class="dash-nav-label">Operations</span>
+        <a href="index.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-dashboard"></use></svg></span><span>Overview</span>
+        </a>
+        <a href="users.html" class="dash-nav-link is-active">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-users"></use></svg></span><span>Members</span>
+        </a>
+        <a href="listings.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg></span><span>Listings</span>
+        </a>
+        <a href="reports.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-flag"></use></svg></span><span>Trust &amp; safety</span>
+          <span class="nav-count nav-count--danger">2</span>
+        </a>
+        <span class="dash-nav-label">Casework</span>
+        <a href="disputes.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield"></use></svg></span><span>Disputes</span>
+          <span class="nav-count nav-count--danger">4</span>
+        </a>
+        <a href="support.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-message-circle"></use></svg></span><span>User concerns</span>
+          <span class="nav-count nav-count--warm">5</span>
+        </a>
+        <a href="activity.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-list"></use></svg></span><span>Activity logs</span>
+        </a>
+        <span class="dash-nav-label">Platform</span>
+        <a href="revenue.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-wallet"></use></svg></span><span>Delivery fees &amp; revenue</span>
+        </a>
+        <a href="content.html" class="dash-nav-link ">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-megaphone"></use></svg></span><span>Ads &amp; content</span>
+        </a>
+        <span class="dash-nav-label">Your space</span>
+        <a href="../donor/index.html" class="dash-nav-link">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-user"></use></svg></span><span>Member workspace</span>
+        </a>
+        <a href="../donor/messages.html" class="dash-nav-link">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-message-circle"></use></svg></span><span>Messages</span>
+          
+        </a>
+        <a href="../../index.html" class="dash-nav-link">
+          <span class="dash-nav-icon"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-globe"></use></svg></span><span>View marketplace</span><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-arrow-up-right"></use></svg>
+        </a>
+      </nav>
+
+      <p class="dash-sidebar-note"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-info"></use></svg> Every moderation action is recorded in the activity log.</p>
+    </aside>
+
+    <div class="dash-content">
+      <header class="dash-topbar">
+        <div class="dash-topbar-copy">
+          <div class="page-breadcrumb">
+            <a href="index.html">Administrator</a> <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg>
+            <span><a href="users.html">Members</a> <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-chevron-right"></use></svg> Lina Villanueva</span>
+          </div>
+          <h1>Lina Villanueva</h1>
+          
+<p>lina@example.com · joined Jun 22, 2026 · User account</p>
+
+        </div>
+        <div class="dash-topbar-actions">
+          
+<a class="btn btn-ghost btn-sm" href="users.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-arrow-left"></use></svg> Directory</a>
+
+        </div>
+      </header>
+
+      <div class="dash-scroll">
+        
+<div class="admin-detail-grid">
+  <div class="admin-detail-main">
+    <section class="panel admin-profile-panel">
+      <div class="admin-profile-head">
+        <span class="avatar avatar--xl">
+  
+    <img src="../../static/img/avatars/lina.jpg" alt="" loading="lazy">
+  
+</span>
+        <div class="admin-profile-identity">
+          <div class="admin-profile-tags">
+            <span class="status status--success">Active</span>
+            
+            <span class="mini-tag mini-tag--cyan"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-badge-check"></use></svg> Verified</span>
+            
+          </div>
+          <h2>Lina Villanueva</h2>
+          <a href="mailto:lina@example.com"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-mail"></use></svg> lina@example.com</a>
+          <p class="admin-profile-location"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-map-pin"></use></svg> Pasig City, Pasig City</p>
+        </div>
+      </div>
+      
+      <blockquote class="admin-profile-bio">Teacher, reader and community volunteer. I often pass things on for neighbours setting up homes.</blockquote>
+      
+      <div class="admin-profile-meta">
+        <div><span>Contact number</span><strong>0917 555 0142</strong></div>
+        <div><span>Member since</span><strong>Jun 22, 2026</strong></div>
+        <div><span>Last sign-in</span><strong>Never recorded</strong></div>
+        <div><span>Coordinates</span><strong>14.5764, 121.0851</strong></div>
+      </div>
+    </section>
+
+    <section class="panel panel--flush">
+      <div class="panel-head panel-head--inline panel-head--padded">
+        <div><span class="eyebrow"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg> Marketplace footprint</span><h2>Recent donations</h2></div>
+        <a class="text-link text-link--sm" href="listings.html">All listings <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-arrow-right"></use></svg></a>
+      </div>
+      
+      <div class="table-wrap">
+        <table class="data-table data-table--compact">
+          <thead><tr><th>Listing</th><th>Status</th><th>Views</th><th>Listed</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td>
+                <strong><a href="../../listing-15.html">School backpack and partly used notebooks</a></strong>
+                <small>Books &amp; School Supplies · Paco, Manila</small>
+              </td>
+              <td><span class="status status--warm">Reserved</span></td>
+              <td>48</td>
+              <td>1 day ago</td>
+            </tr>
+            
+            <tr>
+              <td>
+                <strong><a href="../../listing-11.html">24-inch IPS monitor — VGA and HDMI, no dead pixels</a></strong>
+                <small>Electronics · Uptown, Taguig City</small>
+              </td>
+              <td><span class="status status--warm">Reserved</span></td>
+              <td>87</td>
+              <td>3 day ago</td>
+            </tr>
+            
+            <tr>
+              <td>
+                <strong><a href="../../listing-3.html">Two-seater fabric sofa — cat scratches on one arm</a></strong>
+                <small>Furniture · Kapitolyo, Pasig City</small>
+              </td>
+              <td><span class="status status--success">Available</span></td>
+              <td>81</td>
+              <td>5 day ago</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+      
+    </section>
+
+    <section class="panel panel--flush">
+      <div class="panel-head panel-head--inline panel-head--padded">
+        <div><span class="eyebrow"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-hand-heart"></use></svg> Claim activity</span><h2>Requested items</h2></div>
+      </div>
+      
+      <div class="table-wrap">
+        <table class="data-table data-table--compact">
+          <thead><tr><th>Item</th><th>Method</th><th>Status</th><th>Requested</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td><strong>Preloved office clothes bundle — size M</strong><small>I volunteer with a women&#39;s shelter in Pasig. These pieces would go to…</small></td>
+              <td><span class="mini-tag">Delivery</span></td>
+              <td><span class="status status--warm">Awaiting review</span></td>
+              <td>1 day ago</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+      
+    </section>
+
+    <section class="panel panel--flush">
+      <div class="panel-head panel-head--inline panel-head--padded">
+        <div><span class="eyebrow eyebrow--danger"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-flag"></use></svg> Trust &amp; safety</span><h2>Reports involving this member</h2></div>
+        <a class="text-link text-link--sm" href="reports.html">Safety queue <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-arrow-right"></use></svg></a>
+      </div>
+      
+      <div class="mini-empty"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg><p>No reports involve this member.</p></div>
+      
+    </section>
+  </div>
+
+  <aside class="admin-detail-side">
+    <section class="panel admin-action-panel">
+      <span class="eyebrow"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-settings"></use></svg> Account controls</span>
+      <h2>Moderation actions</h2>
+      
+      <div class="admin-action-stack">
+        
+          
+          <form method="post" action="#" data-preview-missing="" data-confirm="Suspend Lina Villanueva? Their access will be paused immediately.">
+            <input type="hidden" name="csrf_token" value="ANLYyIPLcvFRW9P9_cPJa9GCo9E8av9aEn84UDBZBh0">
+            <input type="hidden" name="action" value="suspend">
+            <button class="btn btn-danger btn-block" type="submit"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-alert-circle"></use></svg> Suspend account</button>
+          </form>
+          
+        
+        <form method="post" action="#" data-preview-missing="">
+          <input type="hidden" name="csrf_token" value="ANLYyIPLcvFRW9P9_cPJa9GCo9E8av9aEn84UDBZBh0">
+          <input type="hidden" name="action" value="unverify">
+          <button class="btn btn-secondary btn-block" type="submit"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-badge-check"></use></svg> Remove verification</button>
+        </form>
+        <a class="btn btn-ghost btn-block" href="mailto:lina@example.com"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-mail"></use></svg> Email member</a>
+      </div>
+      
+    </section>
+
+    <section class="panel">
+      <span class="eyebrow"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-chart"></use></svg> Community record</span>
+      <div class="admin-stat-list">
+        <div><span>Donations</span><strong>3</strong></div>
+        <div><span>Completed gifts</span><strong>0</strong></div>
+        <div><span>Claims made</span><strong>1</strong></div>
+        <div><span>Items received</span><strong>0</strong></div>
+        <div><span>Open reports</span><strong class="">0</strong></div>
+      </div>
+    </section>
+
+    <section class="panel editor-tips">
+      <span class="eyebrow"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> Moderator notes</span>
+      <ul class="check-list check-list--tight">
+        <li><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-check"></use></svg> Verify members only after a reliable handover.</li>
+        <li><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-check"></use></svg> Suspension pauses listings and claims, not history.</li>
+        <li><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-check"></use></svg> Every action is recorded in the audit trail.</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+
+        <footer class="dash-footer">
+          <span><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> Anti-Imbak administrator console</span>
+          <span>Figures are calculated from the marketplace database.</span>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+
+
+
+<nav class="bottom-nav" aria-label="Mobile quick navigation">
+  <a href="../../index.html" class=""><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-home"></use></svg><span>Home</span></a>
+  <a href="../../browse.html" class=""><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg><span>Browse</span></a>
+  <a href="../donor/new-donation.html" class="bottom-nav-give"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-plus"></use></svg><span>Give</span></a>
+  <a href="../donor/messages.html" class=""><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-message-circle"></use></svg><span>Messages</span></a>
+  <a href="../donor/index.html" class=""><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-user"></use></svg><span>Account</span></a>
+</nav>
+
+
+<script src="../../static/js/app.js" defer></script>
+
+<script src="../../static/js/preview.js" defer></script>
+</body>
+</html>

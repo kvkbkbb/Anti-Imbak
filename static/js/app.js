@@ -27,6 +27,38 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
+  /* ---------------------------------------------------------------------
+     Light and dark theme
+     --------------------------------------------------------------------- */
+  const themeRoot = document.documentElement;
+  const themeToggle = $("[data-theme-toggle]");
+  const themeColor = $("[data-theme-color]");
+
+  const applyTheme = (theme, persist = true) => {
+    const next = theme === "light" ? "light" : "dark";
+    themeRoot.dataset.theme = next;
+    themeRoot.style.colorScheme = next;
+    if (themeToggle) {
+      const isLight = next === "light";
+      themeToggle.setAttribute("aria-pressed", String(isLight));
+      themeToggle.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
+      themeToggle.setAttribute("title", isLight ? "Switch to dark mode" : "Switch to light mode");
+    }
+    if (themeColor) themeColor.setAttribute("content", next === "light" ? "#eef3fb" : "#050917");
+    if (persist) {
+      try {
+        localStorage.setItem("antiimbak-theme", next);
+      } catch (error) {
+        /* Theme still applies for this page view. */
+      }
+    }
+  };
+
+  applyTheme(themeRoot.dataset.theme || "dark", false);
+  themeToggle?.addEventListener("click", () => {
+    applyTheme(themeRoot.dataset.theme === "light" ? "dark" : "light");
+  });
+
   const menu = $("[data-mobile-menu]");
   const menuToggle = $("[data-menu-toggle]");
   const menuClose = $("[data-menu-close]");
@@ -58,6 +90,48 @@
   });
   window.addEventListener("resize", () => {
     if (window.innerWidth > 1024 && menu?.classList.contains("is-open")) setMenu(false, false);
+  });
+
+  /* ---------------------------------------------------------------------
+     Profile menu
+     --------------------------------------------------------------------- */
+  const userMenu = $("[data-user-menu]");
+  const userMenuToggle = $("[data-user-menu-toggle]", userMenu || document);
+  const userMenuPanel = $("[data-user-menu-panel]", userMenu || document);
+
+  const setUserMenu = (open, restoreFocus = false) => {
+    if (!userMenu || !userMenuToggle || !userMenuPanel) return;
+    userMenuPanel.hidden = !open;
+    userMenuToggle.setAttribute("aria-expanded", String(open));
+    userMenu.classList.toggle("is-open", open);
+    if (!open && restoreFocus) userMenuToggle.focus();
+  };
+
+  const userMenuIsOpen = () => Boolean(userMenuPanel && !userMenuPanel.hidden);
+
+  userMenuToggle?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setUserMenu(!userMenuIsOpen());
+  });
+
+  userMenuPanel?.addEventListener("click", (event) => {
+    if (event.target.closest("a, button")) setUserMenu(false);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (userMenuIsOpen() && !userMenu.contains(event.target)) setUserMenu(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && userMenuIsOpen()) setUserMenu(false, true);
+  });
+
+  userMenu?.addEventListener("focusout", (event) => {
+    if (userMenuIsOpen() && !userMenu.contains(event.relatedTarget)) setUserMenu(false);
+  });
+
+  window.addEventListener("resize", () => {
+    if (userMenuIsOpen()) setUserMenu(false);
   });
 
   const removeToast = (toast) => {

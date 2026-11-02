@@ -1625,7 +1625,18 @@
   }
 
   .user-chip {
+    padding: 0.18rem;
+    border-radius: 50%;
+  }
+
+  .user-chip-copy,
+  .user-chip-caret {
     display: none;
+  }
+
+  .user-chip .avatar {
+    width: 1.95rem;
+    height: 1.95rem;
   }
 
   .nav-actions > .inline-form {

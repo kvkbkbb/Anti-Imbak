@@ -1,0 +1,131 @@
+/* Static GitHub Pages preview chrome. */
+.static-preview-bar {
+  position: relative;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.7rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(57, 231, 244, 0.22);
+  background: #071226;
+  color: #c5d2e9;
+  font-family: "Manrope", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.static-preview-bar strong {
+  color: #8ff7fc;
+  font-weight: 750;
+}
+
+.static-preview-bar a {
+  color: #8ff7fc;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.static-preview-bar a:hover,
+.static-preview-bar a:focus-visible {
+  text-decoration: underline;
+}
+
+.static-preview-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.14rem;
+  border: 1px solid rgba(57, 231, 244, 0.22);
+  border-radius: 999px;
+  background: rgba(57, 231, 244, 0.05);
+}
+
+.static-preview-links a {
+  padding: 0.16rem 0.5rem;
+  border-radius: 999px;
+  color: #9fb4d4;
+  font-size: 0.66rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.static-preview-links a:hover,
+.static-preview-links a:focus-visible {
+  background: rgba(57, 231, 244, 0.1);
+  color: #d9fbfe;
+  text-decoration: none;
+}
+
+.static-preview-links a.is-current {
+  background: rgba(57, 231, 244, 0.16);
+  color: #8ff7fc;
+}
+
+.static-preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid rgba(57, 231, 244, 0.35);
+  border-radius: 999px;
+  background: rgba(57, 231, 244, 0.1);
+  color: #8ff7fc;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.static-preview-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.4rem;
+  z-index: 400;
+  width: min(32rem, calc(100vw - 2rem));
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(57, 231, 244, 0.35);
+  border-radius: 14px;
+  background: #0a1730;
+  box-shadow: 0 22px 60px -22px rgba(0, 0, 0, 0.85);
+  color: #edf3ff;
+  font-family: "Manrope", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+  transform: translate(-50%, 1rem);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.static-preview-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* The role switcher and reset control need a live server, so hide them here. */
+.viewas-bar {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  .static-preview-bar {
+    gap: 0.35rem 0.55rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.68rem;
+  }
+
+  .static-preview-bar .static-preview-copy {
+    display: none;
+  }
+
+  .static-preview-links a {
+    padding: 0.14rem 0.4rem;
+    font-size: 0.62rem;
+  }
+}

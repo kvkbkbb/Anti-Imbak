@@ -2510,8 +2510,226 @@ input[type="date"] {
   font-weight: 750;
 }
 
+/* Profile menu ------------------------------------------------------------- */
+.user-menu {
+  position: relative;
+}
+
+button.user-chip {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user-chip[aria-expanded="true"] {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--text);
+}
+
+.user-chip-caret {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--muted-dim);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.user-chip[aria-expanded="true"] .user-chip-caret {
+  color: var(--cyan);
+  transform: rotate(180deg);
+}
+
+.user-menu-panel {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  z-index: 140;
+  width: min(19rem, calc(100vw - 2rem));
+  padding: 0.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(160deg, rgba(15, 27, 58, 0.985), rgba(5, 10, 25, 0.995));
+  box-shadow:
+    0 34px 80px -34px rgba(0, 0, 0, 0.92),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transform-origin: top right;
+  animation: user-menu-in 0.16s ease;
+}
+
+.user-menu-panel[hidden] {
+  display: none;
+}
+
+@keyframes user-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.user-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+  padding: 0.55rem 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.user-menu-identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.user-menu-identity strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu-identity small {
+  overflow: hidden;
+  color: var(--muted-dim);
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu-role {
+  margin-left: auto;
+  padding: 0.18rem 0.48rem;
+  border: 1px solid rgba(57, 231, 244, 0.24);
+  border-radius: 999px;
+  background: rgba(57, 231, 244, 0.08);
+  color: var(--cyan);
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.user-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.user-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.52rem 0.6rem;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user-menu-link .icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--muted);
+  transition: color 0.16s ease;
+}
+
+.user-menu-link:hover,
+.user-menu-link:focus-visible {
+  background: rgba(57, 231, 244, 0.08);
+  color: var(--text);
+}
+
+.user-menu-link:hover .icon,
+.user-menu-link:focus-visible .icon {
+  color: var(--cyan);
+}
+
+.user-menu-link.is-active {
+  background: rgba(57, 231, 244, 0.1);
+  color: var(--cyan-bright);
+}
+
+.user-menu-link.is-active .icon {
+  color: var(--cyan);
+}
+
+.user-menu-count {
+  display: grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-left: auto;
+  padding: 0 0.36rem;
+  border-radius: 999px;
+  background: var(--cyan);
+  color: #04121c;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.user-menu-foot {
+  margin-top: 0.4rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--line);
+}
+
+.user-menu-form {
+  margin: 0;
+}
+
+.user-menu-link--danger:hover,
+.user-menu-link--danger:focus-visible {
+  background: rgba(255, 111, 139, 0.1);
+  color: var(--danger);
+}
+
+.user-menu-link--danger:hover .icon,
+.user-menu-link--danger:focus-visible .icon {
+  color: var(--danger);
+}
+
 .notification-button {
   position: relative;
+}
+
+.theme-toggle {
+  position: relative;
+}
+
+.theme-toggle-sun,
+.theme-toggle-moon {
+  display: grid;
+  place-items: center;
+}
+
+.theme-toggle-moon {
+  display: none;
+}
+
+html[data-theme="light"] .theme-toggle-sun {
+  display: none;
+}
+
+html[data-theme="light"] .theme-toggle-moon {
+  display: grid;
 }
 
 .notification-dot {

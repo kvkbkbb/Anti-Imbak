@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#050917">
+  <meta name="theme-color" content="#050917" data-theme-color>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("antiimbak-theme");
+        document.documentElement.dataset.theme = saved === "light" ? "light" : "dark";
+      } catch (error) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    })();
+  </script>
   <title>{% block title %}Anti-Imbak — Giving Items a Second Purpose{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}Anti-Imbak is a donation-only marketplace connecting useful items with people and communities who can give them a second purpose.{% endblock %}">
   <meta property="og:title" content="{% block og_title %}Anti-Imbak — Giving Items a Second Purpose{% endblock %}">
@@ -17,6 +27,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
   {% block head %}{% endblock %}
 </head>
 <body class="{% block body_class %}site-page{% endblock %}">
@@ -68,13 +79,79 @@
           {{ icon('bell') }}
           {% if unread_notifications %}<span class="notification-dot">{{ unread_notifications if unread_notifications < 10 else '9+' }}</span>{% endif %}
         </a>
+        <button class="icon-button theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="false" title="Switch to light mode" data-theme-toggle>
+          <span class="theme-toggle-sun">{{ icon('sun') }}</span>
+          <span class="theme-toggle-moon">{{ icon('moon') }}</span>
+        </button>
         {% if current_user.role == 'admin' %}
           <a class="nav-link nav-link--admin" href="{{ url_for('admin.overview') }}">{{ icon('shield-check') }} Admin</a>
         {% endif %}
-        <a class="user-chip" href="{{ url_for('admin.overview') if demo_role == 'admin' else url_for('dashboard.index') }}" aria-label="Open your {{ demo_roles[demo_role].label }} workspace">
-          {{ avatar(current_user.name, current_user.avatar_url, 'avatar--xs') }}
-          <span class="user-chip-copy"><small>{{ demo_roles[demo_role].label }}</small><strong>{{ current_user.name.split()[0] }}</strong></span>
-        </a>
+        {% set menu_role = 'donor' if demo_role == 'admin' else demo_role %}
+        <div class="user-menu" data-user-menu>
+          <button class="user-chip" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="user-menu-panel" aria-label="Open your account menu" data-user-menu-toggle>
+            {{ avatar(current_user.name, current_user.avatar_url, 'avatar--xs') }}
+            <span class="user-chip-copy"><small>{{ demo_roles[demo_role].label }}</small><strong>{{ current_user.name.split()[0] }}</strong></span>
+            {{ icon('chevron-down', 'user-chip-caret') }}
+          </button>
+          <div class="user-menu-panel" id="user-menu-panel" data-user-menu-panel hidden>
+            <div class="user-menu-head">
+              {{ avatar(current_user.name, current_user.avatar_url, 'avatar--md') }}
+              <span class="user-menu-identity">
+                <strong>{{ current_user.name }}</strong>
+                <small>{{ current_user.email }}</small>
+              </span>
+              <span class="user-menu-role">{{ demo_roles[demo_role].short }}</span>
+            </div>
+            <nav class="user-menu-links" aria-label="Your account pages">
+              {% if current_user.role == 'admin' %}
+                <a class="user-menu-link" href="{{ url_for('admin.overview') }}">
+                  {{ icon('shield-check') }} <span>Administrator Console</span>
+                </a>
+              {% endif %}
+              {% if menu_role == 'donor' %}
+                <a class="user-menu-link {% if request.endpoint in ['dashboard.donations', 'dashboard.listing_form'] %}is-active{% endif %}" href="{{ url_for('dashboard.donations') }}">
+                  {{ icon('gift') }} <span>My Listings</span>
+                </a>
+                <a class="user-menu-link {% if request.endpoint == 'dashboard.messages' %}is-active{% endif %}" href="{{ url_for('dashboard.messages') }}">
+                  {{ icon('message-circle') }} <span>Messages</span>
+                  {% if unread_messages %}<span class="user-menu-count">{{ unread_messages }}</span>{% endif %}
+                </a>
+                <a class="user-menu-link {% if request.endpoint in ['dashboard.incoming_claims', 'dashboard.claim_detail'] %}is-active{% endif %}" href="{{ url_for('dashboard.incoming_claims') }}">
+                  {{ icon('hand-heart') }} <span>Claim Requests</span>
+                  {% if nav_counts.incoming %}<span class="user-menu-count">{{ nav_counts.incoming }}</span>{% endif %}
+                </a>
+              {% else %}
+                <a class="user-menu-link {% if request.endpoint in ['dashboard.my_claims', 'dashboard.claim_detail'] %}is-active{% endif %}" href="{{ url_for('dashboard.my_claims') }}">
+                  {{ icon('hand-heart') }} <span>My Requests</span>
+                  {% if nav_counts.claims %}<span class="user-menu-count">{{ nav_counts.claims }}</span>{% endif %}
+                </a>
+                <a class="user-menu-link {% if request.endpoint == 'dashboard.saved' %}is-active{% endif %}" href="{{ url_for('dashboard.saved') }}">
+                  {{ icon('heart') }} <span>Saved Items</span>
+                </a>
+                <a class="user-menu-link {% if request.endpoint == 'dashboard.messages' %}is-active{% endif %}" href="{{ url_for('dashboard.messages') }}">
+                  {{ icon('message-circle') }} <span>Messages</span>
+                  {% if unread_messages %}<span class="user-menu-count">{{ unread_messages }}</span>{% endif %}
+                </a>
+              {% endif %}
+              <a class="user-menu-link {% if request.endpoint == 'dashboard.notifications' %}is-active{% endif %}" href="{{ url_for('dashboard.notifications') }}">
+                {{ icon('bell') }} <span>Notifications</span>
+                {% if unread_notifications %}<span class="user-menu-count">{{ unread_notifications }}</span>{% endif %}
+              </a>
+              <a class="user-menu-link {% if request.endpoint == 'dashboard.settings' %}is-active{% endif %}" href="{{ url_for('dashboard.settings') }}">
+                {{ icon('settings') }} <span>Account Settings</span>
+              </a>
+              <a class="user-menu-link" href="{{ url_for('public.browse') }}">
+                {{ icon('compass') }} <span>Browse Marketplace</span>
+              </a>
+            </nav>
+            <div class="user-menu-foot">
+              <form method="post" action="{{ url_for('auth.logout') }}" class="user-menu-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <button class="user-menu-link user-menu-link--danger" type="submit">{{ icon('log-out') }} <span>Log out</span></button>
+              </form>
+            </div>
+          </div>
+        </div>
         <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
           <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
           <button class="icon-button" type="submit" aria-label="Log out" title="Log out">{{ icon('log-out') }}</button>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Anti-Imbak icon</title>
+  <desc id="desc">A deep navy app icon with a cyan orbital letter A and a four-point spark.</desc>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="32" x2="448" y2="480" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0d1a33"/>
+      <stop offset="0.55" stop-color="#071022"/>
+      <stop offset="1" stop-color="#040814"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="142" y1="130" x2="365" y2="358" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a6fbff"/>
+      <stop offset="0.42" stop-color="#39e7f4"/>
+      <stop offset="1" stop-color="#16a8c9"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="152" y1="352" x2="366" y2="352" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7e93b3"/>
+      <stop offset="0.5" stop-color="#eef6ff"/>
+      <stop offset="1" stop-color="#9fb4d1"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(256 242) rotate(90) scale(220)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#39e7f4" stop-opacity=".26"/>
+      <stop offset="1" stop-color="#39e7f4" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="none" stroke="#8eeffa" stroke-opacity=".16" stroke-width="2"/>
+  <circle cx="256" cy="248" r="196" fill="url(#glow)"/>
+
+  <g opacity=".55" stroke="#9defff" stroke-width="2" fill="none">
+    <ellipse cx="256" cy="256" rx="190" ry="84" transform="rotate(-24 256 256)"/>
+    <ellipse cx="256" cy="256" rx="190" ry="84" transform="rotate(27 256 256)" opacity=".38"/>
+  </g>
+
+  <g opacity=".2" stroke="#b8d8ff" stroke-width="1.5">
+    <path d="M72 170h368M72 256h368M72 342h368M170 72v368M256 72v368M342 72v368"/>
+  </g>
+
+  <g filter="url(#soft)" opacity=".55">
+    <path d="M154 368 256 122l102 246" fill="none" stroke="#39e7f4" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <path d="M150 372 256 118l106 254" fill="none" stroke="url(#cyan)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M193 292h126" fill="none" stroke="url(#silver)" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="256" cy="118" r="17" fill="#071022" stroke="#8ff6ff" stroke-width="7"/>
+  <circle cx="150" cy="372" r="10" fill="#39e7f4"/>
+  <circle cx="362" cy="372" r="10" fill="#7d6cff"/>
+
+  <path d="M374 113c3 18 9 24 27 27-18 3-24 9-27 27-3-18-9-24-27-27 18-3 24-9 27-27Z" fill="#eef8ff"/>
+  <path d="M126 148c2 11 6 15 17 17-11 2-15 6-17 17-2-11-6-15-17-17 11-2 15-6 17-17Z" fill="#39e7f4" opacity=".9"/>
+
+  <circle cx="390" cy="316" r="4.5" fill="#39e7f4"/>
+  <path d="M104 300a14 14 0 1 0 0 .1" fill="none" stroke="#7d6cff" stroke-width="3" opacity=".8"/>
+</svg>

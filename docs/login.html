@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050917" data-theme-color>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("antiimbak-theme");
+        document.documentElement.dataset.theme = saved === "light" ? "light" : "dark";
+      } catch (error) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    })();
+  </script>
+  <title>Log in — Anti-Imbak</title>
+  <meta name="description" content="Anti-Imbak is a donation-only marketplace connecting useful items with people and communities who can give them a second purpose.">
+  <meta property="og:title" content="Anti-Imbak — Giving Items a Second Purpose">
+  <meta property="og:description" content="Give what you don't need. Find what you truly need.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="static/img/brand-icon.svg">
+  <link rel="preload" href="static/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="static/fonts/outfit-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="static/css/styles.css">
+  <link rel="stylesheet" href="static/css/pages.css">
+  <link rel="stylesheet" href="static/css/dashboard.css">
+  <link rel="stylesheet" href="static/css/admin.css">
+  <link rel="stylesheet" href="static/css/responsive.css">
+  <link rel="stylesheet" href="static/css/theme.css">
+  
+<link rel="stylesheet" href="static/css/preview.css"></head>
+<body class="auth-page"><div class="static-preview-bar" role="note"><span class="static-preview-badge">Static preview</span><span class="static-preview-copy">GitHub Pages snapshot. Accounts and actions run in the Flask app.</span><span class="static-preview-links"><a href="index.html" class="is-current" aria-current="page">Public</a><a href="workspace/donor/index.html">Donor</a><a href="workspace/recipient/index.html">Recipient</a><a href="workspace/admin/index.html">Admin</a></span><a href="https://github.com/payonilanz/Anti-Imbak#quick-start" target="_blank" rel="noopener">Run locally &rarr;</a></div>
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="m3 10.8 9-7.8 9 7.8"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></symbol>
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></symbol>
+  <symbol id="icon-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/></symbol>
+  <symbol id="icon-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13"/><path d="M12 8H7.5a2.5 2.5 0 1 1 2.5-2.5L12 8Zm0 0h4.5a2.5 2.5 0 1 0-2.5-2.5L12 8Z"/></symbol>
+  <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+  <symbol id="icon-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 3.5 1 9a7 7 0 0 1-9 9Z"/><path d="M2 21c0-3 1.9-5.4 5.1-6"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></symbol>
+  <symbol id="icon-shield-check" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"/><path d="M19 16v3M17.5 17.5h3M5 3v2M4 4h2"/></symbol>
+  <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></symbol>
+  <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+  <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="icon-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="icon-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="icon-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="13" cy="18" r="2"/></symbol>
+  <symbol id="icon-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v5M14 11v5"/></symbol>
+  <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></symbol>
+  <symbol id="icon-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="icon-package" viewBox="0 0 24 24"><path d="m7.5 4.3 9 5.2"/><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="icon-truck" viewBox="0 0 24 24"><path d="M10 17h4V5H2v12h3M20 17h2v-3.3a4 4 0 0 0-1.2-2.8L19 9h-5v8h3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="icon-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+  <symbol id="icon-alert-triangle" viewBox="0 0 24 24"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="icon-flag" viewBox="0 0 24 24"><path d="M4 22V4M4 5c5-3 8 3 16 0v10c-8 3-11-3-16 0"/></symbol>
+  <symbol id="icon-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></symbol>
+  <symbol id="icon-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="icon-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.8.6a2 2 0 0 1 1.7 2.1Z"/></symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+  <symbol id="icon-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M20 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/><path d="M16 13h2"/></symbol>
+  <symbol id="icon-tag" viewBox="0 0 24 24"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-8-8a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l8 8a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></symbol>
+  <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 8A7 7 0 0 1 19 10l1 2M4 12l1 2a7 7 0 0 0 12.9 2"/></symbol>
+  <symbol id="icon-recycle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></symbol>
+  <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 3.5 6 3.5 9S14.5 18 12 21c-2.5-3-3.5-6-3.5-9S9.5 6 12 3Z"/></symbol>
+  <symbol id="icon-external-link" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="icon-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-3.8-.8L3 21l1.8-5.2a8.4 8.4 0 1 1 16.2-4.3Z"/></symbol>
+  <symbol id="icon-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16v-5M12 16V7M17 16v-3"/></symbol>
+  <symbol id="icon-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-6v14L3 13v-2Z"/><path d="m6 14 2 6h3l-2-5"/></symbol>
+  <symbol id="icon-book-open" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2V4ZM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7V4Z"/></symbol>
+  <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></symbol>
+  <symbol id="icon-gamepad" viewBox="0 0 24 24"><path d="M6 6h12a5 5 0 0 1 4.8 6.4l-1.4 5A3.5 3.5 0 0 1 16 19l-1.2-1.5a2 2 0 0 0-1.6-.8h-2.4a2 2 0 0 0-1.6.8L8 19a3.5 3.5 0 0 1-5.4-1.6l-1.4-5A5 5 0 0 1 6 6Z"/><path d="M7 11h3M8.5 9.5v3M16 11h.01M18 13h.01"/></symbol>
+  <symbol id="icon-shirt" viewBox="0 0 24 24"><path d="m16 3 5 3-2 4-3-1v12H8V9l-3 1-2-4 5-3a4 4 0 0 0 8 0Z"/></symbol>
+  <symbol id="icon-armchair" viewBox="0 0 24 24"><path d="M5 11a2 2 0 0 1 2 2v2h10v-2a2 2 0 1 1 4 0v6H3v-6a2 2 0 0 1 2-2Z"/><path d="M5 15V8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v7M6 19v2M18 19v2"/></symbol>
+  <symbol id="icon-fridge" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M5 10h14M8 5v2M8 13v3"/></symbol>
+  <symbol id="icon-utensils" viewBox="0 0 24 24"><path d="M6 2v8M3 2v5a3 3 0 0 0 6 0V2M6 10v12M17 2v20M17 2c3 0 4 3 4 6s-1 5-4 5"/></symbol>
+  <symbol id="icon-dumbbell" viewBox="0 0 24 24"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10M1 10v4M23 10v4"/></symbol>
+  <symbol id="icon-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="icon-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="icon-lamp" viewBox="0 0 24 24"><path d="M9 3h6l3 8H6l3-8ZM12 11v8M8 21h8"/></symbol>
+  <symbol id="icon-bicycle" viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="m5.5 17.5 4-8h6l3 8M9 9.5h7M12 17.5l-2.5-8M14 5h3"/></symbol>
+  <symbol id="icon-badge-check" viewBox="0 0 24 24"><path d="m12 2 2.2 2.1 3-.2 1 2.8 2.6 1.6-1 2.8 1 2.8-2.6 1.6-1 2.8-3-.2L12 20.2l-2.2-2.1-3 .2-1-2.8L3.2 14l1-2.8-1-2.8 2.6-1.6 1-2.8 3 .2L12 2Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="icon-hand-heart" viewBox="0 0 24 24"><path d="M11 14 9.5 12.5a2.1 2.1 0 0 1 3-3l.5.5.5-.5a2.1 2.1 0 0 1 3 3L14 14"/><path d="M12 21v-3M3 13l4-4 3 1M21 13l-4-4-4 1M7 21h10a4 4 0 0 0 4-4v-3M3 14v3a4 4 0 0 0 4 4"/></symbol>
+  <symbol id="icon-flame" viewBox="0 0 24 24"><path d="M12 22c4.4 0 7-3 7-7 0-5-5-6-4-13-4 2-7 6-7 10 0 1.5.5 3 1.5 3.5C9.5 14 9 12 10 10c1 5 2 5 2 12Z"/></symbol>
+  <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="icon-menu-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+  <symbol id="icon-receipt" viewBox="0 0 24 24"><path d="M4 2v20l3-2 2.5 2 2.5-2 2.5 2 2.5-2 3 2V2l-3 2-2.5-2L12 4 9.5 2 7 4 4 2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+  <symbol id="icon-credit-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12M7 11l5 5 5-5"/><path d="M4 19v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></symbol>
+  <symbol id="icon-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+  <symbol id="icon-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24"><path d="m6 4 14 8-14 8V4Z"/></symbol>
+  <symbol id="icon-chevron-up" viewBox="0 0 24 24"><path d="m5 15 7-7 7 7"/></symbol>
+  <symbol id="icon-spark" viewBox="0 0 24 24"><path d="M12 2c1.5 6 4 8.5 10 10-6 1.5-8.5 4-10 10-1.5-6-4-8.5-10-10 6-1.5 8.5-4 10-10Z"/></symbol>
+</svg>
+
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<div class="viewas-bar">
+  <div class="container viewas-inner">
+    <div class="viewas-intro">
+      <span class="viewas-dot" aria-hidden="true"></span>
+      <span class="viewas-label">View as:</span>
+    </div>
+    <form class="viewas-switch" method="post" action="#" data-preview-missing="" aria-label="Switch role view">
+      <input type="hidden" name="csrf_token" value="UsAFDbepgCykDTUqpGAUX4gRnnLDLOXypD92BaYdqaQ">
+      
+      <button class="viewas-role is-active" type="submit" formaction="#" data-preview-missing="" aria-current="true" title="Switch to the Public Marketplace view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-globe"></use></svg><span>Public Marketplace</span>
+      </button>
+      
+      <button class="viewas-role" type="submit" formaction="#" data-preview-missing="" title="Switch to the Donor view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg><span>Donor</span>
+      </button>
+      
+      <button class="viewas-role" type="submit" formaction="#" data-preview-missing="" title="Switch to the Recipient view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-hand-heart"></use></svg><span>Recipient</span>
+      </button>
+      
+      <button class="viewas-role" type="submit" formaction="#" data-preview-missing="" title="Switch to the Administrator view">
+        <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg><span>Administrator</span>
+      </button>
+      
+    </form>
+    <div class="viewas-actions">
+      <span class="viewas-current">Currently <strong>Public Marketplace</strong></span>
+      <form method="post" action="#" data-preview-missing="">
+        <input type="hidden" name="csrf_token" value="UsAFDbepgCykDTUqpGAUX4gRnnLDLOXypD92BaYdqaQ">
+        <button class="viewas-reset" type="submit" data-confirm="Reset the sample data? Listings, requests, conversations, reports and records return to their original state."><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-refresh"></use></svg><span>Reset sample data</span></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<header class="site-header" data-site-header>
+  <div class="container nav-shell">
+    <a class="brand brand--compact" href="index.html" aria-label="Anti-Imbak — Giving Items a Second Purpose">
+  <span class="brand-orbit" aria-hidden="true">
+    <svg viewBox="0 0 138 58" fill="none">
+      <path class="orbit-line orbit-line--one" d="M5 45C13 13 56 3 79 8c16 4 16 15 2 20" />
+      <path class="orbit-line orbit-line--two" d="M2 49C39 61 96 54 129 23" />
+      <circle class="orbit-dot" cx="89" cy="33" r="1.6" />
+    </svg>
+  </span>
+  <span class="brand-type">
+    <span class="brand-anti">Anti</span><span class="brand-hyphen">-</span><span class="brand-imbak">Imbak</span>
+    <span class="brand-spark" aria-hidden="true">✦</span>
+  </span>
+  
+</a>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="index.html" class="nav-link ">Home</a>
+      <a href="browse.html" class="nav-link ">Browse</a>
+      <a href="how-it-works.html" class="nav-link ">How It Works</a>
+      <a href="about.html" class="nav-link ">About</a>
+    </nav>
+    <div class="nav-actions">
+      
+        <a class="nav-login" href="login.html">Login</a>
+        <a class="btn btn-ghost btn-sm nav-register" href="register.html">Register</a>
+      
+      <a class="btn btn-primary btn-sm nav-donate" href="access.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg><span>Donate an Item</span></a>
+      <button class="icon-button menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-menu"></use></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true">
+  <div class="mobile-menu-head">
+    <a class="brand brand--compact" href="index.html" aria-label="Anti-Imbak — Giving Items a Second Purpose">
+  <span class="brand-orbit" aria-hidden="true">
+    <svg viewBox="0 0 138 58" fill="none">
+      <path class="orbit-line orbit-line--one" d="M5 45C13 13 56 3 79 8c16 4 16 15 2 20" />
+      <path class="orbit-line orbit-line--two" d="M2 49C39 61 96 54 129 23" />
+      <circle class="orbit-dot" cx="89" cy="33" r="1.6" />
+    </svg>
+  </span>
+  <span class="brand-type">
+    <span class="brand-anti">Anti</span><span class="brand-hyphen">-</span><span class="brand-imbak">Imbak</span>
+    <span class="brand-spark" aria-hidden="true">✦</span>
+  </span>
+  
+</a>
+    <button class="icon-button" type="button" aria-label="Close menu" data-menu-close><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-close"></use></svg></button>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <a href="index.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-home"></use></svg> <span>Home</span></a>
+    <a href="browse.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-compass"></use></svg> <span>Browse</span></a>
+    
+    <a href="how-it-works.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-refresh"></use></svg> <span>How It Works</span></a>
+    <a href="about.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-users"></use></svg> <span>About</span></a>
+    <a href="safety.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> <span>Safety &amp; Trust</span></a>
+    <a href="advertise.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-megaphone"></use></svg> <span>Advertise</span></a>
+  </nav>
+  <div class="mobile-menu-actions">
+    
+      <a class="btn btn-primary btn-block" href="register.html">Create your account</a>
+      <a class="btn btn-secondary btn-block" href="login.html">Login</a>
+      <a class="btn btn-ghost btn-block" href="access.html"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg> Donate an Item</a>
+    
+  </div>
+  <p class="mobile-menu-note">Giving Items a Second Purpose.</p>
+</div>
+<div class="menu-scrim" data-menu-scrim></div>
+
+<div class="toast-stack" aria-live="polite" aria-atomic="false">
+  
+    
+  
+</div>
+
+<main id="main-content" class="auth-main">
+  
+<section class="auth-shell">
+  <div class="container auth-grid">
+    <aside class="auth-panel">
+      <div class="auth-panel-glow" aria-hidden="true"></div>
+      <div class="auth-panel-inner">
+        <a class="brand" href="index.html" aria-label="Anti-Imbak — Giving Items a Second Purpose">
+  <span class="brand-orbit" aria-hidden="true">
+    <svg viewBox="0 0 138 58" fill="none">
+      <path class="orbit-line orbit-line--one" d="M5 45C13 13 56 3 79 8c16 4 16 15 2 20" />
+      <path class="orbit-line orbit-line--two" d="M2 49C39 61 96 54 129 23" />
+      <circle class="orbit-dot" cx="89" cy="33" r="1.6" />
+    </svg>
+  </span>
+  <span class="brand-type">
+    <span class="brand-anti">Anti</span><span class="brand-hyphen">-</span><span class="brand-imbak">Imbak</span>
+    <span class="brand-spark" aria-hidden="true">✦</span>
+  </span>
+  <span class="brand-tagline">Giving Items a Second Purpose.</span>
+</a>
+        <div class="auth-panel-copy">
+          <span class="hero-kicker"><span class="live-pill"><span class="pulse-dot"></span> A donation-only community</span></span>
+          
+<h1>Welcome back.<br>Something useful is waiting.</h1>
+<p>Log in to manage your donations, follow claim updates and arrange a safe handover.</p>
+
+        </div>
+        <ul class="auth-points">
+          <li><span><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-gift"></use></svg></span><div><strong>Everything is free</strong><small>No prices, no bidding, no hidden item costs.</small></div></li>
+          <li><span><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg></span><div><strong>Built for safer handovers</strong><small>Clear profiles, reporting tools and safety checkpoints.</small></div></li>
+          <li><span><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-leaf"></use></svg></span><div><strong>Keep useful things in use</strong><small>Every completed handover is one less thing wasted.</small></div></li>
+        </ul>
+        <div class="auth-panel-footer">
+          <div class="avatar-stack">
+            <span class="avatar avatar--sm"><img src="static/img/avatars/maya.jpg" alt=""></span>
+            <span class="avatar avatar--sm"><img src="static/img/avatars/noah.jpg" alt=""></span>
+            <span class="avatar avatar--sm"><img src="static/img/avatars/lina.jpg" alt=""></span>
+            <span class="avatar avatar--sm"><img src="static/img/avatars/bea.jpg" alt=""></span>
+          </div>
+          <p>Neighbours sharing with purpose across Metro Manila.</p>
+        </div>
+      </div>
+    </aside>
+
+    <div class="auth-card-wrap">
+      <div class="auth-card">
+        <div class="auth-mobile-brand"><a class="brand brand--compact" href="index.html" aria-label="Anti-Imbak — Giving Items a Second Purpose">
+  <span class="brand-orbit" aria-hidden="true">
+    <svg viewBox="0 0 138 58" fill="none">
+      <path class="orbit-line orbit-line--one" d="M5 45C13 13 56 3 79 8c16 4 16 15 2 20" />
+      <path class="orbit-line orbit-line--two" d="M2 49C39 61 96 54 129 23" />
+      <circle class="orbit-dot" cx="89" cy="33" r="1.6" />
+    </svg>
+  </span>
+  <span class="brand-type">
+    <span class="brand-anti">Anti</span><span class="brand-hyphen">-</span><span class="brand-imbak">Imbak</span>
+    <span class="brand-spark" aria-hidden="true">✦</span>
+  </span>
+  
+</a></div>
+        
+<div class="auth-heading">
+  <span class="eyebrow"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-log-out"></use></svg> Member access</span>
+  <h2>Log in to your account</h2>
+  <p>New here? <a href="register.html">Create a free account</a>.</p>
+</div>
+
+<form method="post" action="login.html" class="auth-form" novalidate>
+  <input type="hidden" name="csrf_token" value="UsAFDbepgCykDTUqpGAUX4gRnnLDLOXypD92BaYdqaQ">
+  <input type="hidden" name="next" value="">
+  <label class="field">
+    <span class="field-label">Email address</span>
+    <div class="input-with-icon">
+      <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-mail"></use></svg>
+      <input type="email" name="email" autocomplete="email" required placeholder="you@example.com" value="">
+    </div>
+  </label>
+  <label class="field">
+    <span class="field-label">Password</span>
+    <div class="input-with-icon input-with-action">
+      <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-lock"></use></svg>
+      <input type="password" name="password" autocomplete="current-password" required placeholder="Your password" data-password-input>
+      <button type="button" class="input-action" data-password-toggle aria-label="Show password"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-eye"></use></svg></button>
+    </div>
+  </label>
+  <div class="auth-form-row">
+    <span class="fine-print"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg> Protected session</span>
+    <a href="forgot-password.html" class="text-link text-link--sm">Forgot password?</a>
+  </div>
+  <button class="btn btn-primary btn-block btn-lg" type="submit"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-log-out"></use></svg> Log in</button>
+</form>
+
+<div class="auth-divider"><span>or continue with a sample account</span></div>
+
+<div class="demo-logins">
+  <form method="post" action="#" data-preview-missing="">
+    <input type="hidden" name="csrf_token" value="UsAFDbepgCykDTUqpGAUX4gRnnLDLOXypD92BaYdqaQ">
+    <input type="hidden" name="next" value="">
+    <button class="demo-login" type="submit">
+      <span class="demo-avatar"><img src="static/img/avatars/maya.jpg" alt=""></span>
+      <span><strong>Donor account</strong><small>Maya · manage gifts &amp; claims</small></span>
+      <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-arrow-right"></use></svg>
+    </button>
+  </form>
+  <form method="post" action="#" data-preview-missing="">
+    <input type="hidden" name="csrf_token" value="UsAFDbepgCykDTUqpGAUX4gRnnLDLOXypD92BaYdqaQ">
+    <input type="hidden" name="next" value="">
+    <button class="demo-login" type="submit">
+      <span class="demo-avatar"><img src="static/img/avatars/josh.jpg" alt=""></span>
+      <span><strong>Recipient account</strong><small>Josh · track requests &amp; delivery</small></span>
+      <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-arrow-right"></use></svg>
+    </button>
+  </form>
+  <form method="post" action="#" data-preview-missing="">
+    <input type="hidden" name="csrf_token" value="UsAFDbepgCykDTUqpGAUX4gRnnLDLOXypD92BaYdqaQ">
+    <button class="demo-login" type="submit">
+      <span class="demo-avatar demo-avatar--admin"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-shield-check"></use></svg></span>
+      <span><strong>Administrator account</strong><small>Aria · moderation &amp; platform</small></span>
+      <svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-arrow-right"></use></svg>
+    </button>
+  </form>
+</div>
+<p class="auth-demo-note"><svg class="icon " aria-hidden="true" focusable="false"><use href="#icon-info"></use></svg> Sample accounts are provided so you can explore both sides of the marketplace. You can also create your own free account.</p>
+
+      </div>
+      <p class="auth-legal">By continuing you agree to our <a href="terms.html">Terms of Use</a> and <a href="privacy.html">Privacy Notice</a>.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+
+
+
+<script src="static/js/app.js" defer></script>
+
+<script src="static/js/preview.js" defer></script>
+</body>
+</html>
