@@ -2743,3 +2743,251 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+/* ==========================================================================
+   Public page refinements — simplified navigation and content
+   ========================================================================== */
+
+/* Home: compact hero and consistent rhythm */
+.home-hero .hero-grid-layout {
+  min-height: 0;
+  padding-block: clamp(0.6rem, 2vw, 1.6rem);
+}
+
+.home-hero .hero-copy h1 {
+  font-size: clamp(2.5rem, 5vw, 4.4rem);
+}
+
+.home-hero .hero-visual {
+  min-height: 0;
+}
+
+.home-hero .hero-listing-card {
+  width: min(390px, 100%);
+  transform: none;
+}
+
+.home-hero .hero-listing-card:hover {
+  transform: translateY(-5px);
+}
+
+.landing-page .section,
+.content-page .section {
+  padding-block: clamp(2.8rem, 5vw, 4.4rem);
+}
+
+.landing-page .section-heading,
+.content-page .section-heading {
+  margin-bottom: 1.8rem;
+}
+
+.landing-page .section-heading h2,
+.content-page .section-heading h2 {
+  margin-top: 0.45rem;
+}
+
+.home-listings .listing-grid {
+  gap: 1rem;
+}
+
+@media (min-width: 900px) {
+  .home-listings .listing-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.categories-section .categories-intro > p {
+  margin-bottom: 1.25rem;
+}
+
+.categories-section .btn {
+  margin-top: 0.15rem;
+}
+
+.step-card {
+  min-height: 235px;
+}
+
+/* About: five clear sections */
+.about-hero--simple {
+  padding-block: clamp(2.8rem, 5vw, 4.4rem);
+}
+
+.about-hero--simple .about-hero-mark {
+  min-height: 0;
+  align-self: center;
+}
+
+.about-hero--simple .about-logo-panel {
+  transform: none;
+}
+
+.about-block .mission-copy {
+  padding-top: 0;
+}
+
+.about-block .check-list {
+  margin-bottom: 0;
+}
+
+@media (max-width: 1024px) {
+  .about-block .mission-grid {
+    gap: 1.3rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .value-card {
+    min-height: 0;
+  }
+
+  .value-card > .icon {
+    margin-bottom: 0.9rem;
+  }
+}
+
+.about-motto .final-cta {
+  padding-block: clamp(2.2rem, 5vw, 3.8rem);
+}
+
+.about-motto .final-cta h2 {
+  margin-bottom: 0;
+}
+
+/* Marketplace: one clear search area and a full-width results grid */
+.market-hero {
+  padding: 1.2rem 0 clamp(1.7rem, 3.5vw, 2.6rem);
+}
+
+.market-hero .page-breadcrumb {
+  margin-bottom: 1rem;
+}
+
+.market-hero h1 {
+  margin: 0.45rem 0 0.55rem;
+  font-size: clamp(2rem, 3.6vw, 3.1rem);
+}
+
+.market-hero > .container > p {
+  max-width: 680px;
+  color: var(--muted);
+}
+
+.market-body {
+  padding: clamp(1.3rem, 3vw, 2.2rem) 0 clamp(2.6rem, 5vw, 4rem);
+}
+
+.market-body .category-rail {
+  margin-bottom: 0.9rem;
+}
+
+.market-body .filter-panel {
+  margin-bottom: 1.3rem;
+}
+
+.market-body .filter-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+}
+
+.market-results {
+  min-width: 0;
+}
+
+.market-results .market-grid {
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: 1rem;
+}
+
+.market-results .results-heading {
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.market-results .results-heading .text-link {
+  flex: 0 0 auto;
+}
+
+/* Listing detail: remove duplicate panels and the promotional sidebar */
+.detail-body-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.detail-info-main--cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.detail-info-main--cards .detail-info-card {
+  height: 100%;
+}
+
+/* Responsive refinements for the simplified pages */
+@media (max-width: 1120px) {
+  .home-hero .hero-grid-layout {
+    gap: clamp(1.6rem, 4vw, 2.8rem);
+  }
+
+  .home-hero .hero-visual {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .market-body .filter-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .market-body .filter-submit {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .market-results .market-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .home-hero .hero-visual {
+    width: 100%;
+  }
+
+  .market-results .market-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .market-results .results-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .about-hero--simple .about-hero-mark {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .detail-info-main--cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .market-results .market-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing-page .section,
+  .content-page .section {
+    padding-block: 2.4rem;
+  }
+
+  .home-hero .hero-copy h1 {
+    font-size: clamp(2.1rem, 9vw, 2.8rem);
+  }
+}

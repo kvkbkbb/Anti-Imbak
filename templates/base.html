@@ -54,9 +54,9 @@
     {{ logo(compact=True) }}
     <nav class="desktop-nav" aria-label="Primary navigation">
       <a href="{{ url_for('public.index') }}" class="nav-link {% if request.endpoint == 'public.index' %}is-active{% endif %}">Home</a>
-      <a href="{{ url_for('public.browse') }}" class="nav-link {% if request.endpoint in ['public.browse', 'public.listing_detail'] %}is-active{% endif %}">Browse Marketplace</a>
+      <a href="{{ url_for('public.browse') }}" class="nav-link {% if request.endpoint in ['public.browse', 'public.listing_detail'] %}is-active{% endif %}">Browse</a>
       <a href="{{ url_for('public.how_it_works') }}" class="nav-link {% if request.endpoint == 'public.how_it_works' %}is-active{% endif %}">How It Works</a>
-      <a href="{{ url_for('public.about') }}" class="nav-link {% if request.endpoint == 'public.about' %}is-active{% endif %}">About Us</a>
+      <a href="{{ url_for('public.about') }}" class="nav-link {% if request.endpoint == 'public.about' %}is-active{% endif %}">About</a>
     </nav>
     <div class="nav-actions">
       {% if current_user %}
@@ -96,12 +96,12 @@
   </div>
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <a href="{{ url_for('public.index') }}">{{ icon('home') }} <span>Home</span></a>
-    <a href="{{ url_for('public.browse') }}">{{ icon('compass') }} <span>Browse Marketplace</span></a>
+    <a href="{{ url_for('public.browse') }}">{{ icon('compass') }} <span>Browse</span></a>
     {% if current_user %}
     <a href="{{ url_for('dashboard.messages') }}">{{ icon('message-circle') }} <span>Messages</span>{% if unread_messages %}<span class="nav-count">{{ unread_messages }}</span>{% endif %}</a>
     {% endif %}
     <a href="{{ url_for('public.how_it_works') }}">{{ icon('refresh') }} <span>How It Works</span></a>
-    <a href="{{ url_for('public.about') }}">{{ icon('users') }} <span>About Us</span></a>
+    <a href="{{ url_for('public.about') }}">{{ icon('users') }} <span>About</span></a>
     <a href="{{ url_for('public.safety') }}">{{ icon('shield-check') }} <span>Safety &amp; Trust</span></a>
     <a href="{{ url_for('public.advertise') }}">{{ icon('megaphone') }} <span>Advertise</span></a>
   </nav>
@@ -153,8 +153,6 @@
     <div class="footer-column">
       <h3>Explore</h3>
       <a href="{{ url_for('public.browse') }}">Browse the marketplace</a>
-      <a href="{{ url_for('public.browse', availability='all') }}">Community finds</a>
-      <a href="{{ url_for('public.browse', sort='newest') }}">Recently added</a>
       <a href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">Donate an item</a>
     </div>
     <div class="footer-column">
@@ -185,7 +183,7 @@
 {% if not request.endpoint or not request.endpoint.startswith('auth.') %}
 <nav class="bottom-nav" aria-label="Mobile quick navigation">
   <a href="{{ url_for('public.index') }}" class="{% if request.endpoint == 'public.index' %}is-active{% endif %}">{{ icon('home') }}<span>Home</span></a>
-  <a href="{{ url_for('public.browse') }}" class="{% if request.endpoint in ['public.browse', 'public.listing_detail'] %}is-active{% endif %}">{{ icon('compass') }}<span>Explore</span></a>
+  <a href="{{ url_for('public.browse') }}" class="{% if request.endpoint in ['public.browse', 'public.listing_detail'] %}is-active{% endif %}">{{ icon('compass') }}<span>Browse</span></a>
   <a href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}" class="bottom-nav-give">{{ icon('plus') }}<span>Give</span></a>
   <a href="{{ url_for('dashboard.messages') if current_user else url_for('demo.access', intent='message') }}" class="{% if request.endpoint and request.endpoint.startswith('dashboard.messages') %}is-active{% endif %}">{{ icon('message-circle') }}<span>Messages</span>{% if current_user and unread_messages %}<span class="bottom-nav-count">{{ unread_messages }}</span>{% endif %}</a>
   <a href="{{ url_for('dashboard.index') if current_user else url_for('auth.login') }}" class="{% if current_user and request.endpoint and request.endpoint.startswith('dashboard.') %}is-active{% endif %}">{{ icon('user') }}<span>{{ 'Account' if current_user else 'Login' }}</span></a>

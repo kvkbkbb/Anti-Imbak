@@ -3,54 +3,59 @@
 {% from "_logo.html" import logo %}
 
 {% block title %}About Anti-Imbak — Giving Items a Second Purpose{% endblock %}
-{% block meta_description %}Anti-Imbak is a donation-only online marketplace built around sustainability, generosity, community and responsible consumption.{% endblock %}
+{% block meta_description %}Anti-Imbak is a donation-only online marketplace connecting useful items with people and communities who can give them a second purpose.{% endblock %}
 {% block body_class %}site-page content-page about-page{% endblock %}
 
 {% block content %}
-<section class="about-hero">
+<section class="about-hero about-hero--simple">
   <div class="about-hero-glow" aria-hidden="true"></div>
   <div class="container about-hero-grid">
     <div class="about-hero-copy">
       <span class="eyebrow">{{ icon('users') }} About Anti-Imbak</span>
-      <h1>Useful things<br><span class="text-gradient">deserve another chapter.</span></h1>
-      <p>Anti-Imbak is a donation-only online marketplace built to connect unused but useful items with people and communities who can benefit from them.</p>
-      <p>We believe giving and receiving should be accessible. That is why the items are always free, the process is transparent and every safety decision is treated with care.</p>
-      <div class="about-hero-tagline">{{ icon('sparkles') }} Giving Items a Second Purpose.</div>
+      <h1>Useful things deserve <span class="text-gradient">another chapter.</span></h1>
+      <p>Anti-Imbak is a donation-only online marketplace that connects unused but useful items with people and communities who can benefit from them.</p>
+      <p>Every listing is free. Donors share what they no longer need, Recipients explain what would help, and both sides arrange a safe handover.</p>
     </div>
     <div class="about-hero-mark reveal">
-      <div class="about-orbit about-orbit--one"></div>
-      <div class="about-orbit about-orbit--two"></div>
       <div class="about-logo-panel">
         {{ logo(tagline=True) }}
         <span class="about-brand-line"></span>
         <span class="about-brand-caption">A marketplace where generosity is the product.</span>
       </div>
-      <span class="about-spark">✦</span>
     </div>
   </div>
 </section>
 
-<section class="about-stats">
-  <div class="container about-stats-grid">
-    <div><strong>{{ stats.members }}</strong><span>community members</span></div>
-    <div><strong>{{ stats.listings }}</strong><span>donations listed</span></div>
-    <div><strong>{{ stats.gifts }}</strong><span>successful handovers</span></div>
-    <div><strong>₱0</strong><span>price of every item</span></div>
-  </div>
-</section>
-
-<section class="section">
+<section class="section about-block">
   <div class="container mission-grid">
     <div class="section-heading">
       <div>
-        <span class="eyebrow">{{ icon('compass') }} Why we exist</span>
-        <h2>Make sharing feel<br>as natural as buying.</h2>
+        <span class="eyebrow">{{ icon('compass') }} Vision</span>
+        <h2>A community where useful things never go to waste.</h2>
       </div>
     </div>
     <div class="mission-copy">
-      <p class="lead">Many homes hold things that are no longer needed but are still entirely useful. At the same time, someone nearby may need exactly that thing and cannot justify buying it new.</p>
-      <p>Anti-Imbak closes that gap with a marketplace that is intentionally different: there are no prices on donated items, no bidding, and no pressure to turn generosity into a transaction. Instead, Donors share the item's story, Recipients explain why it matters, and both sides coordinate a safe handover.</p>
-      <p>We combine the convenience of a modern marketplace with the purpose of a community-support initiative. Our work is guided by sustainability, generosity, community, innovation, accessibility and responsible consumption.</p>
+      <p class="lead">We imagine neighbourhoods where giving and receiving are ordinary, dignified and easy — and where a useful item always finds its next person.</p>
+      <p>Long term, Anti-Imbak aims to make reuse a natural first choice, reduce unnecessary waste, and strengthen local connections through generous, direct handovers.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section about-block">
+  <div class="container mission-grid">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">{{ icon('flag') }} Mission</span>
+        <h2>Make giving and receiving simple, safe and free.</h2>
+      </div>
+    </div>
+    <div class="mission-copy">
+      <p class="lead">Anti-Imbak gives every useful item a second purpose by connecting people who no longer need something with people who do.</p>
+      <ul class="check-list">
+        <li>{{ icon('check') }} Keep every donated item free — no prices, bidding or pressure to buy.</li>
+        <li>{{ icon('check') }} Make browsing, claiming and handovers clear, respectful and easy to follow.</li>
+        <li>{{ icon('check') }} Protect members with honest listings, private contact details and safety reminders.</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -59,8 +64,8 @@
   <div class="container">
     <div class="section-heading">
       <div>
-        <span class="eyebrow">{{ icon('sparkles') }} What guides us</span>
-        <h2>Our values are part of the product.</h2>
+        <span class="eyebrow">{{ icon('sparkles') }} Values</span>
+        <h2>The principles that guide the platform.</h2>
       </div>
     </div>
     <div class="values-grid">
@@ -74,90 +79,11 @@
   </div>
 </section>
 
-<section class="section brand-section">
+<section class="section final-cta-section about-motto">
   <div class="container">
-    <div class="section-heading">
-      <div>
-        <span class="eyebrow">{{ icon('sparkles') }} Brand identity</span>
-        <h2>Two typefaces. One shared purpose.</h2>
-        <p>The Anti-Imbak mark pairs an angular, technology-inspired “Anti” with a softer, modern geometric “Imbak” — a visual meeting point between innovation and human generosity.</p>
-      </div>
-    </div>
-    <div class="brand-board">
-      <div class="brand-board-main brand-board-main--dark">
-        {{ logo(tagline=True) }}
-        <div class="brand-board-meta">
-          <span>Primary mark</span>
-          <span>Dark environment</span>
-        </div>
-        <span class="brand-orbit-line" aria-hidden="true"></span>
-      </div>
-      <div class="brand-board-main brand-board-main--light">
-        {{ logo(tagline=True, light=True) }}
-        <div class="brand-board-meta">
-          <span>Light environment</span>
-          <span>Full horizontal lockup</span>
-        </div>
-      </div>
-      <div class="brand-tokens">
-        <div class="brand-token">
-          <span class="brand-token-label">Anti</span>
-          <strong>Chakra Petch</strong>
-          <p>Angular, sharp and technology-inspired. Rendered italic with electric cyan.</p>
-        </div>
-        <div class="brand-token">
-          <span class="brand-token-label brand-token-label--imbak">Imbak</span>
-          <strong>Outfit</strong>
-          <p>Clean, bold and slightly rounded. Rendered in silver-white for clarity.</p>
-        </div>
-        <div class="brand-swatches">
-          <span class="swatch swatch--cyan" title="Electric cyan">#39E7F4</span>
-          <span class="swatch swatch--navy" title="Deep navy">#050917</span>
-          <span class="swatch swatch--violet" title="Violet">#7D6CFF</span>
-          <span class="swatch swatch--silver" title="Silver">#DCE5F5</span>
-        </div>
-      </div>
-      <div class="brand-icon-panel">
-        <div class="brand-icon-display">
-          <img src="{{ url_for('static', filename='img/brand-icon.svg') }}" alt="Anti-Imbak icon-only mark">
-        </div>
-        <div>
-          <span class="eyebrow eyebrow--soft">Compact mark</span>
-          <p>The orbital A and four-point spark stay readable at app icon and social profile sizes.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section revenue-explain about-revenue">
-  <div class="container">
-    <div class="revenue-copy">
-      <span class="eyebrow">{{ icon('wallet') }} Sustainably funded</span>
-      <h2>Free for people.<br>Supported by optional services.</h2>
-      <p>The donated items themselves never generate a fee. Anti-Imbak sustains the platform through optional listing boosts and clearly labelled local advertisements. Partnered Delivery is charged as one inclusive fee and passed in full to the delivery partner.</p>
-      <p class="fine-print">Delivery fees stay between ₱50 and ₱150, depending on item size and distance. The donated item itself stays free.</p>
-    </div>
-    <div class="about-revenue-list">
-      <a href="{{ url_for('dashboard.new_donation') }}"><span>{{ icon('sparkles') }}</span><div><strong>Optional listing boosts</strong><small>More visibility, still a free donation</small></div>{{ icon('arrow-up-right') }}</a>
-      <a href="{{ url_for('public.advertise') }}"><span>{{ icon('megaphone') }}</span><div><strong>Clearly labelled ads</strong><small>Relevant local businesses, separated from donations</small></div>{{ icon('arrow-up-right') }}</a>
-      <a href="{{ url_for('public.how_it_works') }}"><span>{{ icon('truck') }}</span><div><strong>Partnered Delivery</strong><small>One inclusive fee of ₱50–₱150, passed to the partner</small></div>{{ icon('arrow-up-right') }}</a>
-    </div>
-  </div>
-</section>
-
-<section class="section about-contact-section">
-  <div class="container">
-    <div class="about-contact-card">
-      <div>
-        <span class="eyebrow eyebrow--light">{{ icon('mail') }} Let's build a more generous marketplace</span>
-        <h2>Questions, ideas or a local partnership?</h2>
-        <p>We would love to hear from community organisations, local businesses and anyone who believes useful things should stay useful.</p>
-      </div>
-      <div class="about-contact-actions">
-        <a class="btn btn-primary btn-lg" href="mailto:hello@antiimbak.ph">{{ icon('mail') }} hello@antiimbak.ph</a>
-        <a class="btn btn-secondary btn-lg" href="{{ url_for('public.safety') }}">Read our safety principles</a>
-      </div>
+    <div class="final-cta final-cta--compact reveal">
+      <span class="eyebrow eyebrow--light">{{ icon('sparkles') }} Motto</span>
+      <h2>Giving Items a Second Purpose.</h2>
     </div>
   </div>
 </section>

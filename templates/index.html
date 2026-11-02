@@ -1,12 +1,14 @@
 {% extends "base.html" %}
-{% from "_ui.html" import icon, avatar, listing_card, category_card, ad_banner %}
+{% from "_ui.html" import icon, avatar, listing_card, category_card %}
 
-{% block title %}Anti-Imbak — Give What You Don't Need. Find What You Truly Need.{% endblock %}
+{% block title %}Anti-Imbak — Free Donations for Your Community{% endblock %}
 {% block body_class %}site-page landing-page{% endblock %}
 {% block main_class %}landing-main{% endblock %}
 
 {% block content %}
-<section class="hero">
+{% set home_items = (featured + recent)[:6] %}
+
+<section class="hero home-hero">
   <div class="hero-atmosphere" aria-hidden="true">
     <span class="hero-orb hero-orb--cyan"></span>
     <span class="hero-orb hero-orb--violet"></span>
@@ -18,15 +20,7 @@
         <span class="live-pill"><span class="pulse-dot"></span> Community-powered · 100% donation-based</span>
       </div>
       <h1 class="reveal">Give what you <span class="text-gradient">don't need.</span><br>Find what you <span class="text-gradient-violet">truly need.</span></h1>
-      <p class="hero-lede reveal">Anti-Imbak connects people through the power of giving. Discover useful items, share what you no longer need, and help create a more sustainable community.</p>
-      <div class="hero-tagline reveal">
-        <span class="tagline-line"></span>
-        <span>Giving Items a Second Purpose.</span>
-      </div>
-      <div class="hero-actions reveal">
-        <a class="btn btn-primary btn-lg" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Explore Free Items</a>
-        <a class="btn btn-secondary btn-lg" href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">{{ icon('gift') }} Donate an Item</a>
-      </div>
+      <p class="hero-lede reveal">Discover free, useful items shared by people nearby. No prices, no bidding — just a simple handover that gives good things another purpose.</p>
       <form class="hero-search reveal" method="get" action="{{ url_for('public.browse') }}" role="search">
         <label class="hero-search-input">
           <span class="sr-only">Search free donations</span>
@@ -43,42 +37,13 @@
         </label>
         <button class="btn btn-primary" type="submit">{{ icon('search') }} Search</button>
       </form>
-      <div class="hero-search-hints reveal">
-        <span>Popular:</span>
-        {% for category in categories[:4] %}
-        <a href="{{ url_for('public.browse', category=category.slug) }}">{{ category.name }}</a>
-        {% endfor %}
-      </div>
-      <div class="hero-proof reveal">
-        <div class="avatar-stack">
-          {% for listing in featured[:3] %}
-            {{ avatar(listing.donor_name, listing.donor_avatar, 'avatar--sm') }}
-          {% endfor %}
-          {% if not featured %}
-            <span class="avatar avatar--sm"><span>AI</span></span>
-          {% endif %}
-        </div>
-        <div>
-          <strong>{{ stats.members }} members</strong>
-          <span>sharing with purpose across {{ stats.cities }} cities</span>
-        </div>
-        <span class="proof-divider"></span>
-        <div class="hero-free-note">{{ icon('check-circle') }} Every listing is free</div>
+      <div class="hero-actions reveal">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('public.browse') }}">{{ icon('compass') }} Browse donations</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">{{ icon('gift') }} Donate an item</a>
       </div>
     </div>
 
     <div class="hero-visual reveal" aria-label="Featured community donation">
-      <div class="hero-orbit hero-orbit--outer" aria-hidden="true"></div>
-      <div class="hero-orbit hero-orbit--inner" aria-hidden="true"></div>
-      <div class="hero-comet" aria-hidden="true"></div>
-      <div class="hero-data-card hero-data-card--impact">
-        <span class="data-icon">{{ icon('leaf') }}</span>
-        <div><strong>{{ stats.diverted_kg }} kg</strong><span>estimated waste diverted</span></div>
-      </div>
-      <div class="hero-data-card hero-data-card--safe">
-        <span class="data-icon data-icon--violet">{{ icon('shield-check') }}</span>
-        <div><strong>Safer handovers</strong><span>safety reminders built in</span></div>
-      </div>
       {% if hero_listing %}
       <article class="hero-listing-card">
         <a href="{{ url_for('public.listing_detail', listing_id=hero_listing.id) }}" class="hero-listing-image">
@@ -107,13 +72,7 @@
         <a class="btn btn-primary" href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">Donate an item</a>
       </article>
       {% endif %}
-      <span class="hero-spark hero-spark--one" aria-hidden="true">✦</span>
-      <span class="hero-spark hero-spark--two" aria-hidden="true">✦</span>
     </div>
-  </div>
-  <div class="container hero-scroll-cue" aria-hidden="true">
-    <span>Scroll to discover</span>
-    <span class="scroll-line"></span>
   </div>
 </section>
 
@@ -126,19 +85,19 @@
   </div>
 </section>
 
-<section class="section featured-section">
+<section class="section home-listings">
   <div class="container">
     <div class="section-heading">
       <div>
-        <span class="eyebrow">{{ icon('sparkles') }} Curated by community</span>
-        <h2>Featured donations</h2>
-        <p>Good finds with a little extra visibility — still completely free.</p>
+        <span class="eyebrow">{{ icon('clock') }} Fresh finds</span>
+        <h2>Latest donations</h2>
+        <p>Free items recently shared by the community.</p>
       </div>
-      <a class="text-link" href="{{ url_for('public.browse', sort='featured') }}">Browse all donations {{ icon('arrow-right') }}</a>
+      <a class="text-link" href="{{ url_for('public.browse', sort='newest') }}">Browse all donations {{ icon('arrow-right') }}</a>
     </div>
-    {% if featured %}
-      <div class="listing-grid listing-grid--three">
-        {% for listing in featured %}{{ listing_card(listing) }}{% endfor %}
+    {% if home_items %}
+      <div class="listing-grid">
+        {% for listing in home_items %}{{ listing_card(listing) }}{% endfor %}
       </div>
     {% else %}
       <div class="empty-state"><h3>Fresh finds are on the way.</h3><p>Explore the marketplace or give an item its next chapter.</p></div>
@@ -146,56 +105,13 @@
   </div>
 </section>
 
-{{ ad_banner(banner_ad) }}
-
-<section class="section recent-section">
-  <div class="container">
-    <div class="section-heading">
-      <div>
-        <span class="eyebrow">{{ icon('clock') }} Fresh from the community</span>
-        <h2>Recently added items</h2>
-        <p>New possibilities, just shared by generous neighbours.</p>
-      </div>
-      <a class="text-link" href="{{ url_for('public.browse', sort='newest') }}">See what's new {{ icon('arrow-right') }}</a>
-    </div>
-    <div class="listing-grid listing-grid--three">
-      {% for listing in recent[:6] %}{{ listing_card(listing) }}{% endfor %}
-    </div>
-  </div>
-</section>
-
-<section class="section nearby-section">
-  <div class="container">
-    <div class="section-heading">
-      <div>
-        <span class="eyebrow eyebrow--green">{{ icon('map-pin') }} Close to home</span>
-        <h2>Useful things nearby</h2>
-        <p>Closest to {{ nearby_city }} — measured from stored city coordinates, not live GPS.</p>
-      </div>
-      <a class="text-link" href="{{ url_for('public.browse', sort='nearest') }}">See nearest finds {{ icon('arrow-right') }}</a>
-    </div>
-    {% if nearby %}
-    <div class="listing-grid listing-grid--three">
-      {% for listing in nearby %}{{ listing_card(listing) }}{% endfor %}
-    </div>
-    <p class="nearby-note">{{ icon('info') }} Distances are estimates based on the city coordinates stored for each listing.</p>
-    {% else %}
-    <div class="empty-state"><h3>No nearby listings right now.</h3><p>Try browsing the full marketplace or widen your city.</p></div>
-    {% endif %}
-  </div>
-</section>
-
 <section class="section categories-section">
   <div class="container categories-layout">
     <div class="categories-intro">
-      <span class="eyebrow">{{ icon('grid') }} Find your next useful thing</span>
-      <h2>Popular categories</h2>
-      <p>From a first apartment to a fresh school year, there is usually something useful waiting nearby.</p>
-      <a class="btn btn-secondary" href="{{ url_for('public.browse') }}">Explore everything {{ icon('arrow-right') }}</a>
-      <div class="categories-signature">
-        <span class="signature-number">{{ stats.items }}</span>
-        <span>useful items currently listed<br>by the community</span>
-      </div>
+      <span class="eyebrow">{{ icon('grid') }} Categories</span>
+      <h2>Browse by category</h2>
+      <p>Jump straight to the kind of item you need.</p>
+      <a class="btn btn-secondary" href="{{ url_for('public.browse') }}">Browse everything {{ icon('arrow-right') }}</a>
     </div>
     <div class="category-grid">
       {% for category in categories %}{{ category_card(category) }}{% endfor %}
@@ -207,151 +123,35 @@
   <div class="container">
     <div class="section-heading section-heading--center">
       <div>
-        <span class="eyebrow">{{ icon('refresh') }} A simple exchange</span>
-        <h2>How Anti-Imbak works</h2>
-        <p>No transactions for the items. No price negotiation. Just a thoughtful handover.</p>
+        <span class="eyebrow">{{ icon('refresh') }} Simple and free</span>
+        <h2>How it works</h2>
+        <p>Browse, request, and arrange a safe handover. The item is always free.</p>
       </div>
     </div>
     <div class="steps-grid">
       <div class="step-card reveal">
         <span class="step-index">01</span>
         <span class="step-icon">{{ icon('search') }}</span>
-        <h3>Discover something useful</h3>
-        <p>Browse free donations by category, location and condition. Save the finds that catch your eye.</p>
-        <a class="text-link text-link--sm" href="{{ url_for('public.browse') }}">Start browsing {{ icon('arrow-right') }}</a>
+        <h3>Find something useful</h3>
+        <p>Search or browse by category, city and condition. Save the finds that catch your eye.</p>
       </div>
       <div class="step-card reveal">
         <span class="step-index">02</span>
         <span class="step-icon">{{ icon('message-circle') }}</span>
-        <h3>Tell the Donor why</h3>
-        <p>Send a thoughtful claim request. Partnered Delivery is selected by default, or choose Self Pickup and arrange it in Messages.</p>
+        <h3>Send a claim request</h3>
+        <p>Tell the Donor why the item would help and choose delivery or pickup.</p>
       </div>
       <div class="step-card reveal">
         <span class="step-index">03</span>
         <span class="step-icon">{{ icon('shield-check') }}</span>
-        <h3>Arrange a safe handover</h3>
-        <p>When accepted, coordinate a public, well-lit meeting point and follow the safety reminders.</p>
+        <h3>Arrange the handover</h3>
+        <p>Once accepted, agree on a safe public meeting point or track the delivery.</p>
       </div>
       <div class="step-card reveal">
         <span class="step-index">04</span>
         <span class="step-icon">{{ icon('leaf') }}</span>
         <h3>Give it a second life</h3>
-        <p>Collect your item, confirm the handover, and keep one more useful thing out of the waste stream.</p>
-      </div>
-    </div>
-    <div class="how-cta-row">
-      <span>Have something you no longer need?</span>
-      <a class="btn btn-primary" href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">{{ icon('gift') }} Donate an Item</a>
-    </div>
-  </div>
-</section>
-
-<section class="section impact-section">
-  <div class="container">
-    <div class="impact-shell">
-      <div class="impact-intro">
-        <span class="eyebrow eyebrow--light">{{ icon('chart') }} Community snapshot</span>
-        <h2>Small handovers.<br><span class="text-gradient">Measurable change.</span></h2>
-        <p>These figures come from the live Anti-Imbak environment — not a marketing claim. Every completed handover is counted.</p>
-        <span class="impact-note">Environmental estimates use 4.2 kg diverted and 8.4 kg CO₂e avoided per completed exchange.</span>
-      </div>
-      <div class="impact-metrics">
-        <div class="impact-metric">
-          <span class="metric-icon">{{ icon('users') }}</span>
-          <strong>{{ stats.members }}</strong>
-          <span>community members</span>
-        </div>
-        <div class="impact-metric">
-          <span class="metric-icon">{{ icon('gift') }}</span>
-          <strong>{{ stats.gifts }}</strong>
-          <span>handovers completed</span>
-        </div>
-        <div class="impact-metric">
-          <span class="metric-icon">{{ icon('package') }}</span>
-          <strong>{{ stats.items }}</strong>
-          <span>items given a listing</span>
-        </div>
-        <div class="impact-metric">
-          <span class="metric-icon">{{ icon('map-pin') }}</span>
-          <strong>{{ stats.cities }}</strong>
-          <span>cities represented</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section why-section">
-  <div class="container">
-    <div class="section-heading">
-      <div>
-        <span class="eyebrow">{{ icon('sparkles') }} Built differently</span>
-        <h2>Why choose Anti-Imbak?</h2>
-        <p>A modern marketplace with a simple rule: the items themselves are never for sale.</p>
-      </div>
-    </div>
-    <div class="feature-grid">
-      <article class="feature-card feature-card--wide reveal">
-        <span class="feature-icon">{{ icon('gift') }}</span>
-        <div>
-          <h3>Free is not a promotion — it is the point.</h3>
-          <p>Every donation listing stays free. Optional boosts and delivery help sustain the platform without putting a price on generosity.</p>
-        </div>
-        <span class="feature-glow" aria-hidden="true"></span>
-      </article>
-      <article class="feature-card reveal">
-        <span class="feature-icon">{{ icon('shield-check') }}</span>
-        <h3>Trust by design</h3>
-        <p>Clear Donor details, verified profiles, reporting tools and safety checkpoints before every finalised handover.</p>
-      </article>
-      <article class="feature-card reveal">
-        <span class="feature-icon">{{ icon('globe') }}</span>
-        <h3>Local by default</h3>
-        <p>Filter by city and condition, then sort by nearest to make pickup practical and low-impact.</p>
-      </article>
-      <article class="feature-card reveal">
-        <span class="feature-icon">{{ icon('refresh') }}</span>
-        <h3>An honest circular loop</h3>
-        <p>Items move from someone who no longer needs them to someone who does — with their history shown clearly.</p>
-      </article>
-      <article class="feature-card reveal">
-        <span class="feature-icon">{{ icon('users') }}</span>
-        <h3>Community-led</h3>
-        <p>Donors review every claim, Recipients share why the item matters, and administrative oversight keeps things fair.</p>
-      </article>
-      <article class="feature-card reveal">
-        <span class="feature-icon">{{ icon('wallet') }}</span>
-        <h3>Transparent revenue</h3>
-        <p>Optional featured placements and clearly labelled local ads fund the platform. Partnered Delivery fees go in full to the delivery partner.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="section sustainability-section">
-  <div class="container sustainability-layout">
-    <div class="sustainability-visual reveal" aria-hidden="true">
-      <div class="sustain-orbit sustain-orbit--one"></div>
-      <div class="sustain-orbit sustain-orbit--two"></div>
-      <div class="sustain-core">{{ icon('leaf') }}</div>
-      <span class="sustain-tag sustain-tag--one">reuse</span>
-      <span class="sustain-tag sustain-tag--two">repair</span>
-      <span class="sustain-tag sustain-tag--three">redistribute</span>
-      <span class="sustain-dot sustain-dot--one"></span>
-      <span class="sustain-dot sustain-dot--two"></span>
-    </div>
-    <div class="sustainability-copy">
-      <span class="eyebrow eyebrow--green">{{ icon('leaf') }} Sustainability, in motion</span>
-      <h2>Every useful thing deserves another chapter.</h2>
-      <p>Making a new product takes energy, water and materials. Keeping a usable item in circulation for longer avoids unnecessary waste and reduces the demand for new things.</p>
-      <div class="sustainability-stats">
-        <div><strong>{{ stats.diverted_kg }} kg</strong><span>estimated waste diverted</span></div>
-        <div><strong>{{ stats.co2_kg }} kg</strong><span>estimated CO₂e avoided</span></div>
-      </div>
-      <p class="fine-print">Estimates are calculated from completed handovers in this environment. They are directional, not a formal carbon audit.</p>
-      <div class="sustainability-actions">
-        <a class="btn btn-primary" href="{{ url_for('public.how_it_works') }}">Learn how it works</a>
-        <a class="text-link" href="{{ url_for('public.safety') }}">Read safety guidelines {{ icon('arrow-right') }}</a>
+        <p>Collect the item, confirm the handover, and keep one more useful thing in use.</p>
       </div>
     </div>
   </div>
@@ -359,16 +159,13 @@
 
 <section class="section final-cta-section">
   <div class="container">
-    <div class="final-cta reveal">
-      <div class="final-cta-orbit" aria-hidden="true"></div>
-      <span class="eyebrow eyebrow--light">{{ icon('hand-heart') }} A better kind of marketplace</span>
-      <h2>There is something useful<br>waiting to meet its next person.</h2>
-      <p>Give what you don't need. Find what you truly need. Help a good thing keep going.</p>
+    <div class="final-cta final-cta--compact reveal">
+      <h2>Give what you don't need.<br>Find what you truly need.</h2>
+      <p>Every item on Anti-Imbak is free.</p>
       <div class="final-cta-actions">
-        <a class="btn btn-primary btn-lg" href="{{ url_for('public.browse') }}">Explore free items {{ icon('arrow-right') }}</a>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('public.browse') }}">Browse donations {{ icon('arrow-right') }}</a>
         <a class="btn btn-secondary btn-lg" href="{{ url_for('dashboard.new_donation') if current_user else url_for('demo.access', intent='donate') }}">{{ icon('gift') }} Donate an item</a>
       </div>
-      <span class="final-tagline">Giving Items a Second Purpose.</span>
     </div>
   </div>
 </section>

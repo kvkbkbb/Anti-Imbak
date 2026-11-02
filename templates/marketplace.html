@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_ui.html" import icon, avatar, listing_card, pagination, empty_state, ad_sidebar_card %}
+{% from "_ui.html" import icon, listing_card, pagination, empty_state %}
 
 {% block title %}Browse Free Donations — Anti-Imbak{% endblock %}
 {% block meta_description %}Browse free donated items near you. Search by category, location and condition on Anti-Imbak.{% endblock %}
@@ -9,23 +9,9 @@
 <section class="market-hero">
   <div class="container">
     <div class="page-breadcrumb"><a href="{{ url_for('public.index') }}">Home</a> {{ icon('chevron-right') }} <span>Browse donations</span></div>
-    <div class="market-hero-grid">
-      <div>
-        <span class="eyebrow">{{ icon('compass') }} The free marketplace</span>
-        <h1>Find something useful.<br><span class="text-gradient">Leave the price behind.</span></h1>
-        <p>Every item here is donated by a community member and listed at zero pesos. Search thoughtfully, meet safely, and give something a second purpose.</p>
-      </div>
-      <div class="market-hero-notes">
-        <div class="market-note">
-          <span>{{ icon('tag') }}</span>
-          <div><strong>100% free</strong><span>Items are never sold here.</span></div>
-        </div>
-        <div class="market-note">
-          <span>{{ icon('shield-check') }}</span>
-          <div><strong>Community reviewed</strong><span>Report anything that feels off.</span></div>
-        </div>
-      </div>
-    </div>
+    <span class="eyebrow">{{ icon('compass') }} Free marketplace</span>
+    <h1>Browse donations</h1>
+    <p>Every item is donated by a community member and listed at zero pesos. Search, filter, and request what you need.</p>
   </div>
 </section>
 
@@ -49,16 +35,6 @@
         <button class="btn btn-primary" type="submit">Search</button>
       </div>
       <div class="filter-row">
-        <label class="select-field">
-          <span>Category</span>
-          <select name="category">
-            <option value="">All categories</option>
-            {% for category in categories %}
-              <option value="{{ category.slug }}" {% if selected_category and selected_category.id == category.id %}selected{% endif %}>{{ category.name }}</option>
-            {% endfor %}
-          </select>
-          {{ icon('chevron-down') }}
-        </label>
         <label class="select-field">
           <span>Location</span>
           <select name="location">
@@ -104,70 +80,33 @@
         {% if selected_category %}<span class="filter-chip">{{ icon(selected_category.icon) }} {{ selected_category.name }}</span>{% endif %}
         {% if location %}<span class="filter-chip">{{ icon('map-pin') }} {{ location }}</span>{% endif %}
         {% if condition %}<span class="filter-chip">{{ icon('tag') }} {{ condition }}</span>{% endif %}
-        {% if availability != 'available' %}<span class="filter-chip">{{ availability|status_label }}</span>{% endif %}
+        {% if availability != 'available' %}<span class="filter-chip">{{ icon('list') }} {{ 'All listings' if availability == 'all' else availability|status_label }}</span>{% endif %}
         {% if sort != 'featured' %}<span class="filter-chip">{{ sort|capitalize }}</span>{% endif %}
         <a class="clear-filters" href="{{ url_for('public.browse') }}">Clear all {{ icon('close') }}</a>
       </div>
       {% endif %}
     </form>
 
-    {% if category_ad %}
-    <aside class="category-sponsor" aria-label="Sponsored category message">
-      <span class="sponsored-flag">Sponsored · Category partner</span>
-      <div class="category-sponsor-img"><img src="{{ category_ad.image_url }}" alt="" loading="lazy"></div>
-      <div class="category-sponsor-copy">
-        <span class="eyebrow eyebrow--soft">{{ category_ad.business_type }}</span>
-        <h2>{{ category_ad.title }}</h2>
-        <p>{{ category_ad.body }}</p>
+    <div class="market-results">
+      <div class="results-heading">
+        <div>
+          <h2>{{ total }} {{ total|plural('donation') }} found</h2>
+          <p>
+            {% if sort == 'nearest' %}{{ icon('map-pin') }} Sorted by distance from {{ near_label }}
+            {% elif sort == 'newest' %}{{ icon('clock') }} Newest community listings first
+            {% else %}{{ icon('sparkles') }} Featured finds first, followed by recent donations{% endif %}
+          </p>
+        </div>
+        <a class="text-link text-link--sm" href="{{ url_for('public.browse') }}">Reset</a>
       </div>
-      <a class="btn btn-secondary btn-sm" href="{{ url_for('public.ad_visit', ad_id=category_ad.id) }}">{{ category_ad.cta_label }} {{ icon('arrow-up-right') }}</a>
-    </aside>
-    {% endif %}
-
-    <div class="market-layout">
-      <div class="market-results">
-        <div class="results-heading">
-          <div>
-            <h2>{{ total }} {{ total|plural('donation') }} found</h2>
-            <p>
-              {% if sort == 'nearest' %}{{ icon('map-pin') }} Sorted by distance from {{ near_label }}
-              {% elif sort == 'newest' %}{{ icon('clock') }} Newest community listings first
-              {% else %}{{ icon('sparkles') }} Featured finds first, followed by recent donations{% endif %}
-            </p>
-          </div>
-          <span class="results-view" aria-hidden="true">{{ icon('grid') }}</span>
+      {% if listings %}
+        <div class="listing-grid market-grid">
+          {% for listing in listings %}{{ listing_card(listing) }}{% endfor %}
         </div>
-        {% if listings %}
-          <div class="listing-grid listing-grid--three market-grid">
-            {% for listing in listings %}{{ listing_card(listing) }}{% endfor %}
-          </div>
-          {{ pagination(page, total_pages, page_url) }}
-        {% else %}
-          {{ empty_state('search', 'No matches just yet', 'Try widening your filters, searching another keyword, or being the first to donate something useful in this category.', 'Clear filters', url_for('public.browse')) }}
-        {% endif %}
-      </div>
-
-      <aside class="market-sidebar">
-        {{ ad_sidebar_card(sidebar_ad) }}
-        <div class="sidebar-card sidebar-card--free">
-          <span class="sidebar-icon">{{ icon('gift') }}</span>
-          <h3>Everything is free.</h3>
-          <p>No item prices, no hidden charges. Optional delivery and promotional boosts are the only paid services — and they are never required to give or receive.</p>
-          <a class="text-link text-link--sm" href="{{ url_for('public.how_it_works') }}">How the exchange works {{ icon('arrow-right') }}</a>
-        </div>
-        <div class="sidebar-card sidebar-card--safety">
-          <span class="sidebar-icon">{{ icon('shield-check') }}</span>
-          <h3>Make the handover safe.</h3>
-          <p>Meet in a public place, bring a friend when it helps, and tell someone where you are going.</p>
-          <a class="text-link text-link--sm" href="{{ url_for('public.safety') }}">Read safety guidelines {{ icon('arrow-right') }}</a>
-        </div>
-        <div class="sidebar-card sidebar-card--cta">
-          <span class="eyebrow eyebrow--soft">Giving something?</span>
-          <h3>Let it be useful again.</h3>
-          <p>Create a free listing in a few thoughtful steps.</p>
-          <a class="btn btn-primary btn-block" href="{{ url_for('dashboard.new_donation') }}">{{ icon('plus') }} Create a donation</a>
-        </div>
-      </aside>
+        {{ pagination(page, total_pages, page_url) }}
+      {% else %}
+        {{ empty_state('search', 'No matches just yet', 'Try widening your filters, searching another keyword, or being the first to donate something useful in this category.', 'Clear filters', url_for('public.browse')) }}
+      {% endif %}
     </div>
   </div>
 </section>
