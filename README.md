@@ -6,7 +6,7 @@ Anti-Imbak is a donation-only community marketplace. People give away items they
 
 This is a complete, self-contained community marketplace built with Flask, SQLite, Jinja templates, and vanilla JavaScript. It runs locally with no Node.js build step, no external database, and no third-party services.
 
-**Live static preview:** <https://payonilanz.github.io/Anti-Imbak/> — a GitHub Pages snapshot of the public marketplace. GitHub Pages only serves static files, so sign-in, search filters, and donation actions remain in the Flask app; the preview links back to the quick start below.
+**Live static preview:** <https://kvkbkbb.github.io/Anti-Imbak/> — a GitHub Pages snapshot of the public marketplace and the three sample workspaces. GitHub Pages only serves static files, so sign-in, search filters, and donation actions remain in the Flask app; the preview links back to the quick start below.
 
 ---
 
@@ -48,7 +48,7 @@ python db.py
 python tools/build_pages.py
 ```
 
-The script renders the guest-facing pages and the three signed-in sample workspaces against a temporary copy of the seeded database, then writes them to `docs/`. GitHub Pages deploys that folder from the `main` branch. The snapshot covers the landing page, marketplace categories, listing details, member profiles, sponsored pages, the public content pages, and read-only Donor, Recipient, and Administrator workspaces. Because Pages cannot run Flask, forms and account actions show a short notice, and the preview bar links to the public site and each workspace snapshot.
+The script renders the guest-facing pages and the three signed-in sample workspaces against a temporary copy of the seeded database, then writes them to `docs/`. GitHub Pages deploys that folder from the `main` branch (the published mirror is <https://kvkbkbb.github.io/Anti-Imbak/>). The snapshot covers the landing page, marketplace categories, listing details, member profiles, sponsored pages, the public content pages, and read-only Donor, Recipient, and Administrator workspaces. Because Pages cannot run Flask, forms and account actions show a short notice, and the preview bar links to the public site and each workspace snapshot.
 
 ---
 
